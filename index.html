@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聴牌でGO!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen text-white transition-all duration-700">
+    <div id="scale-stage" class="scale-stage">
+    <div id="design-root" class="design-root">
+        
+        <header class="text-center mb-12 fade-in">
+            <h1 id="header-title" class="text-6xl font-black mb-4 text-shadow-glow">聴牌でGO!</h1>
+            <p id="header-subtitle" class="text-2xl font-bold text-purple-300">麻雀聴牌トレーニングゲーム</p>
+        </header>
+
+        <main id="app-main" class="app-main">
+
+        <div id="language-screen" class="screen-container fade-in">
+            <h2 id="language-title" class="text-4xl font-bold mb-8 text-center">Select Language</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <button id="lang-ja" class="mode-btn">
+                    <div class="text-5xl mb-4">🇯🇵</div>
+                    <div id="lang-ja-text" class="text-2xl font-bold">日本語</div>
+                </button>
+                <button id="lang-en" class="mode-btn">
+                    <div class="text-5xl mb-4">🇬🇧</div>
+                    <div id="lang-en-text" class="text-2xl font-bold">English</div>
+                </button>
+                <button id="lang-zh" class="mode-btn">
+                    <div class="text-5xl mb-4">🇭🇰</div>
+                    <div id="lang-zh-text" class="text-2xl font-bold">繁體中文</div>
+                </button>
+            </div>
+        </div>
+
+        <div id="mode-screen" class="screen-container hidden">
+            <h2 id="mode-title" class="text-4xl font-bold mb-8 text-center">Select Game Mode</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <button id="casual-btn" class="mode-btn">
+                    <div class="text-5xl mb-4">CASUAL</div>
+                    <div id="casual-title" class="text-2xl font-bold mb-3">Casual Mode</div>
+                    <div id="casual-desc" class="text-sm opacity-80 whitespace-pre-line">9 Questions + BOSS Stage</div>
+                </button>
+                <button id="story-btn" class="mode-btn">
+                    <div class="text-5xl mb-4">STORY</div>
+                    <div id="story-title" class="text-2xl font-bold mb-3">Story Mode</div>
+                    <div id="story-desc" class="text-sm opacity-80 whitespace-pre-line">Progressive Difficulty</div>
+                </button>
+                <button id="survival-btn" class="mode-btn">
+                    <div class="text-5xl mb-4">SURVIVAL</div>
+                    <div id="survival-title" class="text-2xl font-bold mb-3">Survival Mode</div>
+                    <div id="survival-desc" class="text-sm opacity-80 whitespace-pre-line">Infinite Questions</div>
+                </button>
+            </div>
+        </div>
+
+        <div id="difficulty-screen" class="screen-container hidden">
+            <h2 id="difficulty-title" class="text-4xl font-bold mb-8 text-center">Select Difficulty</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <button id="easy" class="mode-btn">
+                    <div class="text-5xl mb-4">EASY</div>
+                    <div id="easy-title" class="text-2xl font-bold mb-3">Easy</div>
+                    <div id="easy-desc" class="text-sm opacity-80">Up to 3 waits</div>
+                </button>
+                <button id="medium" class="mode-btn">
+                    <div class="text-5xl mb-4">MEDIUM</div>
+                    <div id="medium-title" class="text-2xl font-bold mb-3">Medium</div>
+                    <div id="medium-desc" class="text-sm opacity-80">Up to 6 waits</div>
+                </button>
+                <button id="hard" class="mode-btn">
+                    <div class="text-5xl mb-4">HARD</div>
+                    <div id="hard-title" class="text-2xl font-bold mb-3">Hard</div>
+                    <div id="hard-desc" class="text-sm opacity-80">Up to 9 waits</div>
+                </button>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen-container hidden">
+            <div id="boss-indicator" class="boss-title text-center hidden">
+                <div class="text-6xl font-black animate-pulse">BOSS STAGE</div>
+            </div>
+
+            <div class="hud-top">
+                <div class="hud-left">
+                    <h3 id="question-number" class="font-bold">Question 1/9</h3>
+                    <p id="stage-info" class="text-purple-300"></p>
+                    <p id="lives-display" class="mt-1 hidden"></p>
+                </div>
+
+                <div class="hud-center">
+                    <div id="timer-display" class="timer-value">30</div>
+                    <div class="timer-bar-container">
+                        <div id="timer-bar" class="timer-bar"></div>
+                    </div>
+                </div>
+
+                <div class="hud-right">
+                    <div id="time-extension-slot" class="time-extension-slot"></div>
+                </div>
+            </div>
+
+            <div class="game-main">
+                <div class="mb-6">
+                    <h4 id="hand-title" class="text-2xl font-bold text-center mb-3">Your Hand</h4>
+                    <div id="hand-tiles" class="flex flex-wrap gap-2 justify-center"></div>
+                </div>
+
+                <div class="mb-6 wait-section">
+                    <h4 id="select-waiting-title" class="text-2xl font-bold text-center mb-3">Select All Waiting Tiles</h4>
+                    <div id="possible-tiles" class="grid grid-cols-9 gap-4 max-w-3xl mx-auto"></div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button id="submit-btn" class="mode-btn action-btn">
+                    <span id="submit-text">Check Answer</span>
+                </button>
+            </div>
+
+            <!-- 結果モーダル（16:9 フレーム内でスクロール） -->
+            <div id="result-section" class="hidden">
+                <div class="result-container">
+                    <div id="result-message" class="text-3xl font-bold text-green-300 mb-6">Correct!</div>
+                    <div id="correct-answer-display" class="mb-6"></div>
+
+                    <div id="result-nav" class="mt-6 flex gap-6 justify-center flex-wrap">
+                        <button id="next-btn" class="mode-btn action-btn hidden">
+                            <span id="next-text">Next Question</span>
+                        </button>
+                    </div>
+
+                    <div id="result-actions" class="mt-6 hidden">
+                        <div id="result-actions-title" class="text-3xl font-black mb-3 text-center"></div>
+                        <div id="result-actions-body" class="text-xl mb-6 text-center"></div>
+                        <div class="flex gap-6 justify-center flex-wrap">
+                            <button id="result-continue-btn" class="mode-btn continue-btn hidden">
+                                <span id="result-continue-text">Continue</span>
+                            </button>
+                            <button id="result-back-btn" class="mode-btn hidden">
+                                <span id="result-back-text">Back to Menu</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="hand-breakdown" class="mb-6"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="victory-screen" class="victory-screen hidden">
+            <div class="victory-content">
+                <h2 id="victory-title" class="text-7xl font-black mb-8 animate-bounce">VICTORY!</h2>
+                <div class="text-3xl mb-8">
+                    <p class="mb-4"><span id="final-questions-label">Questions:</span> <span id="final-questions" class="font-bold text-yellow-300">10</span></p>
+                    <p class="mb-4"><span id="final-correct-label">Correct:</span> <span id="final-correct" class="font-bold text-green-300">0</span></p>
+                </div>
+                <div class="flex gap-6 justify-center flex-wrap">
+                    <button id="play-again-victory" class="reset-btn mode-btn">Play Again</button>
+                    <button id="menu-victory" class="reset-btn mode-btn">Back to Menu</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="gameover-screen" class="gameover-screen hidden">
+            <div class="gameover-content">
+                <h2 id="gameover-title" class="text-7xl font-black mb-8">GAME OVER</h2>
+                <div id="gameover-message" class="text-4xl mb-8 text-red-300"></div>
+                <div class="text-3xl mb-8">
+                    <p class="mb-4"><span id="final-score-label">Correct:</span> <span id="final-score" class="font-bold text-yellow-300">0</span></p>
+                </div>
+                <div class="flex gap-6 justify-center flex-wrap">
+                    <button id="play-again-gameover" class="reset-btn mode-btn">Play Again</button>
+                    <button id="menu-gameover" class="reset-btn mode-btn">Back to Menu</button>
+                </div>
+            </div>
+        </div>
+
+        </main>
+
+        <footer class="text-center py-6 mt-auto border-t-0 border-purple-600">
+            <p id="footer-text" class="text-lg font-bold">聴牌でGO! &copy; 2025 Akira Akiyama</p>
+        </footer>
+    </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

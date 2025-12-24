@@ -1,0 +1,1084 @@
+/* 🀄 聴牌でGO! - モダンデザイン */
+
+/* ========== 基礎スタイル ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0e27;
+    position: relative;
+    min-height: 100vh;
+    font-family: 'Noto Sans JP', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
+    display: flex;
+    /* 16:9 ステージを上寄せに固定し、短い画面で上部に大きな余白が出ないようにする */
+    align-items: flex-start;
+    justify-content: center;
+    padding: 8px;
+}
+
+/* ========== ゲーム中レイアウト圧縮（問題エリアの余白確保） ========== */
+body.in-game header {
+    display: none;
+}
+
+body.in-game .design-root {
+    padding: 1rem;
+}
+
+body.in-game footer {
+    /* フッター行は縦スペースを取り、はみ出しのように見えることがあるため非表示 */
+    display: none;
+}
+
+body.in-game #game-screen.screen-container {
+    padding: 1rem;
+}
+
+/* ゲーム画面内の Tailwind 余白を上書き（詰めて表示） */
+body.in-game #game-screen .mb-6 {
+    margin-bottom: 0.75rem !important;
+}
+
+/* 手牌と待ち牌選択の間に余白を追加（縦方向に余裕があるため） */
+body.in-game #game-screen .wait-section {
+    margin-top: 1.4rem;
+}
+
+body.in-game #hand-title,
+body.in-game #select-waiting-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem !important;
+}
+
+body.in-game #question-number {
+    font-size: 1.6rem;
+}
+
+body.in-game #lives-display {
+    font-size: 1.1rem;
+}
+
+/* ========== 16:9 固定比率スケール舞台（設計基準：1280x720） ========== */
+:root {
+    --ui-scale: 1;
+}
+
+.scale-stage {
+    width: 1280px;
+    height: 720px;
+    transform: scale(var(--ui-scale));
+    transform-origin: top center;
+}
+
+.design-root {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    position: relative;
+}
+
+.app-main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-main > .screen-container {
+    flex: 1;
+    min-height: 0;
+}
+
+/* 非ゲーム画面は必要に応じて内部スクロール（ページ自体はスクロールしない） */
+#language-screen,
+#mode-screen,
+#difficulty-screen {
+    overflow: auto;
+}
+
+/* 動的背景 - 柔らかい星空エフェクト */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(100, 100, 200, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(80, 120, 180, 0.03) 0%, transparent 50%);
+    animation: pulse-bg 8s ease-in-out infinite;
+    z-index: -2;
+}
+
+/* 回転する光のにじみ - ソフト版 */
+body::after {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(circle, rgba(100, 100, 150, 0.02) 0%, transparent 40%);
+    animation: rotate-bg 30s linear infinite;
+    z-index: -1;
+}
+
+/* 時間切迫時の背景エフェクト */
+body.time-critical::before {
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(185, 28, 28, 0.08) 0%, transparent 50%);
+    animation: pulse-bg-danger 1.5s ease-in-out infinite;
+}
+
+body.time-critical::after {
+    background: 
+        radial-gradient(circle, rgba(220, 38, 38, 0.05) 0%, transparent 40%);
+}
+
+@keyframes pulse-bg-danger {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+@keyframes pulse-bg {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes rotate-bg {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========== タイトルスタイル ========== */
+#header-title {
+    background: linear-gradient(135deg, #c084fc 0%, #a78bfa 50%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 200%;
+    animation: gradient-text 3s ease infinite;
+    filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.4)) 
+            drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes gradient-text {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+#header-subtitle {
+    text-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
+}
+
+/* ========== コンテナスタイル ========== */
+.screen-container {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    backdrop-filter: blur(20px) saturate(150%);
+    border-radius: 24px;
+    padding: 3rem;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 60px rgba(100, 100, 150, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+#game-screen {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+}
+
+/* HUD：上段レイアウト（左：ステージ/ライフ、中央：時間、右：延長ボタン） */
+.hud-top {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    margin-bottom: 0.6rem;
+}
+
+.hud-top .hud-left {
+    justify-self: start;
+}
+
+.hud-top .hud-center {
+    justify-self: center;
+    text-align: center;
+}
+
+.hud-top .hud-right {
+    justify-self: end;
+    display: flex;
+    align-items: flex-start;
+}
+
+#question-number {
+    font-size: 1.6rem;
+    line-height: 1.1;
+}
+
+#stage-info {
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+#stage-info:empty {
+    display: none;
+}
+
+#lives-display {
+    font-size: 1.1rem;
+}
+
+.hud-left,
+.hud-center,
+.hud-right {
+    min-width: 0;
+}
+
+/* メインプレイエリア（ページスクロールなし） */
+#game-screen .game-main {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.action-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+}
+
+.action-btn {
+    padding: 1.1rem 1.4rem;
+    border-radius: 14px;
+    font-size: 1.1rem;
+}
+
+body.in-game .action-btn {
+    padding: 0.9rem 1.1rem;
+    font-size: 1rem;
+}
+
+/* 中央タイマー：数値はバーの上 */
+.hud-center #timer-display {
+    font-size: 2.6rem;
+    line-height: 1;
+    margin-bottom: 0.35rem;
+}
+
+.hud-center .timer-bar-container {
+    width: min(520px, 46vw);
+    height: 12px;
+    margin: 0 auto;
+}
+
+body.in-game .hud-center .timer-bar-container {
+    height: 10px;
+}
+
+body.in-game .time-extension-btn {
+    padding: 0.55rem 1rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+}
+
+.timer-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    text-shadow: 0 0 30px rgba(76, 175, 80, 0.8), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.time-extension-slot {
+    margin-top: 0;
+    text-align: right;
+}
+
+body.in-game .time-extension-slot {
+    margin-top: 0;
+}
+
+/* 結果：ライフ減少のヒント + 消失アニメーション */
+.result-lives {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.life-heart {
+    display: inline-block;
+    transform-origin: center;
+}
+
+.life-heart.heart-toggle {
+    position: relative;
+    width: 1em;
+    height: 1em;
+}
+
+.life-heart.heart-toggle .heart-on,
+.life-heart.heart-toggle .heart-off {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.life-heart.heart-toggle.pending-loss .heart-on {
+    animation: heart-on 0.9s ease-in-out infinite;
+}
+
+.life-heart.heart-toggle.pending-loss .heart-off {
+    animation: heart-off 0.9s ease-in-out infinite;
+}
+
+.life-heart.heart-toggle.removing .heart-on {
+    animation: heart-remove 0.35s ease-out forwards;
+}
+
+.life-heart.heart-toggle.removing .heart-off {
+    opacity: 1;
+}
+
+@keyframes heart-on {
+    0%, 100% { opacity: 0.95; transform: scale(1); }
+    50% { opacity: 0.15; transform: scale(0.95); }
+}
+
+@keyframes heart-off {
+    0%, 100% { opacity: 0.15; transform: scale(0.95); }
+    50% { opacity: 0.95; transform: scale(1.06); }
+}
+
+@keyframes heart-remove {
+    from { opacity: 0.95; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.2); }
+}
+
+/* （コンティニュー / ゲームオーバーは結果モーダル内に表示） */
+
+/* 結果モーダルのオーバーレイ（フレーム内のみスクロール） */
+#result-section {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 1.25rem;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+}
+
+#result-section.hidden {
+    display: none;
+}
+
+#result-section .result-container {
+    width: min(980px, 100%);
+    height: 100%;
+    overflow: auto;
+}
+
+.screen-container::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+        rgba(139, 92, 246, 0.15),
+        rgba(167, 139, 250, 0.15),
+        rgba(196, 181, 253, 0.15),
+        rgba(139, 92, 246, 0.15));
+    background-size: 300% 300%;
+    animation: border-glow 6s linear infinite;
+    border-radius: 24px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.screen-container:hover::before {
+    opacity: 1;
+}
+
+@keyframes border-glow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* ========== ボタンスタイル ========== */
+.mode-btn {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.5) 0%, rgba(167, 139, 250, 0.4) 100%);
+    border: 2px solid rgba(167, 139, 250, 0.3);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 8px 24px rgba(139, 92, 246, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.mode-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.mode-btn:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 
+        0 16px 48px rgba(139, 92, 246, 0.35),
+        0 0 40px rgba(167, 139, 250, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(167, 139, 250, 0.5);
+}
+
+.mode-btn:hover::before {
+    width: 400px;
+    height: 400px;
+}
+
+.mode-btn:active {
+    transform: translateY(-4px) scale(1.02);
+}
+
+/* ========== 麻雀牌スタイル ========== */
+.hand-tile {
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    border: 3px solid #d0d0d0;
+    border-radius: 8px;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.selectable-tile {
+    background: linear-gradient(145deg, #ffffff, #f5f5f5);
+    border: 3px solid rgba(138, 43, 226, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.15),
+        inset 0 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+/* PNG の麻雀牌画像 */
+.tile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none; /* クリックは牌コンテナ側で受ける */
+}
+
+.tile-inline-hand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 45px;
+    margin-left: 0.4rem;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+}
+
+.selectable-tile::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    transition: all 0.5s;
+}
+
+.selectable-tile:hover {
+    transform: translateY(-12px) scale(1.08);
+    box-shadow: 
+        0 16px 32px rgba(138, 43, 226, 0.4),
+        0 0 40px rgba(255, 20, 147, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 1);
+    border-color: rgba(138, 43, 226, 0.6);
+}
+
+.selectable-tile:hover::before {
+    left: 100%;
+}
+
+/* 選択された牌 */
+.selected {
+    background: linear-gradient(145deg, #ff6b9d, #ff4081) !important;
+    border: 4px solid #ff1744 !important;
+    transform: translateY(-8px) scale(1.12) !important;
+    box-shadow: 
+        0 0 40px rgba(255, 23, 68, 0.8),
+        0 0 80px rgba(255, 23, 68, 0.4),
+        0 12px 32px rgba(255, 23, 68, 0.5),
+        inset 0 2px 8px rgba(255, 255, 255, 0.4) !important;
+    animation: pulse-glow 1.5s ease-in-out infinite;
+    z-index: 10;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { 
+        box-shadow: 
+            0 0 40px rgba(255, 23, 68, 0.8),
+            0 0 80px rgba(255, 23, 68, 0.4),
+            0 12px 32px rgba(255, 23, 68, 0.5),
+            inset 0 2px 8px rgba(255, 255, 255, 0.4);
+    }
+    50% { 
+        box-shadow: 
+            0 0 60px rgba(255, 23, 68, 1),
+            0 0 120px rgba(255, 23, 68, 0.6),
+            0 12px 32px rgba(255, 23, 68, 0.7),
+            inset 0 2px 8px rgba(255, 255, 255, 0.6);
+    }
+}
+
+/* 正解の牌 */
+.correct-selected {
+    background: linear-gradient(145deg, #69f0ae, #00e676) !important;
+    border: 4px solid #00c853 !important;
+    box-shadow: 
+        0 0 40px rgba(0, 230, 118, 0.9),
+        0 0 80px rgba(0, 230, 118, 0.5),
+        0 12px 32px rgba(0, 200, 83, 0.6) !important;
+    animation: correct-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.correct-missed {
+    background: linear-gradient(145deg, #ffd54f, #ffca28) !important;
+    border: 4px solid #ffa000 !important;
+    box-shadow: 
+        0 0 40px rgba(255, 193, 7, 0.9),
+        0 0 80px rgba(255, 193, 7, 0.5) !important;
+    animation: correct-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.incorrect-selected {
+    background: linear-gradient(145deg, #ff5252, #f44336) !important;
+    border: 4px solid #d32f2f !important;
+    box-shadow: 
+        0 0 40px rgba(244, 67, 54, 0.9),
+        0 0 80px rgba(244, 67, 54, 0.5) !important;
+    animation: shake-wrong 0.6s ease-in-out;
+}
+
+@keyframes correct-bounce {
+    0% { transform: scale(1) translateY(0); }
+    30% { transform: scale(1.2) translateY(-20px); }
+    50% { transform: scale(0.95) translateY(-10px); }
+    70% { transform: scale(1.05) translateY(-15px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes shake-wrong {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-8px) rotate(-3deg); }
+    20%, 40%, 60%, 80% { transform: translateX(8px) rotate(3deg); }
+}
+
+/* ========== タイマー ========== */
+.timer-container {
+    background: linear-gradient(135deg, rgba(100, 100, 150, 0.15), rgba(120, 120, 180, 0.12));
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 2px solid rgba(167, 139, 250, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.timer-bar-container {
+    width: 100%;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    position: relative;
+}
+
+.timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+    border-radius: 12px;
+    box-shadow: 
+        0 0 20px rgba(76, 175, 80, 0.6),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    position: relative;
+    /* transition を外し、CSS 変数でアニメーションを制御 */
+    will-change: width;
+}
+
+.timer-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    border-radius: 12px 12px 0 0;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.timer-bar-warning {
+    background: linear-gradient(90deg, #FFC107, #FFD54F, #FFEB3B) !important;
+    box-shadow: 
+        0 0 30px rgba(255, 193, 7, 0.8),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+.timer-bar-danger {
+    background: linear-gradient(90deg, #F44336, #E57373, #EF5350) !important;
+    animation: pulse-danger 0.5s ease-in-out infinite, shimmer 2s linear infinite !important;
+    box-shadow: 
+        0 0 40px rgba(244, 67, 54, 1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+@keyframes pulse-danger {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+#timer-display {
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 30px rgba(76, 175, 80, 0.8), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.timer-warning {
+    color: #FFC107 !important;
+    text-shadow: 0 0 40px rgba(255, 193, 7, 1), 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    animation: pulse-scale 1s ease-in-out infinite;
+}
+
+.timer-danger {
+    color: #F44336 !important;
+    text-shadow: 0 0 50px rgba(244, 67, 54, 1), 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    animation: pulse-scale 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse-scale {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* ========== BOSS ステージ ========== */
+.boss-stage {
+    position: relative;
+}
+
+.boss-stage::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 50% 50%, rgba(220, 20, 60, 0.25) 0%, transparent 70%),
+        radial-gradient(circle at 20% 80%, rgba(138, 43, 226, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 20, 147, 0.3) 0%, transparent 50%);
+    animation: boss-pulse 2s ease-in-out infinite;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes boss-pulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% { 
+        opacity: 0.85; 
+        transform: scale(1.02);
+        filter: brightness(1.2);
+    }
+}
+
+.boss-title {
+    animation: boss-shake 0.3s ease-in-out infinite, boss-glow 1.5s ease-in-out infinite;
+    text-shadow: 
+        0 0 30px rgba(220, 20, 60, 1),
+        0 0 60px rgba(220, 20, 60, 0.9),
+        0 0 90px rgba(220, 20, 60, 0.7),
+        0 0 120px rgba(255, 0, 0, 0.5),
+        0 4px 20px rgba(0, 0, 0, 0.6);
+    transform-origin: center;
+}
+
+@keyframes boss-shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-2px) rotate(-1deg); }
+    75% { transform: translateX(2px) rotate(1deg); }
+}
+
+@keyframes boss-glow {
+    0%, 100% { 
+        text-shadow: 
+            0 0 30px rgba(220, 20, 60, 1),
+            0 0 60px rgba(220, 20, 60, 0.9),
+            0 0 90px rgba(220, 20, 60, 0.7),
+            0 0 120px rgba(255, 0, 0, 0.5),
+            0 4px 20px rgba(0, 0, 0, 0.6);
+        filter: brightness(1);
+    }
+    50% { 
+        text-shadow: 
+            0 0 50px rgba(220, 20, 60, 1),
+            0 0 100px rgba(220, 20, 60, 1),
+            0 0 150px rgba(220, 20, 60, 0.9),
+            0 0 200px rgba(255, 0, 0, 0.7),
+            0 4px 20px rgba(0, 0, 0, 0.6);
+        filter: brightness(1.3);
+    }
+}
+
+/* ========== 勝利・敗北画面 ========== */
+.victory-screen, .gameover-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.victory-content {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.9), rgba(129, 199, 132, 0.9));
+    border-radius: 24px;
+    padding: 4rem;
+    text-align: center;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 100px rgba(76, 175, 80, 0.5);
+    animation: victory-appear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes victory-appear {
+    0% { opacity: 0; transform: scale(0.3) rotate(-10deg); }
+    70% { transform: scale(1.1) rotate(5deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.gameover-content {
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.9), rgba(229, 115, 115, 0.9));
+    border-radius: 24px;
+    padding: 4rem;
+    text-align: center;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 100px rgba(244, 67, 54, 0.5);
+    animation: gameover-appear 0.6s ease-out;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes gameover-appear {
+    0% { opacity: 0; transform: translateY(-100px); }
+    60% { transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 紙吹雪 */
+.confetti {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    animation: confetti-fall 3s linear forwards;
+    z-index: 1001;
+}
+
+@keyframes confetti-fall {
+    0% { 
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* ========== 結果表示 ========== */
+.result-container {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#correct-answer-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#hand-tiles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#possible-tiles {
+    display: grid;
+    justify-items: center;
+    align-items: center;
+}
+
+/* ========== アニメーション ========== */
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-down {
+    animation: slideDown 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-50px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.text-shadow-glow {
+    text-shadow: 
+        0 0 40px rgba(255, 215, 0, 0.8),
+        0 0 80px rgba(255, 215, 0, 0.6),
+        0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* ========== 牌形解析 ========== */
+#hand-breakdown {
+    margin-top: 2rem;
+}
+
+.breakdown-section {
+    background: rgba(26, 26, 46, 0.6);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(138, 43, 226, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.breakdown-section h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #fbbf24;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+.breakdown-section.missed-tile {
+    border-color: rgba(234, 179, 8, 0.5);
+}
+
+.breakdown-section.selected-tile {
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.tile-group {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    margin: 0.75rem 1rem 0.75rem 0;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.tile-group-label {
+    font-size: 0.9rem;
+    color: #a78bfa;
+    margin-right: 0;
+    margin-bottom: 0.1rem;
+    font-weight: 600;
+    min-width: 0;
+}
+
+.tile-group .hand-tile {
+    margin: 0 2px;
+}
+
+/* ========== ライフとコンティニュー選択肢 ========== */
+#lives-display {
+    font-size: 1.5rem;
+    color: #fbbf24;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+.continue-option {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.continue-btn {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.5), rgba(22, 163, 74, 0.4)) !important;
+    border-color: rgba(34, 197, 94, 0.5) !important;
+}
+
+.continue-btn:hover {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.7), rgba(22, 163, 74, 0.6)) !important;
+    box-shadow: 0 16px 48px rgba(34, 197, 94, 0.4) !important;
+}
+
+.giveup-btn {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.5), rgba(220, 38, 38, 0.4)) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+.giveup-btn:hover {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.7), rgba(220, 38, 38, 0.6)) !important;
+    box-shadow: 0 16px 48px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* ========== 時間延長（Time Extension）ボタン ========== */
+.time-extension-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.time-extension-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+.time-extension-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.time-extended {
+    animation: timeExtendPulse 1s ease-out;
+}
+
+@keyframes timeExtendPulse {
+    0% { transform: scale(1); color: white; }
+    50% { transform: scale(1.2); color: #10b981; text-shadow: 0 0 20px #10b981; }
+    100% { transform: scale(1); color: white; }
+}
+
+/* ========== 一時停止オーバーレイ ========== */
+.pause-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 14, 39, 0.95);
+    backdrop-filter: blur(20px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Tailwind の .hidden は常に最優先にし、display:flex の規則で上書きされて重なるのを防ぐ */
+.hidden {
+    display: none !important;
+}
+
+/* 固定レイアウトで BOSS 表示の余白を少し詰める */
+#boss-indicator {
+    margin-bottom: 0.75rem;
+}
