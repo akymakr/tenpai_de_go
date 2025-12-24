@@ -49,7 +49,7 @@ mahjong/
 
 ## 遊び方 (How to Play)
 
-1. Open `index.html` in a web browser
+1. You can try out the project here: [https://akymakr.github.io/tenpai_de_go/](https://akymakr.github.io/tenpai_de_go/)
 2. Select your language
 3. Choose a game mode
 4. Select difficulty (for Casual and Survival modes)
