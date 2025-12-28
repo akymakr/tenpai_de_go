@@ -6,7 +6,7 @@ const translations = {
         gameSubtitle: "麻雀聴牌トレーニングゲーム",
         selectMode: "ゲームモードを選択してください",
         casualMode: "カジュアルモード",
-        casualDesc: "9問 + BOSSステージ\n各問60秒、3ライフ制",
+        casualDesc: "9問 + BOSSステージ\n各問45秒、3ライフ制",
         storyMode: "ストーリーモード",
         storyDesc: "初級→中級→上級各3問 + BOSS\n各問30秒、3ライフ制",
         survivalMode: "サバイバルモード",
@@ -64,14 +64,15 @@ const translations = {
         tapToResume: "タップして再開",
         timeExtension: "⏱️ 長考",
         timeExtensionDesc: "+30秒",
-        extensionsLeft: "残り"
+        extensionsLeft: "残り",
+        ok: "OK"
     },
     en: {
         gameTitle: "🀄 Tenpai de GO! 🀄",
         gameSubtitle: "Mahjong Tenpai Training Game",
         selectMode: "Select Game Mode",
         casualMode: "Casual Mode",
-        casualDesc: "9 Questions + BOSS Stage\n60 sec each, 3 lives",
+        casualDesc: "9 Questions + BOSS Stage\n45 sec each, 3 lives",
         storyMode: "Story Mode",
         storyDesc: "3 Questions each from Easy→Medium→Hard + BOSS\n30 sec each, 3 lives",
         survivalMode: "Survival Mode",
@@ -129,14 +130,15 @@ const translations = {
         tapToResume: "Tap to Resume",
         timeExtension: "⏱️ Time Extension",
         timeExtensionDesc: "+30s",
-        extensionsLeft: "Left"
+        extensionsLeft: "Left",
+        ok: "OK"
     },
     zh: {
         gameTitle: "🀄 聽牌GO! 🀄",
         gameSubtitle: "麻雀聽牌訓練遊戲",
         selectMode: "選擇遊戲模式",
         casualMode: "休閒模式",
-        casualDesc: "9條問題 + BOSS關卡\n每題60秒，3條生命",
+        casualDesc: "9條問題 + BOSS關卡\n每題45秒，3條生命",
         storyMode: "闖關模式",
         storyDesc: "初級→中級→高級各3條問題 + BOSS\n每題30秒，3條生命",
         survivalMode: "生存模式",
@@ -194,7 +196,8 @@ const translations = {
         tapToResume: "點擊繼續",
         timeExtension: "⏱️ 延長",
         timeExtensionDesc: "+30秒",
-        extensionsLeft: "剩餘"
+        extensionsLeft: "剩餘",
+        ok: "OK"
     }
 };
 
@@ -236,8 +239,50 @@ function hideResultActions() {
 
     const continueBtn = document.getElementById('result-continue-btn');
     const backBtn = document.getElementById('result-back-btn');
+    const okBtn = document.getElementById('result-ok-btn');
     if (continueBtn) continueBtn.classList.add('hidden');
     if (backBtn) backBtn.classList.add('hidden');
+    if (okBtn) okBtn.classList.add('hidden');
+}
+
+let pendingOkAction = null;
+
+function showResultOkAction({ titleText, titleClassName, bodyText = '', okText = null, onOk }) {
+    const actions = document.getElementById('result-actions');
+    if (!actions) return;
+
+    const title = document.getElementById('result-actions-title');
+    const body = document.getElementById('result-actions-body');
+    const continueBtn = document.getElementById('result-continue-btn');
+    const backBtn = document.getElementById('result-back-btn');
+    const okBtn = document.getElementById('result-ok-btn');
+    const okTextSpan = document.getElementById('result-ok-text');
+
+    pendingOkAction = typeof onOk === 'function' ? onOk : null;
+
+    if (title) {
+        title.textContent = titleText || '';
+        title.className = titleClassName || 'text-3xl font-black mb-3 text-center';
+    }
+    if (body) body.textContent = bodyText || '';
+
+    if (continueBtn) continueBtn.classList.add('hidden');
+    if (backBtn) backBtn.classList.add('hidden');
+
+    if (okTextSpan) okTextSpan.textContent = okText || t('ok');
+    if (okBtn) {
+        okBtn.classList.remove('hidden');
+        okBtn.disabled = false;
+        okBtn.onclick = () => {
+            if (!pendingOkAction) return;
+            okBtn.disabled = true;
+            const action = pendingOkAction;
+            pendingOkAction = null;
+            action();
+        };
+    }
+
+    actions.classList.remove('hidden');
 }
 
 function showResultLifeAction() {
@@ -279,15 +324,19 @@ function showResultLifeAction() {
 
     const continueBtn = document.getElementById('result-continue-btn');
     const backBtn = document.getElementById('result-back-btn');
+    const okBtn = document.getElementById('result-ok-btn');
     const continueText = document.getElementById('result-continue-text');
     const backText = document.getElementById('result-back-text');
     if (continueText) continueText.textContent = t('continue');
-    if (backText) backText.textContent = t('backToMenu');
+    if (backText) backText.textContent = t('giveUp');
+
+    if (okBtn) okBtn.classList.add('hidden');
 
     if (continueBtn) {
         continueBtn.classList.remove('hidden');
         continueBtn.disabled = false;
         continueBtn.onclick = () => {
+            playSound('continue');
             // 続行前に、失ったライフが消える演出を入れる
             continueBtn.disabled = true;
             const pending = document.getElementById('result-pending-loss-heart');
@@ -307,38 +356,24 @@ function showResultLifeAction() {
     if (backBtn) {
         backBtn.classList.remove('hidden');
         backBtn.disabled = false;
-        backBtn.onclick = backToMenu;
+        backBtn.onclick = () => {
+            giveUpGame();
+        };
     }
 
     actions.classList.remove('hidden');
 }
 
 function showResultGameOverAction(timeUp) {
-    const actions = document.getElementById('result-actions');
-    if (!actions) return;
-
-    const title = document.getElementById('result-actions-title');
-    const body = document.getElementById('result-actions-body');
-    if (title) {
-        title.textContent = t('gameOver');
-        title.className = 'text-3xl font-black mb-3 text-red-300 text-center';
-    }
-    // 主要な結果メッセージ（上部）を唯一の表示ソースとして扱う
-    if (body) body.textContent = '';
-
-    const continueBtn = document.getElementById('result-continue-btn');
-    const backBtn = document.getElementById('result-back-btn');
-    const backText = document.getElementById('result-back-text');
-    if (backText) backText.textContent = t('backToMenu');
-
-    if (continueBtn) continueBtn.classList.add('hidden');
-    if (backBtn) {
-        backBtn.classList.remove('hidden');
-        backBtn.disabled = false;
-        backBtn.onclick = backToMenu;
-    }
-
-    actions.classList.remove('hidden');
+    showResultOkAction({
+        titleText: t('gameOver'),
+        titleClassName: 'text-3xl font-black mb-3 text-red-300 text-center',
+        bodyText: '',
+        onOk: () => {
+            playSound('gameover');
+            showGameOverOverlay(timeUp);
+        }
+    });
 }
 
 const tileImages = {
@@ -365,6 +400,80 @@ const getTileInfo = (type, number) => ({
     name: tileNames[currentLang][type][number]
 });
 
+// ========== Sounds ==========
+const soundConfig = {
+    select: { src: 'assets/select.mp3', pool: 4 },
+    tap: { src: 'assets/tap.mp3', pool: 6 },
+    correct: { src: 'assets/correct.mp3', pool: 2 },
+    incorrect: { src: 'assets/incorrect.mp3', pool: 2 },
+    continue: { src: 'assets/continue.mp3', pool: 2 },
+    gameover: { src: 'assets/gameover.mp3', pool: 2 },
+    victory: { src: 'assets/victory.mp3', pool: 2 },
+    timeup: { src: 'assets/timeup.mp3', pool: 2 }
+};
+
+const soundPools = new Map();
+
+function initSounds() {
+    for (const [name, cfg] of Object.entries(soundConfig)) {
+        const poolSize = Math.max(1, cfg.pool || 1);
+        const pool = [];
+        for (let i = 0; i < poolSize; i++) {
+            const audio = new Audio(cfg.src);
+            audio.preload = 'auto';
+            pool.push(audio);
+        }
+        soundPools.set(name, pool);
+    }
+}
+
+function playSound(name) {
+    const pool = soundPools.get(name);
+    if (!pool || pool.length === 0) return;
+
+    let audio = pool.find(a => a.paused || a.ended);
+    if (!audio) audio = pool[0];
+
+    try {
+        audio.currentTime = 0;
+        const p = audio.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+    } catch {
+        // ignore
+    }
+}
+
+// timer.mp3 は「5秒以内のカウントダウン中にループ再生」する専用音
+let timerAudio = null;
+
+function initTimerSound() {
+    timerAudio = new Audio('assets/timer.mp3');
+    timerAudio.preload = 'auto';
+    timerAudio.loop = true;
+}
+
+function startTimerSound() {
+    if (!timerAudio) return;
+    if (!timerAudio.paused) return;
+    try {
+        const p = timerAudio.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+    } catch {
+        // ignore
+    }
+}
+
+function pauseTimerSound() {
+    if (!timerAudio) return;
+    if (!timerAudio.paused) timerAudio.pause();
+}
+
+function stopTimerSound() {
+    if (!timerAudio) return;
+    timerAudio.pause();
+    timerAudio.currentTime = 0;
+}
+
 function createTileImage(tileInfo) {
     const img = document.createElement('img');
     img.src = tileInfo.imgSrc;
@@ -387,7 +496,8 @@ const gameState = {
     hand: [], counts: {}, waitingTiles: [], selectedTiles: new Set(), tileType: 'pin',
     timeLeft: 0, maxTime: 0, timeBonus: 0, timerInterval: null, isBossStage: false, isAnswered: false,
     lives: 3, maxLives: 3, isPaused: false,
-    timeExtensions: 3, maxTimeExtensions: 3, extendedTime: 0 // タイム延長（Time Extension）の仕組み
+    timeExtensions: 3, maxTimeExtensions: 3, extendedTime: 0, // タイム延長（Time Extension）の仕組み
+    timerCuePlayed: false
 };
 
 // 正確な和了判定（4面子1雀頭）
@@ -533,7 +643,7 @@ function generateTenpaiHand(difficulty) {
 function startTimer() {
     stopTimer();
     // 現在ステージの最大時間を保存
-    gameState.maxTime = gameState.isBossStage ? gameState.timeBonus : getMaxTime();
+    gameState.maxTime = gameState.isBossStage ? Math.max(0, gameState.timeLeft) : getMaxTime();
     gameState.isPaused = false;
     updateTimerDisplay();
     gameState.timerInterval = setInterval(() => {
@@ -556,6 +666,14 @@ function stopTimer() {
         clearInterval(gameState.timerInterval);
         gameState.timerInterval = null;
     }
+
+    // タイマー停止時は一旦「一時停止」。回答送信時（isAnswered=true）は完全停止。
+    if (gameState.isAnswered) {
+        stopTimerSound();
+    } else {
+        pauseTimerSound();
+    }
+
     gameState.isPaused = false;
     // 時間切迫エフェクトを解除
     document.body.classList.remove('time-critical');
@@ -566,6 +684,7 @@ function stopTimer() {
 function pauseTimer() {
     if (!gameState.timerInterval || gameState.isAnswered) return;
     gameState.isPaused = true;
+    pauseTimerSound();
     showPauseOverlay();
     updateInteractionState();
 }
@@ -574,6 +693,9 @@ function resumeTimer() {
     if (!gameState.timerInterval) return;
     gameState.isPaused = false;
     hidePauseOverlay();
+    if (gameState.timerCuePlayed && gameState.timeLeft <= 5 && !gameState.isAnswered) {
+        startTimerSound();
+    }
     updateInteractionState();
 }
 
@@ -588,9 +710,10 @@ function updateInteractionState() {
     const resultSection = document.getElementById('result-section');
 
     const active = isActiveQuestion();
+    const hasSelection = gameState.selectedTiles && gameState.selectedTiles.size > 0;
 
     if (submitBtn) {
-        submitBtn.disabled = !active;
+        submitBtn.disabled = !active || !hasSelection;
     }
 
     if (nextBtn) {
@@ -626,7 +749,17 @@ function updateTimerDisplay() {
         timerElement.classList.add('timer-danger');
         timerBar.classList.add('timer-bar-danger');
         document.body.classList.add('time-critical');
+
+        if (!gameState.timerCuePlayed && gameState.timeLeft === 5) {
+            gameState.timerCuePlayed = true;
+            if (!gameState.isPaused && !gameState.isAnswered) startTimerSound();
+        }
     } else {
+        // 5秒以上に戻ったらカウントダウン音は停止（延長など）
+        if (gameState.timerCuePlayed) {
+            gameState.timerCuePlayed = false;
+            stopTimerSound();
+        }
         document.body.classList.remove('time-critical');
         if (gameState.timeLeft <= 10) {
             timerElement.classList.add('timer-warning');
@@ -636,7 +769,7 @@ function updateTimerDisplay() {
 }
 
 function getMaxTime() {
-    if (gameState.mode === 'casual') return 60;
+    if (gameState.mode === 'casual') return 45;
     if (gameState.mode === 'story') return 30;
     if (gameState.mode === 'survival') return 60;
     return 0;
@@ -644,8 +777,21 @@ function getMaxTime() {
 
 function handleTimeUp() {
     if (gameState.isAnswered) return;
+
+    // 1枚でも選んでいれば「自動提出」として扱う（select 音は鳴らさない）
+    if (gameState.selectedTiles && gameState.selectedTiles.size > 0) {
+        checkAnswer({ force: true });
+        return;
+    }
+
     gameState.isAnswered = true;
     updateInteractionState();
+
+    // 時間切れ確定：カウントダウン音は停止
+    stopTimerSound();
+
+    // 未提出の時間切れ：incorrect ではなく timeup を鳴らす
+    playSound('timeup');
     
     // サバイバルは時間切れで即終了
     if (gameState.mode === 'survival') {
@@ -795,7 +941,7 @@ function startGameWithDifficulty(difficulty) {
     document.getElementById('difficulty-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     document.body.classList.add('in-game');
-    if (gameState.mode === 'survival') gameState.timeLeft = 100; // サバイバルの初期時間
+    if (gameState.mode === 'survival') gameState.timeLeft = 60; // サバイバルの初期時間
     updateLivesDisplay();
     startNewQuestion();
 }
@@ -822,6 +968,8 @@ function generateAndShowQuestion() {
     gameState.selectedTiles.clear();
     gameState.isAnswered = false;
     gameState.extendedTime = 0; // このステージの延長時間をリセット
+    gameState.timerCuePlayed = false;
+    stopTimerSound();
     
     // ストーリーはステージに応じて難易度を調整
     if (gameState.mode === 'story') {
@@ -870,6 +1018,8 @@ function generateAndShowBossQuestion({ resetTime = false } = {}) {
     gameState.selectedTiles.clear();
     gameState.isAnswered = false;
     gameState.extendedTime = 0;
+    gameState.timerCuePlayed = false;
+    stopTimerSound();
 
     // ボスは現在の難易度を引き継ぐ（カジュアルは選択値、ストーリーは7-9でハードの想定）
     const result = generateTenpaiHand(gameState.difficulty);
@@ -883,7 +1033,8 @@ function generateAndShowBossQuestion({ resetTime = false } = {}) {
     gameState.waitingTiles = result.waiting;
 
     document.body.classList.add('boss-stage');
-    document.getElementById('boss-indicator').classList.remove('hidden');
+    // BOSS STAGE の置頂表示は使わない（背景効果で十分）
+    document.getElementById('boss-indicator').classList.add('hidden');
     const resultSection = document.getElementById('result-section');
     resultSection.classList.add('hidden');
     hideResultActions();
@@ -893,7 +1044,9 @@ function generateAndShowBossQuestion({ resetTime = false } = {}) {
     renderPossibleTiles();
 
     if (resetTime) {
-        gameState.timeLeft = gameState.timeBonus;
+        // BOSS は累積時間のみ。ただし累積が少ない場合は各モードの基本秒数を下限にする
+        const baseTime = getMaxTime();
+        gameState.timeLeft = Math.max(gameState.timeBonus, baseTime);
     }
     startTimer();
 }
@@ -965,6 +1118,8 @@ function renderPossibleTiles() {
 
 function toggleTileSelection(tile, element) {
     if (!isActiveQuestion()) return;
+
+    playSound('tap');
     if (gameState.selectedTiles.has(tile)) {
         gameState.selectedTiles.delete(tile);
         element.classList.remove('selected');
@@ -972,11 +1127,13 @@ function toggleTileSelection(tile, element) {
         gameState.selectedTiles.add(tile);
         element.classList.add('selected');
     }
+
+    updateInteractionState();
 }
 
-function checkAnswer() {
+function checkAnswer({ force = false } = {}) {
     if (gameState.isAnswered) return;
-    if (!isActiveQuestion()) return;
+    if (!force && !isActiveQuestion()) return;
     gameState.isAnswered = true;
     stopTimer();
     const selected = Array.from(gameState.selectedTiles);
@@ -989,6 +1146,8 @@ function checkAnswer() {
 
 function handleCorrectAnswer() {
     gameState.correctCount++;
+
+    playSound('correct');
     
     // 時間ボーナスを計算（元の時間のみ。延長時間は含めない）
     // timeBonus はカジュアル/ストーリーのボス用。ボス自体では timeBonus を加算しない。
@@ -1010,11 +1169,20 @@ function handleCorrectAnswer() {
     
     // ボスクリア後に勝利表示
     if (gameState.isBossStage) {
-        setTimeout(() => showVictory(), 2000);
+        showResultOkAction({
+            titleText: t('victory'),
+            titleClassName: 'text-3xl font-black mb-3 text-green-300 text-center',
+            bodyText: '',
+            onOk: () => {
+                playSound('victory');
+                showVictory();
+            }
+        });
     }
 }
 
 function handleIncorrectAnswer() {
+    playSound('incorrect');
     showResult(false);
     highlightAnswers();
     
@@ -1341,10 +1509,18 @@ function updateTimeExtensionButton() {
 function useTimeExtension() {
     if (!isActiveQuestion()) return;
     if (gameState.timeExtensions <= 0 || gameState.isBossStage || gameState.isAnswered) return;
+
+    playSound('select');
     
     gameState.timeExtensions--;
     gameState.timeLeft += 30;
     gameState.extendedTime += 30; // このステージで使った延長時間を記録
+
+    // 延長で 5秒以上に戻る可能性があるため、カウントダウン音は止める
+    if (gameState.timeLeft > 5) {
+        gameState.timerCuePlayed = false;
+        stopTimerSound();
+    }
     
     updateTimeExtensionButton();
     
@@ -1386,17 +1562,14 @@ function giveUpGame() {
 }
 
 function showVictory() {
-    setTimeout(() => {
-        document.getElementById('game-screen').classList.add('hidden');
-        const screen = document.getElementById('victory-screen');
-        screen.classList.remove('hidden');
-        // すべてのモードで currentStage を使用
-        document.getElementById('final-questions').textContent = gameState.currentStage;
-        document.getElementById('final-correct').textContent = gameState.correctCount;
-        createConfetti();
-        
-        // 16:9 固定フレーム設計：ページスクロールは使わない
-    }, gameState.isBossStage ? 1500 : 800);
+    document.getElementById('game-screen').classList.add('hidden');
+    const screen = document.getElementById('victory-screen');
+    screen.classList.remove('hidden');
+    // すべてのモードで currentStage を使用
+    document.getElementById('final-questions').textContent = gameState.currentStage;
+    document.getElementById('final-correct').textContent = gameState.correctCount;
+    createConfetti();
+    // 16:9 固定フレーム設計：ページスクロールは使わない
 }
 
 function showGameOver(timeUp) {
@@ -1483,8 +1656,10 @@ function updateUILanguage() {
 
     const resultContinueText = document.getElementById('result-continue-text');
     const resultBackText = document.getElementById('result-back-text');
+    const resultOkText = document.getElementById('result-ok-text');
     if (resultContinueText) resultContinueText.textContent = t('continue');
-    if (resultBackText) resultBackText.textContent = t('backToMenu');
+    if (resultBackText) resultBackText.textContent = t('giveUp');
+    if (resultOkText) resultOkText.textContent = t('ok');
     
     
     // 勝利/敗北画面
@@ -1580,36 +1755,33 @@ function hidePauseOverlay() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    initSounds();
+    initTimerSound();
     applyUiScale();
     window.addEventListener('resize', applyUiScale);
     window.visualViewport?.addEventListener('resize', applyUiScale);
 
-    document.getElementById('lang-ja').addEventListener('click', () => selectLanguage('ja'));
-    document.getElementById('lang-en').addEventListener('click', () => selectLanguage('en'));
-    document.getElementById('lang-zh').addEventListener('click', () => selectLanguage('zh'));
-    document.getElementById('casual-btn').addEventListener('click', () => startGameMode('casual'));
-    document.getElementById('story-btn').addEventListener('click', () => startGameMode('story'));
-    document.getElementById('survival-btn').addEventListener('click', () => startGameMode('survival'));
-    document.getElementById('easy').addEventListener('click', () => startGameWithDifficulty('easy'));
-    document.getElementById('medium').addEventListener('click', () => startGameWithDifficulty('medium'));
-    document.getElementById('hard').addEventListener('click', () => startGameWithDifficulty('hard'));
-    document.getElementById('submit-btn').addEventListener('click', checkAnswer);
-    document.getElementById('next-btn').addEventListener('click', startNewQuestion);
-
-    const resultContinueBtn = document.getElementById('result-continue-btn');
-    const resultBackBtn = document.getElementById('result-back-btn');
-    if (resultContinueBtn) resultContinueBtn.addEventListener('click', continueGame);
-    if (resultBackBtn) resultBackBtn.addEventListener('click', backToMenu);
+    document.getElementById('lang-ja').addEventListener('click', () => { playSound('select'); selectLanguage('ja'); });
+    document.getElementById('lang-en').addEventListener('click', () => { playSound('select'); selectLanguage('en'); });
+    document.getElementById('lang-zh').addEventListener('click', () => { playSound('select'); selectLanguage('zh'); });
+    document.getElementById('casual-btn').addEventListener('click', () => { playSound('select'); startGameMode('casual'); });
+    document.getElementById('story-btn').addEventListener('click', () => { playSound('select'); startGameMode('story'); });
+    document.getElementById('survival-btn').addEventListener('click', () => { playSound('select'); startGameMode('survival'); });
+    document.getElementById('easy').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('easy'); });
+    document.getElementById('medium').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('medium'); });
+    document.getElementById('hard').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('hard'); });
+    document.getElementById('submit-btn').addEventListener('click', () => { playSound('select'); checkAnswer(); });
+    document.getElementById('next-btn').addEventListener('click', () => { playSound('select'); startNewQuestion(); });
 
     // 勝利/ゲームオーバー画面のボタン
     const playAgainVictory = document.getElementById('play-again-victory');
     const menuVictory = document.getElementById('menu-victory');
     const playAgainGameOver = document.getElementById('play-again-gameover');
     const menuGameOver = document.getElementById('menu-gameover');
-    if (playAgainVictory) playAgainVictory.addEventListener('click', restartCurrentRun);
-    if (menuVictory) menuVictory.addEventListener('click', backToMenu);
-    if (playAgainGameOver) playAgainGameOver.addEventListener('click', restartCurrentRun);
-    if (menuGameOver) menuGameOver.addEventListener('click', backToMenu);
+    if (playAgainVictory) playAgainVictory.addEventListener('click', () => { playSound('select'); restartCurrentRun(); });
+    if (menuVictory) menuVictory.addEventListener('click', () => { playSound('select'); backToMenu(); });
+    if (playAgainGameOver) playAgainGameOver.addEventListener('click', () => { playSound('select'); restartCurrentRun(); });
+    if (menuGameOver) menuGameOver.addEventListener('click', () => { playSound('select'); backToMenu(); });
     
     // ウィンドウのフォーカス喪失/復帰を監視
     document.addEventListener('visibilitychange', () => {
