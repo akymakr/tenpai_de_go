@@ -20,9 +20,9 @@ Mahjong tenpai training game.
 - Endless questions
 - Start with 60 seconds, no lives
 - Time recovery on correct answers:
-  - Easy: +10s
-  - Medium: +15s
-  - Hard: +20s
+  - Easy: +5s
+  - Medium: +10s
+  - Hard: +15s
 
 ## BOSS Stage Rules
 

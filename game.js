@@ -1649,9 +1649,9 @@ function handleCorrectAnswer() {
     
     if (gameState.mode === 'survival') {
         let recovery = 0;
-        if (gameState.difficulty === 'easy') recovery = 10;
-        else if (gameState.difficulty === 'medium') recovery = 15;
-        else if (gameState.difficulty === 'hard') recovery = 20;
+        if (gameState.difficulty === 'easy') recovery = 5;
+        else if (gameState.difficulty === 'medium') recovery = 10;
+        else if (gameState.difficulty === 'hard') recovery = 15;
         gameState.timeLeft += recovery;
     }
     showResult(true);
