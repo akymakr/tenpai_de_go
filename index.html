@@ -20,7 +20,18 @@
 
         <main id="app-main" class="app-main">
 
-        <div id="language-screen" class="screen-container fade-in">
+        <div id="preload-screen" class="screen-container fade-in">
+            <h2 id="preload-title" class="text-4xl font-bold mb-6 text-center">Loading…</h2>
+            <p id="preload-subtitle" class="text-xl opacity-80 text-center mb-8">Preloading assets for smoother play</p>
+            <div class="preload-progress-wrap max-w-3xl mx-auto">
+                <div class="preload-progress-bar">
+                    <div id="preload-progress-fill" class="preload-progress-fill" style="width:0%"></div>
+                </div>
+                <div id="preload-progress-text" class="text-center mt-4 text-lg opacity-90">0%</div>
+            </div>
+        </div>
+
+        <div id="language-screen" class="screen-container fade-in hidden">
             <h2 id="language-title" class="text-4xl font-bold mb-8 text-center">Select Language</h2>
             <div class="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
                 <button id="lang-ja" class="mode-btn">
@@ -39,23 +50,28 @@
         </div>
 
         <div id="mode-screen" class="screen-container hidden">
-            <h2 id="mode-title" class="text-4xl font-bold mb-8 text-center">Select Game Mode</h2>
+            <button id="mode-back-btn" class="nav-back-btn" type="button" aria-label="Back">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                <span id="mode-back-text">Back</span>
+            </button>
+            <div class="flex items-center justify-center relative mb-8">
+                <h2 id="mode-title" class="text-4xl font-bold text-center">Select Game Mode</h2>
+                <button id="tutorial-btn" class="tutorial-btn" type="button" aria-label="Tutorial">
+                    <i class="fa fa-book" aria-hidden="true"></i>
+                    <span id="tutorial-btn-text" class="tutorial-btn-text">Tutorial</span>
+                </button>
+            </div>
             <div class="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
                 <button id="casual-btn" class="mode-btn">
                     <div class="text-5xl mb-4">CASUAL</div>
                     <div id="casual-title" class="text-2xl font-bold mb-3">Casual Mode</div>
                     <div id="casual-desc" class="text-sm opacity-80 whitespace-pre-line">9 Questions + BOSS Stage</div>
                 </button>
-                <div class="story-btn-wrap">
-                    <button id="story-btn" class="mode-btn">
-                        <div class="text-5xl mb-4">STORY</div>
-                        <div id="story-title" class="text-2xl font-bold mb-3">Story Mode</div>
-                        <div id="story-desc" class="text-sm opacity-80 whitespace-pre-line">Progressive Difficulty</div>
-                    </button>
-                    <button id="story-info-btn" type="button" class="story-info-btn" aria-label="Story mode info">
-                        <i class="fa fa-question" aria-hidden="true"></i>
-                    </button>
-                </div>
+                <button id="story-btn" class="mode-btn">
+                    <div class="text-5xl mb-4">STORY</div>
+                    <div id="story-title" class="text-2xl font-bold mb-3">Story Mode</div>
+                    <div id="story-desc" class="text-sm opacity-80 whitespace-pre-line">Progressive Difficulty</div>
+                </button>
                 <button id="survival-btn" class="mode-btn">
                     <div class="text-5xl mb-4">SURVIVAL</div>
                     <div id="survival-title" class="text-2xl font-bold mb-3">Survival Mode</div>
@@ -64,7 +80,41 @@
             </div>
         </div>
 
+        <div id="tutorial-screen" class="tutorial-overlay hidden" aria-hidden="true">
+            <div class="tutorial-modal" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+                <div class="tutorial-modal-header">
+                    <div class="tutorial-modal-title-wrap">
+                        <h2 id="tutorial-title" class="tutorial-modal-title">Tutorial</h2>
+                        <div id="tutorial-page-indicator" class="tutorial-page-indicator">1/5</div>
+                    </div>
+
+                    <div class="tutorial-modal-actions">
+                        <button id="tutorial-prev-btn" class="mode-btn action-btn tutorial-nav-btn" type="button">
+                            <span id="tutorial-prev-text">Prev</span>
+                        </button>
+                        <button id="tutorial-next-btn" class="mode-btn action-btn tutorial-nav-btn" type="button">
+                            <span id="tutorial-next-text">Next</span>
+                        </button>
+                        <button id="tutorial-close-btn" class="mode-btn tutorial-close-btn" type="button">
+                            <span id="tutorial-close-text">Close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tutorial-modal-body">
+                    <div class="tutorial-section">
+                        <h3 id="tutorial-page-title" class="text-3xl font-black mb-4 text-purple-200 text-center">Title</h3>
+                        <div id="tutorial-page-body" class="tutorial-body text-xl text-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="difficulty-screen" class="screen-container hidden">
+            <button id="difficulty-back-btn" class="nav-back-btn" type="button" aria-label="Back">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                <span id="difficulty-back-text">Back</span>
+            </button>
             <h2 id="difficulty-title" class="text-4xl font-bold mb-8 text-center">Select Difficulty</h2>
             <div class="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
                 <button id="easy" class="mode-btn">
@@ -171,8 +221,7 @@
             <div class="victory-content">
                 <h2 id="victory-title" class="text-7xl font-black mb-8 animate-bounce">VICTORY!</h2>
                 <div class="text-3xl mb-8">
-                    <p class="mb-4"><span id="final-questions-label">Questions:</span> <span id="final-questions" class="font-bold text-yellow-300">10</span></p>
-                    <p class="mb-4"><span id="final-correct-label">Correct:</span> <span id="final-correct" class="font-bold text-green-300">0</span></p>
+                    <p class="mb-4"><span id="mode-label">Mode:</span> <span id="mode" class="font-bold text-red-300"></span></p>
                     <p class="mb-4"><span id="final-time-left-label">Time Left:</span> <span id="final-time-left" class="font-bold text-purple-200">0</span></p>
                     <p class="mb-4"><span id="final-lives-left-label">Lives Left:</span> <span id="final-lives-left" class="font-bold"></span></p>
                 </div>
@@ -200,7 +249,7 @@
         </main>
 
         <footer class="text-center py-6 mt-auto border-t-0 border-purple-600">
-            <p id="footer-text" class="text-lg font-bold">聴牌でGO! &copy; 2025 Akira Akiyama</p>
+            <p id="footer-text" class="text-lg font-bold">聴牌でGO! &copy; 2026 Akira Akiyama</p>
         </footer>
     </div>
     </div>

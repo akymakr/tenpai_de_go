@@ -1,226 +1,321 @@
-// 聴牌でGO! - ゲームロジック
+// 聴牌で GO! - ゲームロジック
 
 const translations = {
     ja: {
-        gameTitle: "🀄 聴牌でGO! 🀄",
-        gameSubtitle: "麻雀聴牌トレーニングゲーム",
-        selectMode: "ゲームモードを選択してください",
-        casualMode: "カジュアルモード",
-        casualDesc: "9問 + BOSSステージ\n各問45秒、3ライフ制",
-        storyMode: "ストーリーモード",
-        storyDesc: "初級→中級→上級各3問 + BOSS\n各問30秒、3ライフ制",
-        survivalMode: "サバイバルモード",
-        survivalDesc: "60秒からスタート\n正解すると時間回復、ライフなし",
+        gameTitle: "🀄 聴牌で GO! 🀄",
+        gameSubtitle: "麻雀 待ち当てトレーニング",
+        selectMode: "モードを選択してください",
+        casualMode: "カジュアル",
+        casualDesc: "全 9 問 + BOSS ステージ\n各問 45 秒 / 3 ライフ制",
+        storyMode: "ストーリー",
+        storyDesc: "初級 → 中級 → 上級の各 3 問 + BOSS\n各問 30 秒 / 3ライフ制",
+        survivalMode: "サバイバル",
+        survivalDesc: "60 秒からスタート\n正解でタイム回復 / ライフなし",
         selectDifficulty: "難易度を選択してください",
         easy: "初級",
-        easyDesc: "3面張まで",
+        easyDesc: "最大 3 面張まで",
         medium: "中級",
-        mediumDesc: "6面張まで",
+        mediumDesc: "最大 6 面張まで",
         hard: "上級",
-        hardDesc: "9面張まで",
+        hardDesc: "最大 9 面張まで",
         handTitle: "🎴 手牌 🎴",
-        selectWaiting: "🎯 待ち牌をすべて選択してください 🎯",
-        submitAnswer: "✨ 回答を確認 ✨",
-        correct: "🎉 正解です！素晴らしい！ 🎉",
-        incorrect: "❌ 残念、不正解です。",
-        timeUp: "⏰ 時間切れです！",
-        correctAnswer: "💡 正解：",
-        nextQuestion: "➡️ 次の問題",
-        question: "問題",
+        selectWaiting: "🎯 待ち牌をすべて選んでください 🎯",
+        submitAnswer: "✨ 回答する ✨",
+        correct: "🎉 正解！ナイスアガリ！ 🎉",
+        incorrect: "❌ 不正解です...",
+        timeUp: "⏰ 時間切れ！",
+        correctAnswer: "💡 正解の待ち：",
+        nextQuestion: "➡️ 次の問題へ",
+        question: "第",
         bossStage: "🔥 BOSS ステージ 🔥",
-        bossChallenge: "累積時間で挑戦！",
-        bossComplete: "BOSSクリア！",
-        victory: "🎊 全問クリア！ 🎊",
+        bossChallenge: "貯めたタイムで挑戦！",
+        bossComplete: "BOSS 撃破！クリアおめでとう！",
+        victory: "🎊 完全制覇！ 🎊",
         gameOver: "ゲームオーバー",
-        finalQuestions: "問題数：",
-        finalScore: "正解数：",
+        finalQuestions: "到達問題数：",
+        finalScore: "合計正解数：",
         timeLeftLabel: "残り時間：",
         livesLeftLabel: "残りライフ：",
-        playAgain: "もう一度プレイ",
+        playAgain: "もう一度遊ぶ",
         backToMenu: "メニューに戻る",
-        footer: "聴牌でGO!",
-        selectLanguage: "言語を選択 / Select Language / 選擇語言",
+        back: "戻る",
+        footer: "聴牌で GO!",
+        selectLanguage: "言語を選択 / Select Language",
         japanese: "日本語",
         english: "English",
         chinese: "繁體中文",
-        allBreakdown: "📋 和了牌型は以下の通り：",
-        winningTile: "🎯 和了牌：",
+        allBreakdown: "📋 待ち牌の構成（アガリ形）：",
+        winningTile: "🎯 待ち：",
         head: "雀頭",
         meld: "面子",
-        // pair: "対子：",
-        // triplet: "刻子：",
-        // sequence: "順子：",
         pair: "対子",
         triplet: "刻子",
         sequence: "順子",
-        pin: "筒",
-        man: "萬",
-        sou: "索",
+        pin: "筒子",
+        man: "萬子",
+        sou: "索子",
         lives: "ライフ：",
-        loseLife: "ライフ -1",
+        loseLife: "ライフ減少",
         continue: "コンティニュー",
         giveUp: "あきらめる",
         stage: "ステージ",
         difficulty: "難易度",
         maxWaits: "最大待ち数：",
         correctCount: "正解数：",
-        paused: "⏸️ 一時停止",
-        tapToResume: "タップして再開",
-        timeExtension: "⏱️ 長考",
-        timeExtensionDesc: "+30秒",
-        extensionsLeft: "残り",
+        paused: "⏸️ 一時停止中",
+        tapToResume: "画面をタップして再開",
+        timeExtension: "⏱️ 長考（タイム延長）",
+        timeExtensionDesc: "+30 秒",
+        extensionsLeft: "あと",
         ok: "OK",
 
-        storyHelpTitle: "ストーリーモードの難易度",
-        storyHelpBody: "初級：最大3面張（待ち）\n中級：最大6面張（待ち）\n上級：最大9面張（待ち）\n\nストーリーは3ステージごとに難易度が上がります。"
+        tutorial: "チュートリアル",
+        tutorialTitle: "遊び方",
+        tutorialPrev: "戻る",
+        tutorialNext: "次へ",
+        tutorialClose: "閉じる",
+        tutorialFinish: "完了",
+
+        tutorialP1Title: "ゲームの目的",
+        tutorialP1Body: "表示された聴牌（テンパイ）の手牌から、アガリ牌（待ち牌）をすべて見つけ出しましょう。\n\nポイント：\n・待ちは複数ある場合があります\n・手牌で 4 枚使っている牌は、待ち牌にはなりません",
+
+        tutorialP2Title: "操作方法",
+        tutorialP2Body: "1) 画面下の 1 〜 9 のボタンから、待ち牌をすべて選択\n2) 「回答する」ボタンで判定\n\nヒント：\n・もう一度タップすると選択解除できます\n・時間切れになっても、牌を一枚でも選択していれば自動的に提出されます",
+
+        tutorialP3Title: "難易度について",
+        tutorialP3Body: "初級：最大 3 面張\n中級：最大 6 面張\n上級：最大 9 面張\n\nストーリーモードでは、ステージが進むごとに難易度が上がります。",
+
+        tutorialP4Title: "長考（タイム延長）",
+        tutorialP4Body: "カジュアル/ストーリーモードでは「長考」ボタンで時間を増やせます。\n・1 回につき +30 秒\n・残り時間が少なくなると迷わず使ってしまいましょう\n\n※ BOSS ステージでは使用できませんが、残った回数分が BOSS ステージの制限時間に加算されます。",
+
+        tutorialP5Title: "BOSS ステージ",
+        tutorialP5Body: "ステージ 10 は BOSS 戦です。\nこれまでのステージで余った「残り時間の合計」が制限時間になります。正解すればクリアです！"
     },
     en: {
         gameTitle: "🀄 Tenpai de GO! 🀄",
-        gameSubtitle: "Mahjong Tenpai Training Game",
-        selectMode: "Select Game Mode",
-        casualMode: "Casual Mode",
-        casualDesc: "9 Questions + BOSS Stage\n45 sec each, 3 lives",
-        storyMode: "Story Mode",
-        storyDesc: "3 Questions each from Easy→Medium→Hard + BOSS\n30 sec each, 3 lives",
-        survivalMode: "Survival Mode",
-        survivalDesc: "Start with 60 sec\nTime extension if correct, no lives",
+        gameSubtitle: "Mahjong Waiting Tile Trainer",
+        selectMode: "Select Mode",
+        casualMode: "Casual",
+        casualDesc: "9 Questions + BOSS\n45s per tile / 3 Lives",
+        storyMode: "Story",
+        storyDesc: "Easy → Med → Hard (3 levels each) + BOSS\n30s per tile / 3 Lives",
+        survivalMode: "Survival",
+        survivalDesc: "Start with 60s\nCorrect answers restore time / No lives",
         selectDifficulty: "Select Difficulty",
         easy: "Easy",
-        easyDesc: "Up to 3 waits",
+        easyDesc: "Up to 3-way waits",
         medium: "Medium",
-        mediumDesc: "Up to 6 waits",
+        mediumDesc: "Up to 6-way waits",
         hard: "Hard",
-        hardDesc: "Up to 9 waits",
+        hardDesc: "Up to 9-way waits",
         handTitle: "🎴 Your Hand 🎴",
-        selectWaiting: "🎯 Select All Waiting Tiles 🎯",
-        submitAnswer: "✨ Check Answer ✨",
-        correct: "🎉 Correct! Excellent! 🎉",
-        incorrect: "❌ Incorrect!",
+        selectWaiting: "🎯 Select ALL Winning Tiles (Waits) 🎯",
+        submitAnswer: "✨ Submit ✨",
+        correct: "🎉 Correct! Nice Hand! 🎉",
+        incorrect: "❌ Wrong Answer...",
         timeUp: "⏰ Time's Up!",
-        correctAnswer: "💡 Correct Answer:",
+        correctAnswer: "💡 Correct Waits:",
         nextQuestion: "➡️ Next Question",
-        question: "Question",
+        question: "Stage",
         bossStage: "🔥 BOSS STAGE 🔥",
-        bossChallenge: "Use accumulated time!",
-        bossComplete: "BOSS Defeated!",
-        victory: "🎊 VICTORY! 🎊",
+        bossChallenge: "Use your saved time!",
+        bossComplete: "BOSS Defeated! Congratulations!",
+        victory: "🎊 ALL CLEARED! 🎊",
         gameOver: "GAME OVER",
-        finalQuestions: "Questions:",
-        finalScore: "Correct:",
+        finalQuestions: "Stages Completed:",
+        finalScore: "Total Correct:",
         timeLeftLabel: "Time Left:",
-        livesLeftLabel: "Lives Left:",
+        livesLeftLabel: "Lives:",
         playAgain: "Play Again",
-        backToMenu: "Back to Menu",
+        backToMenu: "Main Menu",
+        back: "Back",
         footer: "Tenpai de GO!",
-        selectLanguage: "言語を選択 / Select Language / 選擇語言",
+        selectLanguage: "Select Language",
         japanese: "Japanese",
         english: "English",
-        chinese: "Traditional Chinese",
-        allBreakdown: "📋 All Winning Hand Patterns as follows:",
-        winningTile: "🎯 Winning Tile:",
+        chinese: "繁體中文",
+        allBreakdown: "📋 Hand Structure for each wait:",
+        winningTile: "🎯 Wait:",
         head: "Pair",
         meld: "Meld",
-        // pair: "Pair: ",
-        // triplet: "Triplet: ",
-        // sequence: "Sequence: ",
         pair: "Pair",
-        triplet: "Triplet",
-        sequence: "Sequence",
-        pin: "Pin",
-        man: "Man",
-        sou: "Sou",
+        triplet: "Pung (Triplet)",
+        sequence: "Chow (Sequence)",
+        pin: "Circles (Pin)",
+        man: "Characters (Man)",
+        sou: "Bamboos (Sou)",
         lives: "Lives:",
-        loseLife: "Life -1",
+        loseLife: "Life Lost",
         continue: "Continue",
         giveUp: "Give Up",
         stage: "Stage",
         difficulty: "Difficulty",
-        maxWaits: "Max waits:",
+        maxWaits: "Max Waits:",
         correctCount: "Correct:",
         paused: "⏸️ PAUSED",
         tapToResume: "Tap to Resume",
-        timeExtension: "⏱️ Time Extension",
+        timeExtension: "⏱️ Think Time (+30s)",
         timeExtensionDesc: "+30s",
-        extensionsLeft: "Left",
+        extensionsLeft: "Left:",
         ok: "OK",
 
-        storyHelpTitle: "Story Mode Difficulty",
-        storyHelpBody: "Easy: Up to 3 waits\nMedium: Up to 6 waits\nHard: Up to 9 waits\n\nDifficulty increases every 3 stages."
+        tutorial: "Tutorial",
+        tutorialTitle: "How to Play",
+        tutorialPrev: "Back",
+        tutorialNext: "Next",
+        tutorialClose: "Close",
+        tutorialFinish: "Finish",
+
+        tutorialP1Title: "Goal",
+        tutorialP1Body: "Your hand is in 'Tenpai' (one tile away from winning).\nFind and select ALL possible winning tiles (waits).\n\nKey Points:\n- There may be multiple different winning tiles.\n- Tiles already used 4 times in your hand cannot be waits.",
+
+        tutorialP2Title: "Controls",
+        tutorialP2Body: "1) Tap the tile icons (1-9) to select your waits.\n2) Tap 'Submit' to check your answer.\n\nTips:\n- Tap a selected tile again to unselect it.\n- If time runs out, your current selection will be auto-submitted.",
+
+        tutorialP3Title: "Difficulty Levels",
+        tutorialP3Body: "Easy: Up to 3-way waits.\nMedium: Up to 6-way waits.\nHard: Up to 9-way waits.\n\nIn Story Mode, the difficulty increases every 3 stages.",
+
+        tutorialP4Title: "Think Time (+30s)",
+        tutorialP4Body: "In Casual/Story modes, use 'Think Time' to add 30 seconds.\n- Use it when the timer turns red.\n\nNote: Cannot be used during the BOSS Stage, but unused charges will be converted into extra time for the BOSS battle.",
+
+        tutorialP5Title: "The BOSS Stage",
+        tutorialP5Body: "Stage 10 is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!"
     },
     zh: {
-        gameTitle: "🀄 聽牌GO! 🀄",
-        gameSubtitle: "麻雀聽牌訓練遊戲",
-        selectMode: "選擇遊戲模式",
+        gameTitle: "🀄 聽牌 GO! 🀄",
+        gameSubtitle: "麻雀聽牌強化訓練",
+        selectMode: "請選擇遊戲模式",
         casualMode: "休閒模式",
-        casualDesc: "9條問題 + BOSS關卡\n每題45秒，3條生命",
+        casualDesc: "全 9 題 + BOSS關卡\n每題 45 秒 / 3 條生命",
         storyMode: "闖關模式",
-        storyDesc: "初級→中級→高級各3條問題 + BOSS\n每題30秒，3條生命",
+        storyDesc: "初級 → 中級 → 高級各 3 題 + BOSS\n每題 30 秒 / 3 條生命",
         survivalMode: "生存模式",
-        survivalDesc: "由60秒開始\n答對可回復時間，沒有生命數",
-        selectDifficulty: "選擇難度",
+        survivalDesc: "60 秒開始\n答對可回復時間 / 無生命限制",
+        selectDifficulty: "請選擇難度",
         easy: "初級",
-        easyDesc: "最多聽3張",
+        easyDesc: "最多 3 面聽",
         medium: "中級",
-        mediumDesc: "最多聽6張",
+        mediumDesc: "最多 6 面聽",
         hard: "高級",
-        hardDesc: "最多聽9張",
-        handTitle: "🎴 手牌 🎴",
-        selectWaiting: "🎯 選擇所有聽的牌 🎯",
+        hardDesc: "最多 9 面聽",
+        handTitle: "🎴 目前手牌 🎴",
+        selectWaiting: "🎯 請選出所有聽的牌 🎯",
         submitAnswer: "✨ 確認答案 ✨",
-        correct: "🎉 正確！太棒了！ 🎉",
-        incorrect: "❌ 可惜，不正確。",
-        timeUp: "⏰ 時間到了！",
-        correctAnswer: "💡 正確答案：",
+        correct: "🎉 正確！高手！ 🎉",
+        incorrect: "❌ 答錯了...",
+        timeUp: "⏰ 時間到！",
+        correctAnswer: "💡 正確聽牌：",
         nextQuestion: "➡️ 下一題",
-        question: "問題",
+        question: "第",
         bossStage: "🔥 BOSS 關卡 🔥",
-        bossChallenge: "用累積時間挑戰！",
-        bossComplete: "擊敗BOSS！",
+        bossChallenge: "使用累積時間挑戰！",
+        bossComplete: "擊敗 BOSS！恭喜通關！",
         victory: "🎊 全部通關！ 🎊",
         gameOver: "遊戲結束",
-        finalQuestions: "問題數：",
-        finalScore: "正確數：",
+        finalQuestions: "到達題目數：",
+        finalScore: "總正確數：",
         timeLeftLabel: "剩餘時間：",
         livesLeftLabel: "剩餘生命：",
         playAgain: "再玩一次",
         backToMenu: "返回選單",
-        footer: "聽牌GO!",
-        selectLanguage: "言語を選択 / Select Language / 選擇語言",
+        back: "返回",
+        footer: "聽牌 GO!",
+        selectLanguage: "選擇語言 / Select Language",
         japanese: "日本語",
         english: "English",
         chinese: "繁體中文",
-        allBreakdown: "📋 所有聽的牌的食胡牌型如下：",
-        winningTile: "🎯 食胡牌：",
-        head: "眼",
+        allBreakdown: "📋 聽牌拆解（食胡牌型）：",
+        winningTile: "🎯 聽：",
+        head: "將眼",
         meld: "面子",
-        // pair: "眼：",
-        // triplet: "刻子：",
-        // sequence: "順子：",
-        pair: "眼",
+        pair: "對子",
         triplet: "刻子",
         sequence: "順子",
-        pin: "筒",
-        man: "萬",
-        sou: "索",
-        lives: "生命：",
-        loseLife: "生命 -1",
+        pin: "筒子",
+        man: "萬子",
+        sou: "索子",
+        lives: "生命值：",
+        loseLife: "生命減少",
         continue: "繼續遊戲",
         giveUp: "放棄",
         stage: "關卡",
         difficulty: "難度",
-        maxWaits: "最多聽牌數：",
+        maxWaits: "最大聽牌數：",
         correctCount: "正確數：",
         paused: "⏸️ 已暫停",
-        tapToResume: "點擊繼續",
-        timeExtension: "⏱️ 延長",
-        timeExtensionDesc: "+30秒",
+        tapToResume: "點擊螢幕繼續",
+        timeExtension: "⏱️ 長考（增加時間）",
+        timeExtensionDesc: "+30 秒",
         extensionsLeft: "剩餘",
-        ok: "OK",
+        ok: "確認",
 
-        storyHelpTitle: "闖關模式難度說明",
-        storyHelpBody: "初級：最多聽3張\n中級：最多聽6張\n高級：最多聽9張\n\n闖關模式每3關會提升一次難度。"
+        tutorial: "教學",
+        tutorialTitle: "遊戲玩法",
+        tutorialPrev: "上一頁",
+        tutorialNext: "下一頁",
+        tutorialClose: "關閉",
+        tutorialFinish: "完成",
+
+        tutorialP1Title: "遊戲目標",
+        tutorialP1Body: "根據顯示的手牌（聽牌狀態），找出所有可以食胡的「聽牌」。\n\n注意點：\n・聽牌可能不只一張（多面聽）\n・手牌中已經使用了 4 張的牌，不能作為聽牌",
+
+        tutorialP2Title: "操作方式",
+        tutorialP2Body: "1) 點擊下方 1 ～ 9 的按鈕，選出所有聽牌\n2) 點擊「確認答案」進行判定\n\n提示：\n・再次點擊已選中的牌可取消選擇\n・時間結束時，若已有選牌會自動提交",
+
+        tutorialP3Title: "難度說明",
+        tutorialP3Body: "初級：最多 3 面聽\n中級：最多 6 面聽\n高級：最多 9 面聽\n\n在「闖關模式」中，難度會隨著關卡進度提升。",
+
+        tutorialP4Title: "長考（增加時間）",
+        tutorialP4Body: "休閒/闖關模式中可使用「長考」按鈕。\n・每次使用可增加 30 秒\n・時間快結束時，按鈕會閃爍提示\n\n※ BOSS 關卡不能使用，但剩餘次數會自動轉化為 BOSS 關卡的額外時間。",
+
+        tutorialP5Title: "BOSS 關卡",
+        tutorialP5Body: "第 10 關為 BOSS 關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！"
     }
 };
+
+let tutorialPageIndex = 0;
+
+function getTutorialPages() {
+    return [
+        { title: t('tutorialP1Title'), body: t('tutorialP1Body') },
+        { title: t('tutorialP2Title'), body: t('tutorialP2Body') },
+        { title: t('tutorialP3Title'), body: t('tutorialP3Body') },
+        { title: t('tutorialP4Title'), body: t('tutorialP4Body') },
+        { title: t('tutorialP5Title'), body: t('tutorialP5Body') }
+    ];
+}
+
+function renderTutorialPage() {
+    const screen = document.getElementById('tutorial-screen');
+    if (!screen || screen.classList.contains('hidden')) return;
+
+    const pages = getTutorialPages();
+    const total = pages.length;
+    const idx = Math.min(Math.max(0, tutorialPageIndex), total - 1);
+    tutorialPageIndex = idx;
+
+    const indicator = document.getElementById('tutorial-page-indicator');
+    const titleEl = document.getElementById('tutorial-page-title');
+    const bodyEl = document.getElementById('tutorial-page-body');
+    const prevBtn = document.getElementById('tutorial-prev-btn');
+    const nextBtn = document.getElementById('tutorial-next-btn');
+    const closeBtn = document.getElementById('tutorial-close-btn');
+    const prevText = document.getElementById('tutorial-prev-text');
+    const nextText = document.getElementById('tutorial-next-text');
+    const closeText = document.getElementById('tutorial-close-text');
+
+    if (indicator) indicator.textContent = `${idx + 1}/${total}`;
+    if (titleEl) titleEl.textContent = pages[idx].title || '';
+    if (bodyEl) bodyEl.textContent = pages[idx].body || '';
+
+    if (prevText) prevText.textContent = t('tutorialPrev');
+    if (nextText) nextText.textContent = (idx === total - 1) ? t('tutorialFinish') : t('tutorialNext');
+    if (closeText) closeText.textContent = t('tutorialClose');
+
+    if (prevBtn) prevBtn.disabled = idx === 0;
+    if (nextBtn) nextBtn.disabled = false;
+    if (closeBtn) closeBtn.disabled = false;
+}
 
 let currentLang = 'ja';
 const t = (key) => translations[currentLang][key] || key;
@@ -274,7 +369,7 @@ function showStageIntro({ titleText, subtitleHtml, durationMs }) {
         stageIntroTimeoutId = null;
     }
 
-    // safety: ensure timer isn't running during intro
+    // 安全のため：イントロ表示中はタイマーを停止する
     stopTimer();
 
     titleEl.textContent = titleText || '';
@@ -337,7 +432,7 @@ function applyUiScale() {
 
     document.documentElement.style.setProperty('--ui-scale', clamped.toFixed(4));
 
-    // Optional debug overlay for sizing issues
+    // 表示倍率/サイズ問題の調査用デバッグ表示（任意）
     const overlay = ensureScaleDebugOverlay();
     if (overlay) {
         stage.classList.add('debug-outline');
@@ -557,6 +652,68 @@ const tileNames = {
     }
 };
 
+// assets/ 配下を事前にすべてプリロードして、プレイ中の引っかかりを防ぐ
+//（ブラウザ上では実行時にディレクトリ一覧を取得できないため、静的リストにする）
+const ASSET_FILES = [
+    'Back.png', 'Blank.png', 'Chun.png', 'continue.mp3', 'correct.mp3',
+    'Front.png', 'gameover.mp3', 'Haku.png', 'Hatsu.png', 'incorrect.mp3',
+    'Man1.png', 'Man2.png', 'Man3.png', 'Man4.png', 'Man5-Dora.png', 'Man5.png', 'Man6.png', 'Man7.png', 'Man8.png', 'Man9.png',
+    'Nan.png', 'Pei.png',
+    'Pin1.png', 'Pin2.png', 'Pin3.png', 'Pin4.png', 'Pin5-Dora.png', 'Pin5.png', 'Pin6.png', 'Pin7.png', 'Pin8.png', 'Pin9.png',
+    'select.mp3', 'Shaa.png',
+    'Sou1.png', 'Sou2.png', 'Sou3.png', 'Sou4.png', 'Sou5-Dora.png', 'Sou5.png', 'Sou6.png', 'Sou7.png', 'Sou8.png', 'Sou9.png',
+    'tap.mp3', 'timer.mp3', 'timeup.mp3', 'Ton.png', 'victory.mp3'
+];
+
+function preloadImage(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = url;
+    });
+}
+
+async function preloadAssets({ onProgress } = {}) {
+    const urls = ASSET_FILES.map((f) => `assets/${f}`);
+    const total = urls.length;
+    let loaded = 0;
+
+    const report = () => {
+        if (typeof onProgress === 'function') onProgress({ loaded, total });
+    };
+    report();
+
+    // UI の反応を落とさない程度の並列数に抑える
+    const concurrency = 6;
+    const queue = urls.slice();
+
+    const worker = async () => {
+        while (queue.length) {
+            const url = queue.shift();
+            try {
+                if (url.endsWith('.png')) {
+                    await preloadImage(url);
+                } else {
+                    // fetch してブラウザキャッシュを温める
+                    const res = await fetch(url, { cache: 'force-cache' });
+                    if (res && res.ok) {
+                        await res.blob();
+                    }
+                }
+            } catch {
+                // 個別のアセット読み込み失敗は無視して、ゲーム自体は続行できるようにする
+            } finally {
+                loaded++;
+                report();
+            }
+        }
+    };
+
+    const workers = Array.from({ length: concurrency }, () => worker());
+    await Promise.all(workers);
+}
+
 const getTileInfo = (type, number) => {
     const safeType = tileImages[type] ? type : 'pin';
     const src = tileImages[safeType]?.[number] || tileImages.pin[number];
@@ -568,32 +725,35 @@ const getTileInfo = (type, number) => {
 };
 
 function pickRandomTileType() {
-    // For English UI, avoid Man tiles because the tile face uses kanji.
+    // 英語UIでは牌面が漢字の「萬子」を避ける
     const types = currentLang === 'en' ? ['pin', 'sou'] : ['pin', 'man', 'sou'];
     return types[Math.floor(Math.random() * types.length)];
 }
 
-// ========== Sounds ==========
+// ========== サウンド ==========
 const soundConfig = {
-    select: { src: 'assets/select.mp3', pool: 4 },
-    tap: { src: 'assets/tap.mp3', pool: 6 },
-    correct: { src: 'assets/correct.mp3', pool: 2 },
-    incorrect: { src: 'assets/incorrect.mp3', pool: 2 },
-    continue: { src: 'assets/continue.mp3', pool: 2 },
-    gameover: { src: 'assets/gameover.mp3', pool: 2 },
-    victory: { src: 'assets/victory.mp3', pool: 2 },
-    timeup: { src: 'assets/timeup.mp3', pool: 2 }
+    // allowOverlap=true の場合、プールが埋まっていれば一時的に追加インスタンスを生成して重ねて鳴らす
+    // victory/gameover などは重ねない（カオス防止）
+    select: { src: 'assets/select.mp3', pool: 4, allowOverlap: true, maxExtra: 6 },
+    tap: { src: 'assets/tap.mp3', pool: 6, allowOverlap: true, maxExtra: 8 },
+    correct: { src: 'assets/correct.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
+    incorrect: { src: 'assets/incorrect.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
+    continue: { src: 'assets/continue.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
+    gameover: { src: 'assets/gameover.mp3', pool: 2, allowOverlap: false },
+    victory: { src: 'assets/victory.mp3', pool: 2, allowOverlap: false },
+    timeup: { src: 'assets/timeup.mp3', pool: 2, allowOverlap: false }
 };
 
 const soundPools = new Map();
+const extraSoundInstances = new Map();
 
 let audioUnlocked = false;
 
 function unlockAudioOnce() {
     if (audioUnlocked) return;
 
-    // iOS (Safari/Chrome) blocks audio playback unless it is initiated by a user gesture.
-    // Prime all audio elements on the first interaction so later timer-driven sounds work.
+    // iOS（Safari/Chrome）はユーザー操作起点でない音声再生をブロックする
+    // 最初の操作時に全 Audio を空再生して解除し、タイマー駆動の音も鳴るようにする
     const audiosToPrime = [];
     for (const pool of soundPools.values()) {
         for (const audio of pool) audiosToPrime.push(audio);
@@ -609,20 +769,20 @@ function unlockAudioOnce() {
             audio.currentTime = 0;
             const p = audio.play();
 
-            // Immediately pause/reset; we only need a successful play() within a gesture.
+            // すぐ停止/リセットする。ここでは「ユーザー操作内で play() が成功する」ことだけが必要
             audio.pause();
             audio.currentTime = 0;
             audio.volume = originalVolume;
 
             if (p && typeof p.then === 'function') {
                 anySucceeded = true;
-                // Avoid unhandled rejections
+                // 未処理の Promise rejection を避ける
                 p.catch(() => {});
             } else {
                 anySucceeded = true;
             }
         } catch {
-            // ignore
+            // 無視
         }
     }
 
@@ -639,6 +799,7 @@ function initSounds() {
             pool.push(audio);
         }
         soundPools.set(name, pool);
+        extraSoundInstances.set(name, []);
     }
 }
 
@@ -646,15 +807,53 @@ function playSound(name) {
     const pool = soundPools.get(name);
     if (!pool || pool.length === 0) return;
 
+    const cfg = soundConfig[name] || {};
+    const allowOverlap = cfg.allowOverlap !== false;
+
+    if (!allowOverlap) {
+        // すでに再生中のものがあればスキップ
+        if (pool.some(a => !a.paused && !a.ended)) return;
+    }
+
     let audio = pool.find(a => a.paused || a.ended);
-    if (!audio) audio = pool[0];
+
+    if (!audio) {
+        if (allowOverlap) {
+            const extras = extraSoundInstances.get(name) || [];
+            const maxExtra = Math.max(0, cfg.maxExtra || 0);
+            if (extras.length < maxExtra) {
+                try {
+                    const extra = new Audio(cfg.src);
+                    extra.preload = 'auto';
+                    extra.addEventListener('ended', () => {
+                        const arr = extraSoundInstances.get(name);
+                        if (!arr) return;
+                        const idx = arr.indexOf(extra);
+                        if (idx >= 0) arr.splice(idx, 1);
+                    }, { once: true });
+                    extras.push(extra);
+                    extraSoundInstances.set(name, extras);
+                    audio = extra;
+                } catch {
+                    audio = null;
+                }
+            } else {
+                // 上限に達した場合は先頭のプールを使い回す（フォールバック）
+                audio = pool[0];
+            }
+        } else {
+            audio = pool[0];
+        }
+    }
+
+    if (!audio) return;
 
     try {
         audio.currentTime = 0;
         const p = audio.play();
         if (p && typeof p.catch === 'function') p.catch(() => {});
     } catch {
-        // ignore
+        // 無視
     }
 }
 
@@ -674,7 +873,7 @@ function startTimerSound() {
         const p = timerAudio.play();
         if (p && typeof p.catch === 'function') p.catch(() => {});
     } catch {
-        // ignore
+        // 無視
     }
 }
 
@@ -1313,7 +1512,7 @@ function updateQuestionDisplay() {
     const questionNum = document.getElementById('question-number');
     const stageInfo = document.getElementById('stage-info');
 
-    const totalStages = (gameState.mode === 'casual' || gameState.mode === 'story') ? 10 : null;
+    // const totalStages = (gameState.mode === 'casual' || gameState.mode === 'story') ? 10 : null;
 
     const diffKey = gameState.difficulty || 'easy';
     const diffName = t(diffKey);
@@ -1329,7 +1528,7 @@ function updateQuestionDisplay() {
         `<span class="${diffBadgeClass}">${diffName}</span>` +
         (diffDesc ? ` <span class="opacity-80">(${diffDesc})</span>` : '');
 
-    // difficulty accent (mainly for Story Mode readability)
+    // 難易度アクセント（主にストーリーモードの視認性向上）
     if (questionNum) {
         questionNum.classList.remove('difficulty-accent--easy', 'difficulty-accent--medium', 'difficulty-accent--hard');
         if (!gameState.isBossStage && (gameState.mode === 'casual' || gameState.mode === 'story' || gameState.mode === 'survival')) {
@@ -1339,11 +1538,11 @@ function updateQuestionDisplay() {
 
     if (gameState.isBossStage) {
         questionNum.textContent = t('bossStage');
-        stageInfo.innerHTML = `${t('stage')} ${gameState.currentStage}　${diffInfoHtml}`;
     } else {
         questionNum.textContent = `${t('stage')} ${gameState.currentStage}`;
-        stageInfo.innerHTML = diffInfoHtml;
     }
+    stageInfo.innerHTML = `<small>${diffInfoHtml}</small>`;
+
     updateLivesDisplay();
     updateInteractionState();
 }
@@ -1374,7 +1573,15 @@ function renderPossibleTiles() {
         div.dataset.tile = tile;
         div.appendChild(createTileImage(tileInfo));
         div.title = tileInfo.name;
-        div.addEventListener('click', () => toggleTileSelection(tile, div));
+
+        // 手牌内で同牌が4枚使われている場合、その牌は選択不可にする
+        const exhausted = (gameState.counts && gameState.counts[tile] >= 4);
+        if (exhausted) {
+            div.classList.add('tile-disabled');
+            div.setAttribute('aria-disabled', 'true');
+        } else {
+            div.addEventListener('click', () => toggleTileSelection(tile, div));
+        }
         container.appendChild(div);
     }
 }
@@ -1661,20 +1868,6 @@ function createTileGroup(tileNumbers, label) {
     groupContainer.className = 'tile-group';
     
     // 詳細な牌の種類を説明
-    /*
-    let detailText = '';
-    if (tileNumbers.length === 2) {
-        detailText = `${t('pair')}${tileNumbers[0]}${t('pin')}`;
-    } else if (tileNumbers.length === 3) {
-        if (tileNumbers[0] === tileNumbers[1] && tileNumbers[1] === tileNumbers[2]) {
-            detailText = `${t('triplet')}${tileNumbers[0]}${t('pin')}×3`;
-        } else {
-            detailText = `${t('sequence')}${tileNumbers[0]}-${tileNumbers[1]}-${tileNumbers[2]}${t('pin')}`;
-        }
-    }
-    */
-
-    // 詳細な牌の種類を説明
     let detailText = '';
     if (tileNumbers.length === 2) {
         detailText = `${t('pair')}`;
@@ -1928,6 +2121,12 @@ function updateUILanguage() {
     document.getElementById('story-desc').textContent = t('storyDesc');
     document.getElementById('survival-title').textContent = t('survivalMode');
     document.getElementById('survival-desc').textContent = t('survivalDesc');
+
+    const tutorialBtnText = document.getElementById('tutorial-btn-text');
+    if (tutorialBtnText) tutorialBtnText.textContent = t('tutorial');
+
+    const modeBackText = document.getElementById('mode-back-text');
+    if (modeBackText) modeBackText.textContent = t('back');
     
     // 難易度選択
     document.getElementById('difficulty-title').textContent = t('selectDifficulty');
@@ -1937,6 +2136,9 @@ function updateUILanguage() {
     document.getElementById('medium-desc').textContent = t('mediumDesc');
     document.getElementById('hard-title').textContent = t('hard');
     document.getElementById('hard-desc').textContent = t('hardDesc');
+
+    const difficultyBackText = document.getElementById('difficulty-back-text');
+    if (difficultyBackText) difficultyBackText.textContent = t('back');
     
     // ゲーム画面
     document.getElementById('hand-title').textContent = t('handTitle');
@@ -1957,10 +2159,9 @@ function updateUILanguage() {
     // 勝利/敗北画面
     const resultOpen = !!document.getElementById('result-section') && !document.getElementById('result-section').classList.contains('hidden');
     document.getElementById('gameover-title').textContent = t('gameOver');
-    document.getElementById('final-questions-label').textContent = t('finalQuestions');
-    document.getElementById('final-correct-label').textContent = t('finalScore');
     const timeLeftLabel = document.getElementById('final-time-left-label');
     const livesLeftLabel = document.getElementById('final-lives-left-label');
+    document.getElementById('mode').textContent = t(`${gameState.mode}`);
     if (timeLeftLabel) timeLeftLabel.textContent = t('timeLeftLabel');
     if (livesLeftLabel) livesLeftLabel.textContent = t('livesLeftLabel');
     document.getElementById('final-score-label').textContent = t('finalScore');
@@ -1970,45 +2171,12 @@ function updateUILanguage() {
     document.getElementById('menu-gameover').textContent = t('backToMenu');
     
     // フッター
-    document.getElementById('footer-text').innerHTML = `${t('footer')} &copy; 2025 Akira Akiyama`;
-}
+    document.getElementById('footer-text').innerHTML = `${t('footer')} &copy; 2026 Akira Akiyama`;
 
-function showInfoOverlay({ titleText, bodyText }) {
-    let overlay = document.getElementById('info-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'info-overlay';
-        overlay.className = 'info-overlay hidden';
-        overlay.innerHTML = `
-            <div class="info-overlay-card">
-                <div id="info-overlay-title" class="text-4xl font-black mb-4 text-center"></div>
-                <div id="info-overlay-body" class="info-overlay-body text-xl mb-8 text-center"></div>
-                <div class="flex justify-center">
-                    <button id="info-overlay-ok" class="mode-btn action-btn"><span id="info-overlay-ok-text">OK</span></button>
-                </div>
-            </div>
-        `;
-        const root = document.getElementById('design-root');
-        (root || document.body).appendChild(overlay);
-    }
-
-    const titleEl = document.getElementById('info-overlay-title');
-    const bodyEl = document.getElementById('info-overlay-body');
-    const okBtn = document.getElementById('info-overlay-ok');
-    const okTextEl = document.getElementById('info-overlay-ok-text');
-
-    if (titleEl) titleEl.textContent = titleText || '';
-    if (bodyEl) bodyEl.textContent = bodyText || '';
-    if (okTextEl) okTextEl.textContent = t('ok');
-
-    overlay.classList.remove('hidden');
-    overlay.classList.add('fade-in');
-
-    if (okBtn) {
-        okBtn.onclick = () => {
-            overlay.classList.add('hidden');
-        };
-    }
+    // チュートリアル
+    const tutorialTitle = document.getElementById('tutorial-title');
+    if (tutorialTitle) tutorialTitle.textContent = t('tutorialTitle');
+    renderTutorialPage();
 }
 
 function resetGame() {
@@ -2048,8 +2216,8 @@ function selectLanguage(lang) {
     document.title = t('gameTitle').replace(/🀄/g, '').trim();
     updateUILanguage();
 
-    // If user switches to English, avoid showing Man suit tiles mid-run.
-    // (Images contain kanji, which is hard for many non-Japanese/Chinese players.)
+    // 英語へ切り替えた場合、途中でも萬子が出ないようにする
+    //（画像が漢字牌面のため、海外プレイヤーには判読しづらい）
     if (currentLang === 'en' && gameState?.tileType === 'man') {
         gameState.tileType = 'pin';
         const gameScreen = document.getElementById('game-screen');
@@ -2058,7 +2226,7 @@ function selectLanguage(lang) {
                 renderHand();
                 renderPossibleTiles();
             } catch {
-                // ignore rendering failures during screen transitions
+                // 画面切替中の描画失敗は無視する
             }
         }
     }
@@ -2074,6 +2242,30 @@ function selectLanguage(lang) {
         modeScreen.classList.remove('hidden');
         modeScreen.classList.add('fade-in');
     }, 400);
+}
+
+function backToLanguageSelection() {
+    const languageScreen = document.getElementById('language-screen');
+    const modeScreen = document.getElementById('mode-screen');
+    if (!languageScreen || !modeScreen) return;
+
+    modeScreen.classList.add('hidden');
+    languageScreen.classList.remove('hidden');
+    languageScreen.classList.add('fade-in');
+}
+
+function backToModeSelection() {
+    const difficultyScreen = document.getElementById('difficulty-screen');
+    const modeScreen = document.getElementById('mode-screen');
+    if (!difficultyScreen || !modeScreen) return;
+
+    // 途中まで選んだ状態を破棄する
+    gameState.mode = null;
+    gameState.difficulty = null;
+
+    difficultyScreen.classList.add('hidden');
+    modeScreen.classList.remove('hidden');
+    modeScreen.classList.add('fade-in');
 }
 
 function showPauseOverlay() {
@@ -2105,13 +2297,36 @@ function hidePauseOverlay() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 初期表示はプリロード画面のみにする
+    const preloadScreen = document.getElementById('preload-screen');
+    const languageScreen = document.getElementById('language-screen');
+    if (preloadScreen) preloadScreen.classList.remove('hidden');
+    if (languageScreen) languageScreen.classList.add('hidden');
+
     initSounds();
     initTimerSound();
     applyUiScale();
     window.addEventListener('resize', applyUiScale);
     window.visualViewport?.addEventListener('resize', applyUiScale);
 
-    // Prime audio on the first user gesture (needed on iOS browsers)
+    // 進捗表示付きでアセットをプリロード
+    const progressFill = document.getElementById('preload-progress-fill');
+    const progressText = document.getElementById('preload-progress-text');
+    preloadAssets({
+        onProgress: ({ loaded, total }) => {
+            const pct = total > 0 ? Math.round((loaded / total) * 100) : 0;
+            if (progressFill) progressFill.style.width = `${pct}%`;
+            if (progressText) progressText.textContent = `${pct}% (${loaded}/${total})`;
+        }
+    }).then(() => {
+        if (preloadScreen) preloadScreen.classList.add('hidden');
+        if (languageScreen) {
+            languageScreen.classList.remove('hidden');
+            languageScreen.classList.add('fade-in');
+        }
+    });
+
+    // 最初のユーザー操作で音声を解放（iOS 対策）
     document.addEventListener('pointerdown', unlockAudioOnce, { capture: true, once: true });
     document.addEventListener('touchstart', unlockAudioOnce, { capture: true, once: true, passive: true });
 
@@ -2122,15 +2337,70 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('story-btn').addEventListener('click', () => { playSound('select'); startGameMode('story'); });
     document.getElementById('survival-btn').addEventListener('click', () => { playSound('select'); startGameMode('survival'); });
 
-    const storyInfoBtn = document.getElementById('story-info-btn');
-    if (storyInfoBtn) {
-        storyInfoBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            playSound('tap');
-            showInfoOverlay({ titleText: t('storyHelpTitle'), bodyText: t('storyHelpBody') });
+    const modeBackBtn = document.getElementById('mode-back-btn');
+    if (modeBackBtn) modeBackBtn.addEventListener('click', () => { playSound('tap'); backToLanguageSelection(); });
+
+    const difficultyBackBtn = document.getElementById('difficulty-back-btn');
+    if (difficultyBackBtn) difficultyBackBtn.addEventListener('click', () => { playSound('tap'); backToModeSelection(); });
+
+    const tutorialBtn = document.getElementById('tutorial-btn');
+    const tutorialScreen = document.getElementById('tutorial-screen');
+    const tutorialPrevBtn = document.getElementById('tutorial-prev-btn');
+    const tutorialNextBtn = document.getElementById('tutorial-next-btn');
+    const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+
+    function openTutorial() {
+        if (!tutorialScreen) return;
+        playSound('tap');
+        tutorialPageIndex = 0;
+        tutorialScreen.classList.remove('hidden');
+        tutorialScreen.classList.add('fade-in');
+        tutorialScreen.setAttribute('aria-hidden', 'false');
+        updateUILanguage();
+        renderTutorialPage();
+    }
+
+    function closeTutorial() {
+        if (!tutorialScreen) return;
+        playSound('tap');
+        tutorialScreen.classList.add('hidden');
+        tutorialScreen.setAttribute('aria-hidden', 'true');
+    }
+
+    if (tutorialBtn) tutorialBtn.addEventListener('click', openTutorial);
+
+    if (tutorialScreen) {
+        tutorialScreen.addEventListener('click', (e) => {
+            // モーダル外（背景）クリックで閉じる
+            if (e.target === tutorialScreen) {
+                closeTutorial();
+            }
         });
     }
+
+    if (tutorialPrevBtn) {
+        tutorialPrevBtn.addEventListener('click', () => {
+            playSound('tap');
+            tutorialPageIndex = Math.max(0, tutorialPageIndex - 1);
+            renderTutorialPage();
+        });
+    }
+
+    if (tutorialNextBtn) {
+        tutorialNextBtn.addEventListener('click', () => {
+            const pages = getTutorialPages();
+            const last = pages.length - 1;
+            if (tutorialPageIndex >= last) {
+                closeTutorial();
+                return;
+            }
+            playSound('tap');
+            tutorialPageIndex = Math.min(last, tutorialPageIndex + 1);
+            renderTutorialPage();
+        });
+    }
+
+    if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', closeTutorial);
     document.getElementById('easy').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('easy'); });
     document.getElementById('medium').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('medium'); });
     document.getElementById('hard').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('hard'); });

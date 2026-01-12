@@ -82,7 +82,7 @@ body.in-game #lives-display {
     transform-origin: top center;
 }
 
-/* Debug helpers (enabled via ?debug=1) */
+/* デバッグ用（?debug=1 で有効） */
 .scale-stage.debug-outline {
     outline: 2px dashed rgba(255, 255, 255, 0.35);
     outline-offset: -2px;
@@ -130,12 +130,12 @@ body.in-game #lives-display {
 #mode-screen,
 #difficulty-screen {
     overflow: auto;
-    -ms-overflow-style: none; /* IE/Edge legacy */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge（旧） */
+    scrollbar-width: none; /* Firefox 用 */
     overscroll-behavior: contain;
 }
 
-/* WebKit: hide scrollbars but keep scrolling */
+/* WebKit：スクロールバーは非表示（スクロールは可能） */
 #language-screen::-webkit-scrollbar,
 #mode-screen::-webkit-scrollbar,
 #difficulty-screen::-webkit-scrollbar {
@@ -238,6 +238,196 @@ body.time-critical::after {
     overflow: hidden;
 }
 
+/* ========== プリロード画面 ========== */
+.preload-progress-wrap {
+    width: 100%;
+}
+
+.preload-progress-bar {
+    height: 16px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.preload-progress-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, rgba(167, 139, 250, 0.9) 0%, rgba(192, 132, 252, 0.9) 50%, rgba(139, 92, 246, 0.9) 100%);
+    transition: width 0.18s ease;
+}
+
+/* ========== チュートリアル ========== */
+.tutorial-btn {
+    position: absolute;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 9999px;
+    border: 2px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.95);
+    cursor: pointer;
+    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.nav-back-btn {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 9999px;
+    border: 2px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.95);
+    cursor: pointer;
+    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.nav-back-btn:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.nav-back-btn:active {
+    transform: translateY(0px) scale(0.98);
+}
+
+/* チュートリアルのオーバーレイ（結果モーダル同様に内部スクロール） */
+.tutorial-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 14, 39, 0.86);
+    backdrop-filter: blur(16px) saturate(150%);
+}
+
+.tutorial-modal {
+    width: min(980px, 94%);
+    height: min(640px, calc(100% - 64px));
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.04) 100%);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+}
+
+.tutorial-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.tutorial-modal-title-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    min-width: 0;
+}
+
+.tutorial-modal-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.tutorial-modal-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.tutorial-modal-body {
+    padding: 18px;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -ms-overflow-style: none; /* IE/Edge（旧） */
+    scrollbar-width: none; /* Firefox 用 */
+}
+
+.tutorial-modal-body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.tutorial-btn:hover {
+    transform: translateY(-1px) scale(1.03);
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(167, 139, 250, 0.4);
+}
+
+.tutorial-btn-text {
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.tutorial-section {
+    padding: 1.5rem 1.25rem;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tutorial-page-indicator {
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.tutorial-nav-btn {
+    min-width: 180px;
+}
+
+.tutorial-nav-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.tutorial-close-btn {
+    min-width: 180px;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+.tutorial-close-btn:hover {
+    border-color: rgba(239, 68, 68, 0.55) !important;
+}
+
+.tutorial-body {
+    white-space: pre-line;
+    opacity: 0.95;
+}
+
+/* ========== 選択不可の牌（同牌4枚使用済み） ========== */
+.tile-disabled {
+    opacity: 0.22;
+    filter: grayscale(0.95) saturate(0.2);
+    cursor: not-allowed !important;
+    pointer-events: none;
+    transform: none !important;
+}
+
 #game-screen {
     position: relative;
     overflow: hidden;
@@ -247,7 +437,7 @@ body.time-critical::after {
     height: 100%;
 }
 
-/* ========== Stage Intro Overlay (between questions) ========== */
+/* ========== ステージ開始オーバーレイ（問題間） ========== */
 .stage-intro {
     position: absolute;
     inset: 0;
@@ -333,7 +523,7 @@ body.time-critical::after {
     line-height: 1.2;
 }
 
-/* ========== Difficulty accents (HUD readability) ========== */
+/* ========== 難易度アクセント（HUDの視認性向上） ========== */
 .difficulty-badge {
     display: inline-flex;
     align-items: center;
@@ -346,19 +536,19 @@ body.time-critical::after {
 }
 
 .difficulty-badge--easy {
-    color: rgb(134 239 172); /* close to Tailwind green-300 */
+    color: rgb(134 239 172); /* Tailwind の green-300 相当 */
     border-color: rgba(134, 239, 172, 0.35);
     background: rgba(34, 197, 94, 0.12);
 }
 
 .difficulty-badge--medium {
-    color: rgb(253 224 71); /* close to Tailwind yellow-300 */
+    color: rgb(253 224 71); /* Tailwind の yellow-300 相当 */
     border-color: rgba(253, 224, 71, 0.35);
     background: rgba(234, 179, 8, 0.12);
 }
 
 .difficulty-badge--hard {
-    color: rgb(252 165 165); /* close to Tailwind red-300 */
+    color: rgb(252 165 165); /* Tailwind の red-300 相当 */
     border-color: rgba(252, 165, 165, 0.35);
     background: rgba(239, 68, 68, 0.12);
 }
@@ -619,64 +809,7 @@ body.in-game .time-extension-slot {
     transform: translateY(-4px) scale(1.02);
 }
 
-/* Story Mode: small info button */
-.story-btn-wrap {
-    position: relative;
-}
-
-.story-info-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 40px;
-    height: 40px;
-    border-radius: 9999px;
-    border: 2px solid rgba(167, 139, 250, 0.35);
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.95);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-    z-index: 5;
-}
-
-.story-info-btn:hover {
-    transform: scale(1.08);
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(167, 139, 250, 0.5);
-}
-
-.story-info-btn:active {
-    transform: scale(1.02);
-}
-
-/* Info overlay (Story help) */
-.info-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 9998;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(10, 14, 39, 0.72);
-    backdrop-filter: blur(18px) saturate(155%);
-}
-
-.info-overlay-card {
-    width: min(920px, 92%);
-    border-radius: 24px;
-    padding: 2.2rem 2rem;
-    border: 2px solid rgba(255, 255, 255, 0.14);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.04) 100%);
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
-}
-
-.info-overlay-body {
-    white-space: pre-line;
-    opacity: 0.95;
-}
+/* （ストーリーモードの「?」ヘルプは削除し、チュートリアルに置換済み） */
 
 /* ========== 麻雀牌スタイル ========== */
 .hand-tile {
@@ -859,7 +992,7 @@ body.in-game .time-extension-slot {
         0 0 20px rgba(76, 175, 80, 0.6),
         inset 0 1px 2px rgba(255, 255, 255, 0.5);
     position: relative;
-    /* transition を外し、CSS 変数でアニメーションを制御 */
+    /* トランジションを外し、CSS 変数でアニメーションを制御 */
     will-change: width;
 }
 
@@ -1216,7 +1349,7 @@ body.in-game .time-extension-slot {
     box-shadow: 0 16px 48px rgba(239, 68, 68, 0.4) !important;
 }
 
-/* ========== 時間延長（Time Extension）ボタン ========== */
+/* ========== 時間延長（タイム延長）ボタン ========== */
 .time-extension-btn {
     background: linear-gradient(135deg, #10b981, #059669);
     color: white;
