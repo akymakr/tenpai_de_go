@@ -22,7 +22,7 @@
 
         <div id="language-screen" class="screen-container fade-in">
             <h2 id="language-title" class="text-4xl font-bold mb-8 text-center">Select Language</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div class="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
                 <button id="lang-ja" class="mode-btn">
                     <div class="text-5xl mb-4">🇯🇵</div>
                     <div id="lang-ja-text" class="text-2xl font-bold">日本語</div>
@@ -40,17 +40,22 @@
 
         <div id="mode-screen" class="screen-container hidden">
             <h2 id="mode-title" class="text-4xl font-bold mb-8 text-center">Select Game Mode</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div class="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
                 <button id="casual-btn" class="mode-btn">
                     <div class="text-5xl mb-4">CASUAL</div>
                     <div id="casual-title" class="text-2xl font-bold mb-3">Casual Mode</div>
                     <div id="casual-desc" class="text-sm opacity-80 whitespace-pre-line">9 Questions + BOSS Stage</div>
                 </button>
-                <button id="story-btn" class="mode-btn">
-                    <div class="text-5xl mb-4">STORY</div>
-                    <div id="story-title" class="text-2xl font-bold mb-3">Story Mode</div>
-                    <div id="story-desc" class="text-sm opacity-80 whitespace-pre-line">Progressive Difficulty</div>
-                </button>
+                <div class="story-btn-wrap">
+                    <button id="story-btn" class="mode-btn">
+                        <div class="text-5xl mb-4">STORY</div>
+                        <div id="story-title" class="text-2xl font-bold mb-3">Story Mode</div>
+                        <div id="story-desc" class="text-sm opacity-80 whitespace-pre-line">Progressive Difficulty</div>
+                    </button>
+                    <button id="story-info-btn" type="button" class="story-info-btn" aria-label="Story mode info">
+                        <i class="fa fa-question" aria-hidden="true"></i>
+                    </button>
+                </div>
                 <button id="survival-btn" class="mode-btn">
                     <div class="text-5xl mb-4">SURVIVAL</div>
                     <div id="survival-title" class="text-2xl font-bold mb-3">Survival Mode</div>
@@ -61,7 +66,7 @@
 
         <div id="difficulty-screen" class="screen-container hidden">
             <h2 id="difficulty-title" class="text-4xl font-bold mb-8 text-center">Select Difficulty</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div class="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
                 <button id="easy" class="mode-btn">
                     <div class="text-5xl mb-4">EASY</div>
                     <div id="easy-title" class="text-2xl font-bold mb-3">Easy</div>
@@ -83,6 +88,13 @@
         <div id="game-screen" class="screen-container hidden">
             <div id="boss-indicator" class="boss-title text-center hidden">
                 <div class="text-6xl font-black animate-pulse">BOSS STAGE</div>
+            </div>
+
+            <div id="stage-intro" class="stage-intro hidden" aria-hidden="true">
+                <div class="stage-intro-card">
+                    <div id="stage-intro-title" class="stage-intro-title"></div>
+                    <div id="stage-intro-subtitle" class="stage-intro-subtitle"></div>
+                </div>
             </div>
 
             <div class="hud-top">
@@ -161,6 +173,8 @@
                 <div class="text-3xl mb-8">
                     <p class="mb-4"><span id="final-questions-label">Questions:</span> <span id="final-questions" class="font-bold text-yellow-300">10</span></p>
                     <p class="mb-4"><span id="final-correct-label">Correct:</span> <span id="final-correct" class="font-bold text-green-300">0</span></p>
+                    <p class="mb-4"><span id="final-time-left-label">Time Left:</span> <span id="final-time-left" class="font-bold text-purple-200">0</span></p>
+                    <p class="mb-4"><span id="final-lives-left-label">Lives Left:</span> <span id="final-lives-left" class="font-bold"></span></p>
                 </div>
                 <div class="flex gap-6 justify-center flex-wrap">
                     <button id="play-again-victory" class="reset-btn mode-btn">Play Again</button>

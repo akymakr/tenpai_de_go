@@ -34,6 +34,8 @@ const translations = {
         gameOver: "ゲームオーバー",
         finalQuestions: "問題数：",
         finalScore: "正解数：",
+        timeLeftLabel: "残り時間：",
+        livesLeftLabel: "残りライフ：",
         playAgain: "もう一度プレイ",
         backToMenu: "メニューに戻る",
         footer: "聴牌でGO!",
@@ -52,6 +54,8 @@ const translations = {
         triplet: "刻子",
         sequence: "順子",
         pin: "筒",
+        man: "萬",
+        sou: "索",
         lives: "ライフ：",
         loseLife: "ライフ -1",
         continue: "コンティニュー",
@@ -65,7 +69,10 @@ const translations = {
         timeExtension: "⏱️ 長考",
         timeExtensionDesc: "+30秒",
         extensionsLeft: "残り",
-        ok: "OK"
+        ok: "OK",
+
+        storyHelpTitle: "ストーリーモードの難易度",
+        storyHelpBody: "初級：最大3面張（待ち）\n中級：最大6面張（待ち）\n上級：最大9面張（待ち）\n\nストーリーは3ステージごとに難易度が上がります。"
     },
     en: {
         gameTitle: "🀄 Tenpai de GO! 🀄",
@@ -100,6 +107,8 @@ const translations = {
         gameOver: "GAME OVER",
         finalQuestions: "Questions:",
         finalScore: "Correct:",
+        timeLeftLabel: "Time Left:",
+        livesLeftLabel: "Lives Left:",
         playAgain: "Play Again",
         backToMenu: "Back to Menu",
         footer: "Tenpai de GO!",
@@ -118,6 +127,8 @@ const translations = {
         triplet: "Triplet",
         sequence: "Sequence",
         pin: "Pin",
+        man: "Man",
+        sou: "Sou",
         lives: "Lives:",
         loseLife: "Life -1",
         continue: "Continue",
@@ -131,7 +142,10 @@ const translations = {
         timeExtension: "⏱️ Time Extension",
         timeExtensionDesc: "+30s",
         extensionsLeft: "Left",
-        ok: "OK"
+        ok: "OK",
+
+        storyHelpTitle: "Story Mode Difficulty",
+        storyHelpBody: "Easy: Up to 3 waits\nMedium: Up to 6 waits\nHard: Up to 9 waits\n\nDifficulty increases every 3 stages."
     },
     zh: {
         gameTitle: "🀄 聽牌GO! 🀄",
@@ -166,6 +180,8 @@ const translations = {
         gameOver: "遊戲結束",
         finalQuestions: "問題數：",
         finalScore: "正確數：",
+        timeLeftLabel: "剩餘時間：",
+        livesLeftLabel: "剩餘生命：",
         playAgain: "再玩一次",
         backToMenu: "返回選單",
         footer: "聽牌GO!",
@@ -184,6 +200,8 @@ const translations = {
         triplet: "刻子",
         sequence: "順子",
         pin: "筒",
+        man: "萬",
+        sou: "索",
         lives: "生命：",
         loseLife: "生命 -1",
         continue: "繼續遊戲",
@@ -197,12 +215,104 @@ const translations = {
         timeExtension: "⏱️ 延長",
         timeExtensionDesc: "+30秒",
         extensionsLeft: "剩餘",
-        ok: "OK"
+        ok: "OK",
+
+        storyHelpTitle: "闖關模式難度說明",
+        storyHelpBody: "初級：最多聽3張\n中級：最多聽6張\n高級：最多聽9張\n\n闖關模式每3關會提升一次難度。"
     }
 };
 
 let currentLang = 'ja';
 const t = (key) => translations[currentLang][key] || key;
+
+let stageIntroTimeoutId = null;
+
+function getDifficultyBadgeHtml(diffKey) {
+    const key = diffKey || 'easy';
+    const diffName = t(key);
+    const diffBadgeClass = key === 'easy'
+        ? 'difficulty-badge difficulty-badge--easy'
+        : key === 'medium'
+            ? 'difficulty-badge difficulty-badge--medium'
+            : 'difficulty-badge difficulty-badge--hard';
+    return `<span class="${diffBadgeClass}">${diffName}</span>`;
+}
+
+function hideStageIntro({ immediate = false } = {}) {
+    const overlay = document.getElementById('stage-intro');
+    if (!overlay) return;
+
+    if (stageIntroTimeoutId) {
+        clearTimeout(stageIntroTimeoutId);
+        stageIntroTimeoutId = null;
+    }
+
+    if (immediate) {
+        overlay.classList.add('hidden');
+        overlay.classList.remove('is-leaving');
+        overlay.setAttribute('aria-hidden', 'true');
+        return;
+    }
+
+    overlay.classList.add('is-leaving');
+    stageIntroTimeoutId = setTimeout(() => {
+        overlay.classList.add('hidden');
+        overlay.classList.remove('is-leaving');
+        overlay.setAttribute('aria-hidden', 'true');
+        stageIntroTimeoutId = null;
+    }, 460);
+}
+
+function showStageIntro({ titleText, subtitleHtml, durationMs }) {
+    const overlay = document.getElementById('stage-intro');
+    const titleEl = document.getElementById('stage-intro-title');
+    const subtitleEl = document.getElementById('stage-intro-subtitle');
+    if (!overlay || !titleEl || !subtitleEl) return Promise.resolve();
+
+    if (stageIntroTimeoutId) {
+        clearTimeout(stageIntroTimeoutId);
+        stageIntroTimeoutId = null;
+    }
+
+    // safety: ensure timer isn't running during intro
+    stopTimer();
+
+    titleEl.textContent = titleText || '';
+    subtitleEl.innerHTML = subtitleHtml || '';
+
+    overlay.classList.remove('hidden');
+    overlay.classList.remove('is-leaving');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    const ms = Math.min(5000, Math.max(3000, durationMs ?? 3800));
+
+    return new Promise((resolve) => {
+        stageIntroTimeoutId = setTimeout(() => {
+            hideStageIntro();
+            resolve();
+        }, ms);
+    });
+}
+
+function isDebugScaleEnabled() {
+    try {
+        return new URLSearchParams(window.location.search).get('debug') === '1';
+    } catch {
+        return false;
+    }
+}
+
+function ensureScaleDebugOverlay() {
+    if (!isDebugScaleEnabled()) return null;
+    let overlay = document.getElementById('scale-debug');
+    if (overlay) return overlay;
+
+    overlay = document.createElement('div');
+    overlay.id = 'scale-debug';
+    overlay.className = 'scale-debug';
+    document.body.appendChild(overlay);
+    return overlay;
+}
 
 function applyUiScale() {
     const stage = document.getElementById('scale-stage');
@@ -219,11 +329,29 @@ function applyUiScale() {
     const availableWidth = Math.max(0, viewportWidth - safetyPadding * 2);
     const availableHeight = Math.max(0, viewportHeight - safetyPadding * 2);
 
+    // 常に「16:9 の設計画面（1280x720）を歪めず、そのまま画面内に収める」
+    // ＝縦横どちらか小さい方に合わせてスケール（裁切りはしない）
     const scale = Math.min(availableWidth / baseWidth, availableHeight / baseHeight);
-    // 大きい画面では 1 以上の拡大も許可（極小画面向けに最小値は維持）
+    // 極小画面向けに最小値は維持
     const clamped = Math.max(0.05, scale);
 
     document.documentElement.style.setProperty('--ui-scale', clamped.toFixed(4));
+
+    // Optional debug overlay for sizing issues
+    const overlay = ensureScaleDebugOverlay();
+    if (overlay) {
+        stage.classList.add('debug-outline');
+        const rect = stage.getBoundingClientRect();
+        overlay.textContent = [
+            `visualViewport: ${Math.round(viewportWidth)}x${Math.round(viewportHeight)} (css px)`,
+            `available: ${Math.round(availableWidth)}x${Math.round(availableHeight)} (padding ${safetyPadding}*2)`,
+            `scale: ${clamped.toFixed(4)}  DPR: ${window.devicePixelRatio || 1}`,
+            `stage rect: ${Math.round(rect.width)}x${Math.round(rect.height)} (px)`,
+            `stage base: ${baseWidth}x${baseHeight} (design)`,
+        ].join('\n');
+    } else {
+        stage.classList.remove('debug-outline');
+    }
 }
 
 function hideResultActions() {
@@ -387,18 +515,63 @@ const tileImages = {
         7: 'Pin7.png',
         8: 'Pin8.png',
         9: 'Pin9.png'
+    },
+    man: {
+        1: 'Man1.png',
+        2: 'Man2.png',
+        3: 'Man3.png',
+        4: 'Man4.png',
+        5: 'Man5.png',
+        6: 'Man6.png',
+        7: 'Man7.png',
+        8: 'Man8.png',
+        9: 'Man9.png'
+    },
+    sou: {
+        1: 'Sou1.png',
+        2: 'Sou2.png',
+        3: 'Sou3.png',
+        4: 'Sou4.png',
+        5: 'Sou5.png',    
+        6: 'Sou6.png',
+        7: 'Sou7.png',
+        8: 'Sou8.png',
+        9: 'Sou9.png'
     }
 };
 const tileNames = {
-    ja: { pin: { 1: '一筒（イーピン）', 2: '二筒（リャンピン）', 3: '三筒（サンピン）', 4: '四筒（スーピン）', 5: '五筒（ウーピン）', 6: '六筒（ローピン）', 7: '七筒（チーピン）', 8: '八筒（パーピン）', 9: '九筒（キューピン）' } },
-    en: { pin: { 1: '1-Pin', 2: '2-Pin', 3: '3-Pin', 4: '4-Pin', 5: '5-Pin', 6: '6-Pin', 7: '7-Pin', 8: '8-Pin', 9: '9-Pin' } },
-    zh: { pin: { 1: '一筒', 2: '二筒', 3: '三筒', 4: '四筒', 5: '五筒', 6: '六筒', 7: '七筒', 8: '八筒', 9: '九筒' } }
+    ja: {
+        pin: { 1: '一筒（イーピン）', 2: '二筒（リャンピン）', 3: '三筒（サンピン）', 4: '四筒（スーピン）', 5: '五筒（ウーピン）', 6: '六筒（ローピン）', 7: '七筒（チーピン）', 8: '八筒（パーピン）', 9: '九筒（キューピン）' },
+        man: { 1: '一萬（イーマン）', 2: '二萬（リャンマン）', 3: '三萬（サンマン）', 4: '四萬（スーマン）', 5: '五萬（ウーマン）', 6: '六萬（ローマン）', 7: '七萬（チーマン）', 8: '八萬（パーマン）', 9: '九萬（キューマン）' },
+        sou: { 1: '一索（イーソー）', 2: '二索（リャンソー）', 3: '三索（サンソー）', 4: '四索（スーソー）', 5: '五索（ウーソー）', 6: '六索（ローソー）', 7: '七索（チーソー）', 8: '八索（パーソー）', 9: '九索（キューソー）' }
+    },
+    en: {
+        pin: { 1: '1-Pin', 2: '2-Pin', 3: '3-Pin', 4: '4-Pin', 5: '5-Pin', 6: '6-Pin', 7: '7-Pin', 8: '8-Pin', 9: '9-Pin' },
+        man: { 1: '1-Man', 2: '2-Man', 3: '3-Man', 4: '4-Man', 5: '5-Man', 6: '6-Man', 7: '7-Man', 8: '8-Man', 9: '9-Man' },
+        sou: { 1: '1-Sou', 2: '2-Sou', 3: '3-Sou', 4: '4-Sou', 5: '5-Sou', 6: '6-Sou', 7: '7-Sou', 8: '8-Sou', 9: '9-Sou' }
+    },
+    zh: {
+        pin: { 1: '一筒', 2: '二筒', 3: '三筒', 4: '四筒', 5: '五筒', 6: '六筒', 7: '七筒', 8: '八筒', 9: '九筒' },
+        man: { 1: '一萬', 2: '二萬', 3: '三萬', 4: '四萬', 5: '五萬', 6: '六萬', 7: '七萬', 8: '八萬', 9: '九萬' },
+        sou: { 1: '一索', 2: '二索', 3: '三索', 4: '四索', 5: '五索', 6: '六索', 7: '七索', 8: '八索', 9: '九索' }
+    }
 };
 
-const getTileInfo = (type, number) => ({
-    imgSrc: `assets/${tileImages[type][number]}`,
-    name: tileNames[currentLang][type][number]
-});
+const getTileInfo = (type, number) => {
+    const safeType = tileImages[type] ? type : 'pin';
+    const src = tileImages[safeType]?.[number] || tileImages.pin[number];
+    const name = tileNames[currentLang]?.[safeType]?.[number] || `${number}-${t(safeType)}`;
+    return {
+        imgSrc: `assets/${src}`,
+        name
+    };
+};
+
+function pickRandomTileType() {
+    // For English UI, avoid Man tiles because the tile face uses kanji.
+    const types = currentLang === 'en' ? ['pin', 'sou'] : ['pin', 'man', 'sou'];
+    return types[Math.floor(Math.random() * types.length)];
+}
 
 // ========== Sounds ==========
 const soundConfig = {
@@ -413,6 +586,48 @@ const soundConfig = {
 };
 
 const soundPools = new Map();
+
+let audioUnlocked = false;
+
+function unlockAudioOnce() {
+    if (audioUnlocked) return;
+
+    // iOS (Safari/Chrome) blocks audio playback unless it is initiated by a user gesture.
+    // Prime all audio elements on the first interaction so later timer-driven sounds work.
+    const audiosToPrime = [];
+    for (const pool of soundPools.values()) {
+        for (const audio of pool) audiosToPrime.push(audio);
+    }
+    if (timerAudio) audiosToPrime.push(timerAudio);
+
+    let anySucceeded = false;
+
+    for (const audio of audiosToPrime) {
+        try {
+            const originalVolume = audio.volume;
+            audio.volume = 0;
+            audio.currentTime = 0;
+            const p = audio.play();
+
+            // Immediately pause/reset; we only need a successful play() within a gesture.
+            audio.pause();
+            audio.currentTime = 0;
+            audio.volume = originalVolume;
+
+            if (p && typeof p.then === 'function') {
+                anySucceeded = true;
+                // Avoid unhandled rejections
+                p.catch(() => {});
+            } else {
+                anySucceeded = true;
+            }
+        } catch {
+            // ignore
+        }
+    }
+
+    if (anySucceeded) audioUnlocked = true;
+}
 
 function initSounds() {
     for (const [name, cfg] of Object.entries(soundConfig)) {
@@ -766,6 +981,9 @@ function updateTimerDisplay() {
             timerBar.classList.add('timer-bar-warning');
         }
     }
+
+    // 残り時間に応じて延長ボタンの表示状態も追随させる（毎秒更新）
+    updateTimeExtensionButton();
 }
 
 function getMaxTime() {
@@ -946,19 +1164,43 @@ function startGameWithDifficulty(difficulty) {
     startNewQuestion();
 }
 
-function startNewQuestion() {
+async function startNewQuestion() {
     // 問題進行中（または一時停止中）の誤操作で次へ進まないようにする
     if (gameState.timerInterval && !gameState.isAnswered) return;
+
+    // 次へ移る前に結果表示を閉じる
+    const resultSection = document.getElementById('result-section');
+    if (resultSection) resultSection.classList.add('hidden');
+    hideResultActions();
 
     // すべてのモードで currentStage を進める
     gameState.currentStage++;
     
+    const isBossEntry = (gameState.mode === 'casual' || gameState.mode === 'story') && gameState.currentStage === 10;
+
+    // ストーリーはステージに応じて難易度を調整（過場表示にも反映）
+    if (gameState.mode === 'story' && !isBossEntry) {
+        if (gameState.currentStage <= 3) gameState.difficulty = 'easy';
+        else if (gameState.currentStage <= 6) gameState.difficulty = 'medium';
+        else gameState.difficulty = 'hard';
+    }
+
+    gameState.isBossStage = !!isBossEntry;
+    updateQuestionDisplay();
+
+    const stageTitle = isBossEntry
+        ? t('bossStage')
+        : `${t('stage')} ${gameState.currentStage}`;
+    const subtitle = `${t('difficulty')} ${getDifficultyBadgeHtml(gameState.difficulty)} <span class="opacity-80">(${t(`${gameState.difficulty}Desc`)})</span>`;
+
+    await showStageIntro({ titleText: stageTitle, subtitleHtml: subtitle, durationMs: 3800 });
+
     // ボス（第10ステージ）に入るか判定
-    if ((gameState.mode === 'casual' || gameState.mode === 'story') && gameState.currentStage === 10) {
+    if (isBossEntry) {
         startBossStage();
         return;
     }
-    
+
     // 新しい問題を生成
     generateAndShowQuestion();
 }
@@ -978,6 +1220,9 @@ function generateAndShowQuestion() {
         else gameState.difficulty = 'hard';
     }
     
+    // ランダム花色（筒/萬/索）
+    gameState.tileType = pickRandomTileType();
+
     const result = generateTenpaiHand(gameState.difficulty);
     if (!result) { 
         alert('問題を生成できません。もう一度お試しください。');
@@ -1011,6 +1256,16 @@ function startBossStage() {
     gameState.isAnswered = false;
     gameState.selectedTiles.clear();
 
+    // 未使用の延長回数は、BOSS の挑戦時間にまとめて加算する
+    // （BOSS では延長を使えない設計のため、ここで自動変換して公平にする）
+    if (gameState.mode === 'casual' || gameState.mode === 'story') {
+        const unusedExtensions = Math.max(0, gameState.timeExtensions || 0);
+        if (unusedExtensions > 0) {
+            gameState.timeBonus += unusedExtensions * 30;
+            gameState.timeExtensions = 0;
+        }
+    }
+
     generateAndShowBossQuestion({ resetTime: true });
 }
 
@@ -1020,6 +1275,9 @@ function generateAndShowBossQuestion({ resetTime = false } = {}) {
     gameState.extendedTime = 0;
     gameState.timerCuePlayed = false;
     stopTimerSound();
+
+    // ランダム花色（筒/萬/索）
+    gameState.tileType = pickRandomTileType();
 
     // ボスは現在の難易度を引き継ぐ（カジュアルは選択値、ストーリーは7-9でハードの想定）
     const result = generateTenpaiHand(gameState.difficulty);
@@ -1056,30 +1314,35 @@ function updateQuestionDisplay() {
     const stageInfo = document.getElementById('stage-info');
 
     const totalStages = (gameState.mode === 'casual' || gameState.mode === 'story') ? 10 : null;
+
     const diffKey = gameState.difficulty || 'easy';
     const diffName = t(diffKey);
     const diffDesc = t(`${diffKey}Desc`);
-    const diffInfo = `${t('difficulty')} ${diffName} (${diffDesc})`;
+
+    const diffBadgeClass = diffKey === 'easy'
+        ? 'difficulty-badge difficulty-badge--easy'
+        : diffKey === 'medium'
+            ? 'difficulty-badge difficulty-badge--medium'
+            : 'difficulty-badge difficulty-badge--hard';
+
+    const diffInfoHtml = `<span class="font-bold">${t('difficulty')}</span> ` +
+        `<span class="${diffBadgeClass}">${diffName}</span>` +
+        (diffDesc ? ` <span class="opacity-80">(${diffDesc})</span>` : '');
+
+    // difficulty accent (mainly for Story Mode readability)
+    if (questionNum) {
+        questionNum.classList.remove('difficulty-accent--easy', 'difficulty-accent--medium', 'difficulty-accent--hard');
+        if (!gameState.isBossStage && (gameState.mode === 'casual' || gameState.mode === 'story' || gameState.mode === 'survival')) {
+            questionNum.classList.add(`difficulty-accent--${diffKey}`);
+        }
+    }
 
     if (gameState.isBossStage) {
         questionNum.textContent = t('bossStage');
-        if (totalStages) {
-            stageInfo.textContent = `${t('stage')} ${gameState.currentStage}/${totalStages}　${t('bossChallenge')}　${diffInfo}`;
-        } else {
-            stageInfo.textContent = `${t('stage')} ${t('bossChallenge')}　${diffInfo}`;
-        }
+        stageInfo.innerHTML = `${t('stage')} ${gameState.currentStage}　${diffInfoHtml}`;
     } else {
-        if (gameState.mode === 'survival') {
-            // サバイバルも「ステージ」表記を使用
-            questionNum.textContent = `${t('stage')} ${gameState.currentStage}`;
-            stageInfo.textContent = `${t('correctCount')} ${gameState.correctCount}　${diffInfo}`;
-        } else {
-            // カジュアル/ストーリーは「ステージ」表記を使用
-            questionNum.textContent = totalStages
-                ? `${t('stage')} ${gameState.currentStage}/${totalStages}`
-                : `${t('stage')} ${gameState.currentStage}`;
-            stageInfo.textContent = diffInfo;
-        }
+        questionNum.textContent = `${t('stage')} ${gameState.currentStage}`;
+        stageInfo.innerHTML = diffInfoHtml;
     }
     updateLivesDisplay();
     updateInteractionState();
@@ -1504,6 +1767,10 @@ function updateTimeExtensionButton() {
             textSpan.textContent = `${t('timeExtension')} (${t('extensionsLeft')} 0)`;
         }
     }
+
+    // 残り時間が少ない & 延長可能なら、ボタンを少し目立たせる
+    const shouldAttention = canUseExtension && gameState.timeLeft <= 5;
+    extensionBtn.classList.toggle('attention', !!shouldAttention);
 }
 
 function useTimeExtension() {
@@ -1537,7 +1804,7 @@ function showContinueOption() {
     showResultLifeAction();
 }
 
-function continueGame() {
+async function continueGame() {
     // コンティニューは「解答済み」かつ「進行中ではない」場合のみ許可
     if (!gameState.isAnswered) return;
 
@@ -1549,6 +1816,12 @@ function continueGame() {
 
     // 同一ステージで新しい問題を出す（ステージ数は増やさない）
     // ボスのリトライは残り秒数を引き継ぎ、既定秒数へリセットしない
+    const stageTitle = gameState.isBossStage
+        ? t('bossStage')
+        : `${t('stage')} ${gameState.currentStage}`;
+    const subtitle = `${t('difficulty')} ${getDifficultyBadgeHtml(gameState.difficulty)} <span class="opacity-80">(${t(`${gameState.difficulty}Desc`)})</span>`;
+    await showStageIntro({ titleText: stageTitle, subtitleHtml: subtitle, durationMs: 3200 });
+
     if (gameState.isBossStage) {
         generateAndShowBossQuestion({ resetTime: false });
         return;
@@ -1568,6 +1841,25 @@ function showVictory() {
     // すべてのモードで currentStage を使用
     document.getElementById('final-questions').textContent = gameState.currentStage;
     document.getElementById('final-correct').textContent = gameState.correctCount;
+
+    const timeLeftEl = document.getElementById('final-time-left');
+    if (timeLeftEl) timeLeftEl.textContent = String(Math.max(0, gameState.timeLeft || 0));
+
+    const livesEl = document.getElementById('final-lives-left');
+    const livesLabelEl = document.getElementById('final-lives-left-label');
+    if (livesEl && livesLabelEl) {
+        if (gameState.mode === 'casual' || gameState.mode === 'story') {
+            livesEl.textContent = '';
+            for (let i = 0; i < (gameState.maxLives || 3); i++) {
+                livesEl.textContent += i < (gameState.lives || 0) ? '❤️' : '🖤';
+            }
+            livesLabelEl.parentElement?.classList.remove('hidden');
+        } else {
+            // 念のため（現状 victory は boss クリア時のみ）
+            livesLabelEl.parentElement?.classList.add('hidden');
+        }
+    }
+
     createConfetti();
     // 16:9 固定フレーム設計：ページスクロールは使わない
 }
@@ -1667,6 +1959,10 @@ function updateUILanguage() {
     document.getElementById('gameover-title').textContent = t('gameOver');
     document.getElementById('final-questions-label').textContent = t('finalQuestions');
     document.getElementById('final-correct-label').textContent = t('finalScore');
+    const timeLeftLabel = document.getElementById('final-time-left-label');
+    const livesLeftLabel = document.getElementById('final-lives-left-label');
+    if (timeLeftLabel) timeLeftLabel.textContent = t('timeLeftLabel');
+    if (livesLeftLabel) livesLeftLabel.textContent = t('livesLeftLabel');
     document.getElementById('final-score-label').textContent = t('finalScore');
     document.getElementById('play-again-victory').textContent = t('playAgain');
     document.getElementById('play-again-gameover').textContent = t('playAgain');
@@ -1675,6 +1971,44 @@ function updateUILanguage() {
     
     // フッター
     document.getElementById('footer-text').innerHTML = `${t('footer')} &copy; 2025 Akira Akiyama`;
+}
+
+function showInfoOverlay({ titleText, bodyText }) {
+    let overlay = document.getElementById('info-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'info-overlay';
+        overlay.className = 'info-overlay hidden';
+        overlay.innerHTML = `
+            <div class="info-overlay-card">
+                <div id="info-overlay-title" class="text-4xl font-black mb-4 text-center"></div>
+                <div id="info-overlay-body" class="info-overlay-body text-xl mb-8 text-center"></div>
+                <div class="flex justify-center">
+                    <button id="info-overlay-ok" class="mode-btn action-btn"><span id="info-overlay-ok-text">OK</span></button>
+                </div>
+            </div>
+        `;
+        const root = document.getElementById('design-root');
+        (root || document.body).appendChild(overlay);
+    }
+
+    const titleEl = document.getElementById('info-overlay-title');
+    const bodyEl = document.getElementById('info-overlay-body');
+    const okBtn = document.getElementById('info-overlay-ok');
+    const okTextEl = document.getElementById('info-overlay-ok-text');
+
+    if (titleEl) titleEl.textContent = titleText || '';
+    if (bodyEl) bodyEl.textContent = bodyText || '';
+    if (okTextEl) okTextEl.textContent = t('ok');
+
+    overlay.classList.remove('hidden');
+    overlay.classList.add('fade-in');
+
+    if (okBtn) {
+        okBtn.onclick = () => {
+            overlay.classList.add('hidden');
+        };
+    }
 }
 
 function resetGame() {
@@ -1713,6 +2047,22 @@ function selectLanguage(lang) {
     document.documentElement.lang = lang;
     document.title = t('gameTitle').replace(/🀄/g, '').trim();
     updateUILanguage();
+
+    // If user switches to English, avoid showing Man suit tiles mid-run.
+    // (Images contain kanji, which is hard for many non-Japanese/Chinese players.)
+    if (currentLang === 'en' && gameState?.tileType === 'man') {
+        gameState.tileType = 'pin';
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && !gameScreen.classList.contains('hidden')) {
+            try {
+                renderHand();
+                renderPossibleTiles();
+            } catch {
+                // ignore rendering failures during screen transitions
+            }
+        }
+    }
+
     const languageScreen = document.getElementById('language-screen');
     const modeScreen = document.getElementById('mode-screen');
     languageScreen.style.opacity = '0';
@@ -1761,12 +2111,26 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', applyUiScale);
     window.visualViewport?.addEventListener('resize', applyUiScale);
 
+    // Prime audio on the first user gesture (needed on iOS browsers)
+    document.addEventListener('pointerdown', unlockAudioOnce, { capture: true, once: true });
+    document.addEventListener('touchstart', unlockAudioOnce, { capture: true, once: true, passive: true });
+
     document.getElementById('lang-ja').addEventListener('click', () => { playSound('select'); selectLanguage('ja'); });
     document.getElementById('lang-en').addEventListener('click', () => { playSound('select'); selectLanguage('en'); });
     document.getElementById('lang-zh').addEventListener('click', () => { playSound('select'); selectLanguage('zh'); });
     document.getElementById('casual-btn').addEventListener('click', () => { playSound('select'); startGameMode('casual'); });
     document.getElementById('story-btn').addEventListener('click', () => { playSound('select'); startGameMode('story'); });
     document.getElementById('survival-btn').addEventListener('click', () => { playSound('select'); startGameMode('survival'); });
+
+    const storyInfoBtn = document.getElementById('story-info-btn');
+    if (storyInfoBtn) {
+        storyInfoBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            playSound('tap');
+            showInfoOverlay({ titleText: t('storyHelpTitle'), bodyText: t('storyHelpBody') });
+        });
+    }
     document.getElementById('easy').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('easy'); });
     document.getElementById('medium').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('medium'); });
     document.getElementById('hard').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('hard'); });
