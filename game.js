@@ -1005,25 +1005,25 @@ function calculateWinningTiles(counts) {
 // 難易度に応じて待ちの数が条件を満たすか判定
 function isValidWinningTilesCount(count, difficulty, attempts) {
     if (difficulty === 'easy') {
-        if (attempts <= 5) return count === 3;
-        if (attempts <= 10) return count >= 2 && count <= 3;
+        if (attempts <= 4) return count === 3;
+        if (attempts <= 8) return count >= 2 && count <= 3;
         return count >= 1 && count <= 3;
     } else if (difficulty === 'medium') {
-        if (attempts <= 20) return count === 6;
-        if (attempts <= 40) return count >= 5 && count <= 6;
-        if (attempts <= 80) return count >= 4 && count <= 6;
-        if (attempts <= 160) return count >= 3 && count <= 6;
-        if (attempts <= 320) return count >= 2 && count <= 6;
+        if (attempts <= 16) return count === 6;
+        if (attempts <= 32) return count >= 5 && count <= 6;
+        if (attempts <= 64) return count >= 4 && count <= 6;
+        if (attempts <= 256) return count >= 3 && count <= 6;
+        if (attempts <= 1024) return count >= 2 && count <= 6;
         return count >= 1 && count <= 6;
     } else { // 上級
-        if (attempts <= 10) return count === 9;
-        if (attempts <= 80) return count >= 8 && count <= 9;
-        if (attempts <= 1280) return count >= 7 && count <= 9;
-        if (attempts <= 2560) return count >= 6 && count <= 9;
-        if (attempts <= 5120) return count >= 5 && count <= 9;
-        if (attempts <= 10240) return count >= 4 && count <= 9;
-        if (attempts <= 20480) return count >= 3 && count <= 9;
-        if (attempts <= 40960) return count >= 2 && count <= 9;
+        if (attempts <= 16) return count === 9;
+        if (attempts <= 32) return count >= 8 && count <= 9;
+        if (attempts <= 64) return count >= 7 && count <= 9;
+        if (attempts <= 256) return count >= 6 && count <= 9;
+        if (attempts <= 1024) return count >= 5 && count <= 9;
+        if (attempts <= 4096) return count >= 4 && count <= 9;
+        if (attempts <= 8192) return count >= 3 && count <= 9;
+        if (attempts <= 16384) return count >= 2 && count <= 9;
         return count >= 1 && count <= 9;
     }
 }
