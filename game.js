@@ -35,6 +35,8 @@ const translations = {
         finalQuestions: "到達問題数：",
         finalScore: "合計正解数：",
         timeLeftLabel: "残り時間：",
+        answerTimeLabel: "解答時間：",
+        secondsUnit: "秒",
         livesLeftLabel: "残りライフ：",
         modeLabel: "モード：",
         playAgain: "もう一度遊ぶ",
@@ -126,6 +128,8 @@ const translations = {
         finalQuestions: "Stages Completed:",
         finalScore: "Total Correct:",
         timeLeftLabel: "Time Left:",
+        answerTimeLabel: "Answer Time:",
+        secondsUnit: "s",
         livesLeftLabel: "Lives:",
         modeLabel: "Mode:",
         playAgain: "Play Again",
@@ -217,6 +221,8 @@ const translations = {
         finalQuestions: "到達題目數：",
         finalScore: "總正確數：",
         timeLeftLabel: "剩餘時間：",
+        answerTimeLabel: "答題時間：",
+        secondsUnit: "秒",
         livesLeftLabel: "剩餘生命：",
         modeLabel: "模式：",
         playAgain: "再玩一次",
@@ -1301,6 +1307,8 @@ function restartCurrentRun() {
     }
 
     stopTimer();
+    // 念のため：再開時にカウントダウン音が残らないよう完全停止
+    stopTimerSound();
 
     const mode = gameState.mode;
     const previousDifficulty = gameState.difficulty;
@@ -1330,15 +1338,23 @@ function restartCurrentRun() {
     gameState.selectedTiles.clear();
     gameState.isBossStage = false;
     gameState.isAnswered = false;
+    gameState.isPaused = false;
     gameState.lives = 3;
     gameState.timeExtensions = gameState.maxTimeExtensions;
     gameState.extendedTime = 0;
+    gameState.timerCuePlayed = false;
 
     if (mode === 'story') {
         gameState.difficulty = 'easy';
     } else {
         gameState.difficulty = previousDifficulty;
     }
+
+    // SURVIVAL はステージ間で timeLeft を引き継ぐ仕様なので、リスタート時に明示的に初期値へ戻す
+    // （time up / incorrect で timeLeft が 0 のままだと、次回開始が即 GAME OVER になる）
+    gameState.timeLeft = getMaxTime();
+    gameState.maxTime = getMaxTime();
+    updateTimerDisplay();
 
     document.getElementById('submit-btn').disabled = false;
     updateLivesDisplay();
@@ -2252,6 +2268,7 @@ function updateUILanguage() {
 
 function resetGame() {
     stopTimer();
+    stopTimerSound();
     gameState.mode = null;
     gameState.difficulty = null;
     gameState.currentQuestion = 0;
@@ -2264,8 +2281,13 @@ function resetGame() {
     gameState.selectedTiles.clear();
     gameState.isBossStage = false;
     gameState.isAnswered = false;
+    gameState.isPaused = false;
     gameState.lives = 3;
     gameState.timeExtensions = gameState.maxTimeExtensions;
+    gameState.extendedTime = 0;
+    gameState.timeLeft = 0;
+    gameState.maxTime = 0;
+    gameState.timerCuePlayed = false;
     document.body.classList.remove('boss-stage');
     document.body.classList.remove('in-game');
     document.getElementById('game-screen').classList.add('hidden');
