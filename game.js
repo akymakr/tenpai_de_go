@@ -769,8 +769,138 @@ const extraSoundInstances = new Map();
 
 let audioUnlocked = false;
 
+// WebAudio（AudioContext）を使える環境では、HTMLAudio の「同時再生が詰まる/止まる」問題を避ける
+// ※ iOS などはユーザー操作起点で resume() が必要
+const WebAudioCtx = window.AudioContext || window.webkitAudioContext;
+let webAudioCtx = null;
+let webAudioMasterGain = null;
+const webAudioBuffers = new Map(); // name -> AudioBuffer
+let webAudioLoadPromise = null;
+
+// allowOverlap=false の音だけ「多重再生を抑制」するためのトラッキング
+const webAudioNonOverlapActive = new Map(); // name -> { source: AudioBufferSourceNode }
+
+// タイマー（ループ）用
+let timerWebAudioSource = null;
+
+function getWebAudioContext() {
+    if (!WebAudioCtx) return null;
+    if (webAudioCtx) return webAudioCtx;
+
+    try {
+        webAudioCtx = new WebAudioCtx();
+        webAudioMasterGain = webAudioCtx.createGain();
+        webAudioMasterGain.gain.value = 1;
+        webAudioMasterGain.connect(webAudioCtx.destination);
+        return webAudioCtx;
+    } catch {
+        webAudioCtx = null;
+        webAudioMasterGain = null;
+        return null;
+    }
+}
+
+function startLoadingWebAudioBuffers() {
+    if (webAudioLoadPromise) return webAudioLoadPromise;
+    const ctx = getWebAudioContext();
+    if (!ctx) {
+        webAudioLoadPromise = Promise.resolve();
+        return webAudioLoadPromise;
+    }
+
+    const entries = [
+        ...Object.entries(soundConfig).map(([name, cfg]) => [name, cfg?.src]),
+        ['timer', 'assets/timer.mp3']
+    ].filter(([, src]) => typeof src === 'string' && src.length > 0);
+
+    webAudioLoadPromise = (async () => {
+        await Promise.all(entries.map(async ([name, src]) => {
+            if (webAudioBuffers.has(name)) return;
+            try {
+                const res = await fetch(src, { cache: 'force-cache' });
+                if (!res || !res.ok) return;
+                const arrayBuf = await res.arrayBuffer();
+                // decodeAudioData は引数の ArrayBuffer を破壊的に扱う実装があるため slice で複製
+                // 互換性のためコールバック形式で Promise 化（古い Safari 対応）
+                const buf = await new Promise((resolve, reject) => {
+                    try {
+                        ctx.decodeAudioData(arrayBuf.slice(0), resolve, reject);
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
+                webAudioBuffers.set(name, buf);
+            } catch {
+                // 失敗しても HTMLAudio にフォールバックできる
+            }
+        }));
+    })();
+
+    return webAudioLoadPromise;
+}
+
+function primeWebAudioOnce() {
+    const ctx = getWebAudioContext();
+    if (!ctx) return false;
+    // iOS: ユーザー操作内で resume() する必要がある
+    if (ctx.state !== 'running') {
+        try {
+            const p = ctx.resume();
+            if (p && typeof p.catch === 'function') p.catch(() => {});
+        } catch {
+            // 無視
+        }
+    }
+    // バッファ読み込みは非同期で開始しておく（再生はロード完了前なら HTMLAudio に落ちる）
+    startLoadingWebAudioBuffers();
+    return true;
+}
+
+function playSoundViaWebAudio(name, { loop = false } = {}) {
+    const ctx = getWebAudioContext();
+    if (!ctx || ctx.state !== 'running' || !webAudioMasterGain) return false;
+    const buffer = webAudioBuffers.get(name);
+    if (!buffer) return false;
+
+    const cfg = soundConfig[name] || {};
+    const allowOverlap = cfg.allowOverlap !== false;
+
+    if (!allowOverlap) {
+        const active = webAudioNonOverlapActive.get(name);
+        if (active && active.source) return true; // すでに鳴っているのでスキップ扱い
+    }
+
+    try {
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = !!loop;
+
+        const gain = ctx.createGain();
+        gain.gain.value = 1;
+
+        source.connect(gain);
+        gain.connect(webAudioMasterGain);
+
+        if (!allowOverlap) {
+            webAudioNonOverlapActive.set(name, { source });
+            source.onended = () => {
+                const current = webAudioNonOverlapActive.get(name);
+                if (current && current.source === source) webAudioNonOverlapActive.delete(name);
+            };
+        }
+
+        source.start(0);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 function unlockAudioOnce() {
     if (audioUnlocked) return;
+
+    // WebAudio を優先的に解放（HTMLAudio が詰まる端末向け）
+    const webAudioPrimed = primeWebAudioOnce();
 
     // 仕様：iOS（Safari/Chrome）はユーザー操作起点でない音声再生をブロックする
     // 最初の操作時に全オーディオを空再生して解除し、タイマー駆動の音も鳴るようにする
@@ -780,7 +910,7 @@ function unlockAudioOnce() {
     }
     if (timerAudio) audiosToPrime.push(timerAudio);
 
-    let anySucceeded = false;
+    let anySucceeded = webAudioPrimed;
 
     for (const audio of audiosToPrime) {
         try {
@@ -824,6 +954,9 @@ function initSounds() {
 }
 
 function playSound(name) {
+    // WebAudio のバッファが使える場合はそちらを優先（多重再生・詰まり対策）
+    if (playSoundViaWebAudio(name)) return;
+
     const pool = soundPools.get(name);
     if (!pool || pool.length === 0) return;
 
@@ -869,6 +1002,8 @@ function playSound(name) {
     if (!audio) return;
 
     try {
+        // 再生中のインスタンスを強制的にリスタート（端末によってはこれをしないと詰まることがある）
+        if (!audio.paused) audio.pause();
         audio.currentTime = 0;
         const p = audio.play();
         if (p && typeof p.catch === 'function') p.catch(() => {});
@@ -887,6 +1022,31 @@ function initTimerSound() {
 }
 
 function startTimerSound() {
+    // WebAudio で鳴らせるなら優先（ループ）
+    const ctx = getWebAudioContext();
+    if (ctx && ctx.state === 'running' && webAudioBuffers.has('timer') && webAudioMasterGain) {
+        if (timerWebAudioSource) return;
+        // nonOverlap 管理には載せず、専用参照で stop できるようにする
+        try {
+            const buffer = webAudioBuffers.get('timer');
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+
+            const gain = ctx.createGain();
+            gain.gain.value = 1;
+            source.connect(gain);
+            gain.connect(webAudioMasterGain);
+
+            source.start(0);
+            timerWebAudioSource = source;
+            return;
+        } catch {
+            // フォールバック
+            timerWebAudioSource = null;
+        }
+    }
+
     if (!timerAudio) return;
     if (!timerAudio.paused) return;
     try {
@@ -898,11 +1058,19 @@ function startTimerSound() {
 }
 
 function pauseTimerSound() {
+    if (timerWebAudioSource) {
+        try { timerWebAudioSource.stop(); } catch {}
+        timerWebAudioSource = null;
+    }
     if (!timerAudio) return;
     if (!timerAudio.paused) timerAudio.pause();
 }
 
 function stopTimerSound() {
+    if (timerWebAudioSource) {
+        try { timerWebAudioSource.stop(); } catch {}
+        timerWebAudioSource = null;
+    }
     if (!timerAudio) return;
     timerAudio.pause();
     timerAudio.currentTime = 0;
