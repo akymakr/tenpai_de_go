@@ -297,10 +297,12 @@ function getElementByIdCached(id) {
     return element;
 }
 
-const resultActionCache = {};
+let resultActionCache = {};
 
 function getResultActionElements() {
-    if (resultActionCache.actions) return resultActionCache;
+    if (resultActionCache.actions && resultActionCache.actions.isConnected) return resultActionCache;
+
+    resultActionCache = {};
 
     resultActionCache.actions = getElementByIdCached('result-actions');
     resultActionCache.title = getElementByIdCached('result-actions-title');
@@ -457,7 +459,6 @@ function ensureScaleDebugOverlay() {
     overlay.id = 'scale-debug';
     overlay.className = 'scale-debug';
     document.body.appendChild(overlay);
-    domCache.set('scale-debug', overlay);
     return overlay;
 }
 
@@ -2407,7 +2408,6 @@ function showPauseOverlay() {
 
         const root = getElementByIdCached('design-root');
         (root || document.body).appendChild(overlay);
-        domCache.set('pause-overlay', overlay);
     }
     overlay.classList.remove('hidden');
     overlay.classList.add('fade-in');
@@ -2454,12 +2454,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('pointerdown', unlockAudioOnce, { capture: true, once: true });
     document.addEventListener('touchstart', unlockAudioOnce, { capture: true, once: true, passive: true });
 
-    getElementByIdCached('lang-ja').addEventListener('click', () => { playSound('select'); selectLanguage('ja'); });
-    getElementByIdCached('lang-en').addEventListener('click', () => { playSound('select'); selectLanguage('en'); });
-    getElementByIdCached('lang-zh').addEventListener('click', () => { playSound('select'); selectLanguage('zh'); });
-    getElementByIdCached('casual-btn').addEventListener('click', () => { playSound('select'); startGameMode('casual'); });
-    getElementByIdCached('story-btn').addEventListener('click', () => { playSound('select'); startGameMode('story'); });
-    getElementByIdCached('survival-btn').addEventListener('click', () => { playSound('select'); startGameMode('survival'); });
+    const langJaBtn = getElementByIdCached('lang-ja');
+    if (langJaBtn) langJaBtn.addEventListener('click', () => { playSound('select'); selectLanguage('ja'); });
+
+    const langEnBtn = getElementByIdCached('lang-en');
+    if (langEnBtn) langEnBtn.addEventListener('click', () => { playSound('select'); selectLanguage('en'); });
+
+    const langZhBtn = getElementByIdCached('lang-zh');
+    if (langZhBtn) langZhBtn.addEventListener('click', () => { playSound('select'); selectLanguage('zh'); });
+
+    const casualBtn = getElementByIdCached('casual-btn');
+    if (casualBtn) casualBtn.addEventListener('click', () => { playSound('select'); startGameMode('casual'); });
+
+    const storyBtn = getElementByIdCached('story-btn');
+    if (storyBtn) storyBtn.addEventListener('click', () => { playSound('select'); startGameMode('story'); });
+
+    const survivalBtn = getElementByIdCached('survival-btn');
+    if (survivalBtn) survivalBtn.addEventListener('click', () => { playSound('select'); startGameMode('survival'); });
 
     const modeBackBtn = getElementByIdCached('mode-back-btn');
     if (modeBackBtn) modeBackBtn.addEventListener('click', () => { playSound('tap'); backToLanguageSelection(); });
@@ -2525,11 +2536,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', closeTutorial);
-    getElementByIdCached('easy').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('easy'); });
-    getElementByIdCached('medium').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('medium'); });
-    getElementByIdCached('hard').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('hard'); });
-    getElementByIdCached('submit-btn').addEventListener('click', () => { playSound('select'); checkAnswer(); });
-    getElementByIdCached('next-btn').addEventListener('click', () => { playSound('select'); startNewQuestion(); });
+    const easyBtn = getElementByIdCached('easy');
+    if (easyBtn) easyBtn.addEventListener('click', () => { playSound('select'); startGameWithDifficulty('easy'); });
+
+    const mediumBtn = getElementByIdCached('medium');
+    if (mediumBtn) mediumBtn.addEventListener('click', () => { playSound('select'); startGameWithDifficulty('medium'); });
+
+    const hardBtn = getElementByIdCached('hard');
+    if (hardBtn) hardBtn.addEventListener('click', () => { playSound('select'); startGameWithDifficulty('hard'); });
+
+    const submitBtn = getElementByIdCached('submit-btn');
+    if (submitBtn) submitBtn.addEventListener('click', () => { playSound('select'); checkAnswer(); });
+
+    const nextBtn = getElementByIdCached('next-btn');
+    if (nextBtn) nextBtn.addEventListener('click', () => { playSound('select'); startNewQuestion(); });
 
     // 勝利/ゲームオーバー画面のボタン
     const playAgainVictory = getElementByIdCached('play-again-victory');
