@@ -2752,3 +2752,4 @@ document.addEventListener('DOMContentLoaded', () => {
         // 自動再開しない（一時停止オーバーレイのクリック待ち）
     });
 });
+ 
