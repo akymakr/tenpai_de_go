@@ -284,6 +284,39 @@ const translations = {
 
 let tutorialPageIndex = 0;
 
+const domCache = new Map();
+
+function getElementByIdCached(id) {
+    if (domCache.has(id)) {
+        const cached = domCache.get(id);
+        if (cached && cached.isConnected) return cached;
+        domCache.delete(id);
+    }
+    const element = document.getElementById(id);
+    if (element) domCache.set(id, element);
+    return element;
+}
+
+let resultActionCache = {};
+
+function getResultActionElements() {
+    if (resultActionCache.actions && resultActionCache.actions.isConnected) return resultActionCache;
+
+    resultActionCache = {};
+
+    resultActionCache.actions = getElementByIdCached('result-actions');
+    resultActionCache.title = getElementByIdCached('result-actions-title');
+    resultActionCache.body = getElementByIdCached('result-actions-body');
+    resultActionCache.continueBtn = getElementByIdCached('result-continue-btn');
+    resultActionCache.backBtn = getElementByIdCached('result-back-btn');
+    resultActionCache.okBtn = getElementByIdCached('result-ok-btn');
+    resultActionCache.okTextSpan = getElementByIdCached('result-ok-text');
+    resultActionCache.continueText = getElementByIdCached('result-continue-text');
+    resultActionCache.backText = getElementByIdCached('result-back-text');
+
+    return resultActionCache;
+}
+
 function getTutorialPages() {
     return [
         { title: t('tutorialP1Title'), body: t('tutorialP1Body') },
@@ -295,7 +328,7 @@ function getTutorialPages() {
 }
 
 function renderTutorialPage() {
-    const screen = document.getElementById('tutorial-screen');
+    const screen = getElementByIdCached('tutorial-screen');
     if (!screen || screen.classList.contains('hidden')) return;
 
     const pages = getTutorialPages();
@@ -303,15 +336,15 @@ function renderTutorialPage() {
     const idx = Math.min(Math.max(0, tutorialPageIndex), total - 1);
     tutorialPageIndex = idx;
 
-    const indicator = document.getElementById('tutorial-page-indicator');
-    const titleEl = document.getElementById('tutorial-page-title');
-    const bodyEl = document.getElementById('tutorial-page-body');
-    const prevBtn = document.getElementById('tutorial-prev-btn');
-    const nextBtn = document.getElementById('tutorial-next-btn');
-    const closeBtn = document.getElementById('tutorial-close-btn');
-    const prevText = document.getElementById('tutorial-prev-text');
-    const nextText = document.getElementById('tutorial-next-text');
-    const closeText = document.getElementById('tutorial-close-text');
+    const indicator = getElementByIdCached('tutorial-page-indicator');
+    const titleEl = getElementByIdCached('tutorial-page-title');
+    const bodyEl = getElementByIdCached('tutorial-page-body');
+    const prevBtn = getElementByIdCached('tutorial-prev-btn');
+    const nextBtn = getElementByIdCached('tutorial-next-btn');
+    const closeBtn = getElementByIdCached('tutorial-close-btn');
+    const prevText = getElementByIdCached('tutorial-prev-text');
+    const nextText = getElementByIdCached('tutorial-next-text');
+    const closeText = getElementByIdCached('tutorial-close-text');
 
     if (indicator) indicator.textContent = `${idx + 1}/${total}`;
     if (titleEl) titleEl.textContent = pages[idx].title || '';
@@ -354,7 +387,7 @@ function getModeDisplayText(modeKey) {
 }
 
 function hideStageIntro({ immediate = false } = {}) {
-    const overlay = document.getElementById('stage-intro');
+    const overlay = getElementByIdCached('stage-intro');
     if (!overlay) return;
 
     if (stageIntroTimeoutId) {
@@ -379,9 +412,9 @@ function hideStageIntro({ immediate = false } = {}) {
 }
 
 function showStageIntro({ titleText, subtitleHtml, durationMs }) {
-    const overlay = document.getElementById('stage-intro');
-    const titleEl = document.getElementById('stage-intro-title');
-    const subtitleEl = document.getElementById('stage-intro-subtitle');
+    const overlay = getElementByIdCached('stage-intro');
+    const titleEl = getElementByIdCached('stage-intro-title');
+    const subtitleEl = getElementByIdCached('stage-intro-subtitle');
     if (!overlay || !titleEl || !subtitleEl) return Promise.resolve();
 
     if (stageIntroTimeoutId) {
@@ -419,7 +452,7 @@ function isDebugScaleEnabled() {
 
 function ensureScaleDebugOverlay() {
     if (!isDebugScaleEnabled()) return null;
-    let overlay = document.getElementById('scale-debug');
+    let overlay = getElementByIdCached('scale-debug');
     if (overlay) return overlay;
 
     overlay = document.createElement('div');
@@ -430,7 +463,7 @@ function ensureScaleDebugOverlay() {
 }
 
 function applyUiScale() {
-    const stage = document.getElementById('scale-stage');
+    const stage = getElementByIdCached('scale-stage');
     if (!stage) return;
 
     const baseWidth = 1280;
@@ -470,19 +503,14 @@ function applyUiScale() {
 }
 
 function hideResultActions() {
-    const actions = document.getElementById('result-actions');
+    const { actions, title, body, continueBtn, backBtn, okBtn } = getResultActionElements();
     if (!actions) return;
 
     actions.classList.add('hidden');
 
-    const title = document.getElementById('result-actions-title');
-    const body = document.getElementById('result-actions-body');
     if (title) title.textContent = '';
     if (body) body.textContent = '';
 
-    const continueBtn = document.getElementById('result-continue-btn');
-    const backBtn = document.getElementById('result-back-btn');
-    const okBtn = document.getElementById('result-ok-btn');
     if (continueBtn) continueBtn.classList.add('hidden');
     if (backBtn) backBtn.classList.add('hidden');
     if (okBtn) okBtn.classList.add('hidden');
@@ -491,15 +519,16 @@ function hideResultActions() {
 let pendingOkAction = null;
 
 function showResultOkAction({ titleText, titleClassName, bodyText = '', okText = null, onOk }) {
-    const actions = document.getElementById('result-actions');
+    const {
+        actions,
+        title,
+        body,
+        continueBtn,
+        backBtn,
+        okBtn,
+        okTextSpan
+    } = getResultActionElements();
     if (!actions) return;
-
-    const title = document.getElementById('result-actions-title');
-    const body = document.getElementById('result-actions-body');
-    const continueBtn = document.getElementById('result-continue-btn');
-    const backBtn = document.getElementById('result-back-btn');
-    const okBtn = document.getElementById('result-ok-btn');
-    const okTextSpan = document.getElementById('result-ok-text');
 
     pendingOkAction = typeof onOk === 'function' ? onOk : null;
 
@@ -529,11 +558,18 @@ function showResultOkAction({ titleText, titleClassName, bodyText = '', okText =
 }
 
 function showResultLifeAction() {
-    const actions = document.getElementById('result-actions');
+    const {
+        actions,
+        title,
+        body,
+        continueBtn,
+        backBtn,
+        okBtn,
+        continueText,
+        backText
+    } = getResultActionElements();
     if (!actions) return;
 
-    const title = document.getElementById('result-actions-title');
-    const body = document.getElementById('result-actions-body');
     if (title) {
         title.textContent = t('loseLife');
         title.className = 'text-3xl font-black mb-3 text-yellow-300 text-center';
@@ -565,11 +601,6 @@ function showResultLifeAction() {
         body.innerHTML = heartsHtml;
     }
 
-    const continueBtn = document.getElementById('result-continue-btn');
-    const backBtn = document.getElementById('result-back-btn');
-    const okBtn = document.getElementById('result-ok-btn');
-    const continueText = document.getElementById('result-continue-text');
-    const backText = document.getElementById('result-back-text');
     if (continueText) continueText.textContent = t('continue');
     if (backText) backText.textContent = t('giveUp');
 
@@ -582,7 +613,7 @@ function showResultLifeAction() {
             playSound('continue');
             // 続行前に、失ったライフが消える演出を入れる
             continueBtn.disabled = true;
-            const pending = document.getElementById('result-pending-loss-heart');
+            const pending = getElementByIdCached('result-pending-loss-heart');
             if (!pending) {
                 continueGame();
                 return;
@@ -769,8 +800,138 @@ const extraSoundInstances = new Map();
 
 let audioUnlocked = false;
 
+// WebAudio（AudioContext）を使える環境では、HTMLAudio の「同時再生が詰まる/止まる」問題を避ける
+// ※ iOS などはユーザー操作起点で resume() が必要
+const WebAudioCtx = window.AudioContext || window.webkitAudioContext;
+let webAudioCtx = null;
+let webAudioMasterGain = null;
+const webAudioBuffers = new Map(); // name -> AudioBuffer
+let webAudioLoadPromise = null;
+
+// allowOverlap=false の音だけ「多重再生を抑制」するためのトラッキング
+const webAudioNonOverlapActive = new Map(); // name -> { source: AudioBufferSourceNode }
+
+// タイマー（ループ）用
+let timerWebAudioSource = null;
+
+function getWebAudioContext() {
+    if (!WebAudioCtx) return null;
+    if (webAudioCtx) return webAudioCtx;
+
+    try {
+        webAudioCtx = new WebAudioCtx();
+        webAudioMasterGain = webAudioCtx.createGain();
+        webAudioMasterGain.gain.value = 1;
+        webAudioMasterGain.connect(webAudioCtx.destination);
+        return webAudioCtx;
+    } catch {
+        webAudioCtx = null;
+        webAudioMasterGain = null;
+        return null;
+    }
+}
+
+function startLoadingWebAudioBuffers() {
+    if (webAudioLoadPromise) return webAudioLoadPromise;
+    const ctx = getWebAudioContext();
+    if (!ctx) {
+        webAudioLoadPromise = Promise.resolve();
+        return webAudioLoadPromise;
+    }
+
+    const entries = [
+        ...Object.entries(soundConfig).map(([name, cfg]) => [name, cfg?.src]),
+        ['timer', 'assets/timer.mp3']
+    ].filter(([, src]) => typeof src === 'string' && src.length > 0);
+
+    webAudioLoadPromise = (async () => {
+        await Promise.all(entries.map(async ([name, src]) => {
+            if (webAudioBuffers.has(name)) return;
+            try {
+                const res = await fetch(src, { cache: 'force-cache' });
+                if (!res || !res.ok) return;
+                const arrayBuf = await res.arrayBuffer();
+                // decodeAudioData は引数の ArrayBuffer を破壊的に扱う実装があるため slice で複製
+                // 互換性のためコールバック形式で Promise 化（古い Safari 対応）
+                const buf = await new Promise((resolve, reject) => {
+                    try {
+                        ctx.decodeAudioData(arrayBuf.slice(0), resolve, reject);
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
+                webAudioBuffers.set(name, buf);
+            } catch {
+                // 失敗しても HTMLAudio にフォールバックできる
+            }
+        }));
+    })();
+
+    return webAudioLoadPromise;
+}
+
+function primeWebAudioOnce() {
+    const ctx = getWebAudioContext();
+    if (!ctx) return false;
+    // iOS: ユーザー操作内で resume() する必要がある
+    if (ctx.state !== 'running') {
+        try {
+            const p = ctx.resume();
+            if (p && typeof p.catch === 'function') p.catch(() => {});
+        } catch {
+            // 無視
+        }
+    }
+    // バッファ読み込みは非同期で開始しておく（再生はロード完了前なら HTMLAudio に落ちる）
+    startLoadingWebAudioBuffers();
+    return true;
+}
+
+function playSoundViaWebAudio(name, { loop = false } = {}) {
+    const ctx = getWebAudioContext();
+    if (!ctx || ctx.state !== 'running' || !webAudioMasterGain) return false;
+    const buffer = webAudioBuffers.get(name);
+    if (!buffer) return false;
+
+    const cfg = soundConfig[name] || {};
+    const allowOverlap = cfg.allowOverlap !== false;
+
+    if (!allowOverlap) {
+        const active = webAudioNonOverlapActive.get(name);
+        if (active && active.source) return true; // すでに鳴っているのでスキップ扱い
+    }
+
+    try {
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = !!loop;
+
+        const gain = ctx.createGain();
+        gain.gain.value = 1;
+
+        source.connect(gain);
+        gain.connect(webAudioMasterGain);
+
+        if (!allowOverlap) {
+            webAudioNonOverlapActive.set(name, { source });
+            source.onended = () => {
+                const current = webAudioNonOverlapActive.get(name);
+                if (current && current.source === source) webAudioNonOverlapActive.delete(name);
+            };
+        }
+
+        source.start(0);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 function unlockAudioOnce() {
     if (audioUnlocked) return;
+
+    // WebAudio を優先的に解放（HTMLAudio が詰まる端末向け）
+    const webAudioPrimed = primeWebAudioOnce();
 
     // 仕様：iOS（Safari/Chrome）はユーザー操作起点でない音声再生をブロックする
     // 最初の操作時に全オーディオを空再生して解除し、タイマー駆動の音も鳴るようにする
@@ -780,7 +941,7 @@ function unlockAudioOnce() {
     }
     if (timerAudio) audiosToPrime.push(timerAudio);
 
-    let anySucceeded = false;
+    let anySucceeded = webAudioPrimed;
 
     for (const audio of audiosToPrime) {
         try {
@@ -824,6 +985,9 @@ function initSounds() {
 }
 
 function playSound(name) {
+    // WebAudio のバッファが使える場合はそちらを優先（多重再生・詰まり対策）
+    if (playSoundViaWebAudio(name)) return;
+
     const pool = soundPools.get(name);
     if (!pool || pool.length === 0) return;
 
@@ -869,6 +1033,8 @@ function playSound(name) {
     if (!audio) return;
 
     try {
+        // 再生中のインスタンスを強制的にリスタート（端末によってはこれをしないと詰まることがある）
+        if (!audio.paused) audio.pause();
         audio.currentTime = 0;
         const p = audio.play();
         if (p && typeof p.catch === 'function') p.catch(() => {});
@@ -887,6 +1053,31 @@ function initTimerSound() {
 }
 
 function startTimerSound() {
+    // WebAudio で鳴らせるなら優先（ループ）
+    const ctx = getWebAudioContext();
+    if (ctx && ctx.state === 'running' && webAudioBuffers.has('timer') && webAudioMasterGain) {
+        if (timerWebAudioSource) return;
+        // nonOverlap 管理には載せず、専用参照で stop できるようにする
+        try {
+            const buffer = webAudioBuffers.get('timer');
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+
+            const gain = ctx.createGain();
+            gain.gain.value = 1;
+            source.connect(gain);
+            gain.connect(webAudioMasterGain);
+
+            source.start(0);
+            timerWebAudioSource = source;
+            return;
+        } catch {
+            // フォールバック
+            timerWebAudioSource = null;
+        }
+    }
+
     if (!timerAudio) return;
     if (!timerAudio.paused) return;
     try {
@@ -898,11 +1089,19 @@ function startTimerSound() {
 }
 
 function pauseTimerSound() {
+    if (timerWebAudioSource) {
+        try { timerWebAudioSource.stop(); } catch {}
+        timerWebAudioSource = null;
+    }
     if (!timerAudio) return;
     if (!timerAudio.paused) timerAudio.pause();
 }
 
 function stopTimerSound() {
+    if (timerWebAudioSource) {
+        try { timerWebAudioSource.stop(); } catch {}
+        timerWebAudioSource = null;
+    }
     if (!timerAudio) return;
     timerAudio.pause();
     timerAudio.currentTime = 0;
@@ -2362,7 +2561,7 @@ function backToModeSelection() {
 }
 
 function showPauseOverlay() {
-    let overlay = document.getElementById('pause-overlay');
+    let overlay = getElementByIdCached('pause-overlay');
     if (!overlay) {
         overlay = document.createElement('div');
         overlay.id = 'pause-overlay';
@@ -2375,7 +2574,7 @@ function showPauseOverlay() {
         `;
         overlay.addEventListener('click', resumeTimer);
 
-        const root = document.getElementById('design-root');
+        const root = getElementByIdCached('design-root');
         (root || document.body).appendChild(overlay);
     }
     overlay.classList.remove('hidden');
@@ -2383,7 +2582,7 @@ function showPauseOverlay() {
 }
 
 function hidePauseOverlay() {
-    const overlay = document.getElementById('pause-overlay');
+    const overlay = getElementByIdCached('pause-overlay');
     if (overlay) {
         overlay.classList.add('hidden');
     }
@@ -2391,8 +2590,8 @@ function hidePauseOverlay() {
 
 document.addEventListener('DOMContentLoaded', () => {
     // 初期表示はプリロード画面のみにする
-    const preloadScreen = document.getElementById('preload-screen');
-    const languageScreen = document.getElementById('language-screen');
+    const preloadScreen = getElementByIdCached('preload-screen');
+    const languageScreen = getElementByIdCached('language-screen');
     if (preloadScreen) preloadScreen.classList.remove('hidden');
     if (languageScreen) languageScreen.classList.add('hidden');
 
@@ -2403,8 +2602,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.visualViewport?.addEventListener('resize', applyUiScale);
 
     // 進捗表示付きでアセットをプリロード
-    const progressFill = document.getElementById('preload-progress-fill');
-    const progressText = document.getElementById('preload-progress-text');
+    const progressFill = getElementByIdCached('preload-progress-fill');
+    const progressText = getElementByIdCached('preload-progress-text');
     preloadAssets({
         onProgress: ({ loaded, total }) => {
             const pct = total > 0 ? Math.round((loaded / total) * 100) : 0;
@@ -2423,24 +2622,35 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('pointerdown', unlockAudioOnce, { capture: true, once: true });
     document.addEventListener('touchstart', unlockAudioOnce, { capture: true, once: true, passive: true });
 
-    document.getElementById('lang-ja').addEventListener('click', () => { playSound('select'); selectLanguage('ja'); });
-    document.getElementById('lang-en').addEventListener('click', () => { playSound('select'); selectLanguage('en'); });
-    document.getElementById('lang-zh').addEventListener('click', () => { playSound('select'); selectLanguage('zh'); });
-    document.getElementById('casual-btn').addEventListener('click', () => { playSound('select'); startGameMode('casual'); });
-    document.getElementById('story-btn').addEventListener('click', () => { playSound('select'); startGameMode('story'); });
-    document.getElementById('survival-btn').addEventListener('click', () => { playSound('select'); startGameMode('survival'); });
+    const langJaBtn = getElementByIdCached('lang-ja');
+    if (langJaBtn) langJaBtn.addEventListener('click', () => { playSound('select'); selectLanguage('ja'); });
 
-    const modeBackBtn = document.getElementById('mode-back-btn');
+    const langEnBtn = getElementByIdCached('lang-en');
+    if (langEnBtn) langEnBtn.addEventListener('click', () => { playSound('select'); selectLanguage('en'); });
+
+    const langZhBtn = getElementByIdCached('lang-zh');
+    if (langZhBtn) langZhBtn.addEventListener('click', () => { playSound('select'); selectLanguage('zh'); });
+
+    const casualBtn = getElementByIdCached('casual-btn');
+    if (casualBtn) casualBtn.addEventListener('click', () => { playSound('select'); startGameMode('casual'); });
+
+    const storyBtn = getElementByIdCached('story-btn');
+    if (storyBtn) storyBtn.addEventListener('click', () => { playSound('select'); startGameMode('story'); });
+
+    const survivalBtn = getElementByIdCached('survival-btn');
+    if (survivalBtn) survivalBtn.addEventListener('click', () => { playSound('select'); startGameMode('survival'); });
+
+    const modeBackBtn = getElementByIdCached('mode-back-btn');
     if (modeBackBtn) modeBackBtn.addEventListener('click', () => { playSound('tap'); backToLanguageSelection(); });
 
-    const difficultyBackBtn = document.getElementById('difficulty-back-btn');
+    const difficultyBackBtn = getElementByIdCached('difficulty-back-btn');
     if (difficultyBackBtn) difficultyBackBtn.addEventListener('click', () => { playSound('tap'); backToModeSelection(); });
 
-    const tutorialBtn = document.getElementById('tutorial-btn');
-    const tutorialScreen = document.getElementById('tutorial-screen');
-    const tutorialPrevBtn = document.getElementById('tutorial-prev-btn');
-    const tutorialNextBtn = document.getElementById('tutorial-next-btn');
-    const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+    const tutorialBtn = getElementByIdCached('tutorial-btn');
+    const tutorialScreen = getElementByIdCached('tutorial-screen');
+    const tutorialPrevBtn = getElementByIdCached('tutorial-prev-btn');
+    const tutorialNextBtn = getElementByIdCached('tutorial-next-btn');
+    const tutorialCloseBtn = getElementByIdCached('tutorial-close-btn');
 
     function openTutorial() {
         if (!tutorialScreen) return;
@@ -2494,17 +2704,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', closeTutorial);
-    document.getElementById('easy').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('easy'); });
-    document.getElementById('medium').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('medium'); });
-    document.getElementById('hard').addEventListener('click', () => { playSound('select'); startGameWithDifficulty('hard'); });
-    document.getElementById('submit-btn').addEventListener('click', () => { playSound('select'); checkAnswer(); });
-    document.getElementById('next-btn').addEventListener('click', () => { playSound('select'); startNewQuestion(); });
+    const easyBtn = getElementByIdCached('easy');
+    if (easyBtn) easyBtn.addEventListener('click', () => { playSound('select'); startGameWithDifficulty('easy'); });
+
+    const mediumBtn = getElementByIdCached('medium');
+    if (mediumBtn) mediumBtn.addEventListener('click', () => { playSound('select'); startGameWithDifficulty('medium'); });
+
+    const hardBtn = getElementByIdCached('hard');
+    if (hardBtn) hardBtn.addEventListener('click', () => { playSound('select'); startGameWithDifficulty('hard'); });
+
+    const submitBtn = getElementByIdCached('submit-btn');
+    if (submitBtn) submitBtn.addEventListener('click', () => { playSound('select'); checkAnswer(); });
+
+    const nextBtn = getElementByIdCached('next-btn');
+    if (nextBtn) nextBtn.addEventListener('click', () => { playSound('select'); startNewQuestion(); });
 
     // 勝利/ゲームオーバー画面のボタン
-    const playAgainVictory = document.getElementById('play-again-victory');
-    const menuVictory = document.getElementById('menu-victory');
-    const playAgainGameOver = document.getElementById('play-again-gameover');
-    const menuGameOver = document.getElementById('menu-gameover');
+    const playAgainVictory = getElementByIdCached('play-again-victory');
+    const menuVictory = getElementByIdCached('menu-victory');
+    const playAgainGameOver = getElementByIdCached('play-again-gameover');
+    const menuGameOver = getElementByIdCached('menu-gameover');
     if (playAgainVictory) playAgainVictory.addEventListener('click', () => { playSound('select'); restartCurrentRun(); });
     if (menuVictory) menuVictory.addEventListener('click', () => { playSound('select'); backToMenu(); });
     if (playAgainGameOver) playAgainGameOver.addEventListener('click', () => { playSound('select'); restartCurrentRun(); });
