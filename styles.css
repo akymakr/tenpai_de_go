@@ -72,6 +72,11 @@ body.in-game #lives-display {
 /* ========== 16:9 固定比率スケール舞台（設計基準：1280x720） ========== */
 :root {
     --ui-scale: 1;
+    --transition-ui-button: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-bounce-fast: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-soft: all 0.3s ease;
+    --transition-expand: width 0.6s, height 0.6s;
 }
 
 .scale-stage {
@@ -272,7 +277,7 @@ body.time-critical::after {
     background: rgba(255, 255, 255, 0.06);
     color: rgba(255, 255, 255, 0.95);
     cursor: pointer;
-    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    transition: var(--transition-ui-button);
 }
 
 .nav-back-btn {
@@ -289,7 +294,7 @@ body.time-critical::after {
     background: rgba(255, 255, 255, 0.06);
     color: rgba(255, 255, 255, 0.95);
     cursor: pointer;
-    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    transition: var(--transition-ui-button);
 }
 
 .nav-back-btn:hover {
@@ -770,7 +775,7 @@ body.in-game .time-extension-slot {
     color: white;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: var(--transition-bounce);
     position: relative;
     overflow: hidden;
     box-shadow: 
@@ -788,7 +793,7 @@ body.in-game .time-extension-slot {
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.15);
     transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+    transition: var(--transition-expand);
 }
 
 .mode-btn:hover {
@@ -820,7 +825,7 @@ body.in-game .time-extension-slot {
         0 4px 12px rgba(0, 0, 0, 0.2),
         inset 0 2px 4px rgba(255, 255, 255, 0.8),
         inset 0 -2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    transition: var(--transition-soft);
 }
 
 .selectable-tile {
@@ -830,7 +835,7 @@ body.in-game .time-extension-slot {
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: var(--transition-bounce-fast);
     box-shadow: 
         0 4px 16px rgba(0, 0, 0, 0.15),
         inset 0 2px 4px rgba(255, 255, 255, 0.9);
@@ -1359,7 +1364,7 @@ body.in-game .time-extension-slot {
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition-soft);
     box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
 }
 
