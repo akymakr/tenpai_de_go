@@ -50,5 +50,6 @@
 
 - `index.html`：頁面
 - `styles.css`：樣式
+- `utilities.css`︰從 Tailwind CSS 元素抽取樣式
 - `game.js`：遊戲邏輯
 - `assets/`：牌面圖片與音效

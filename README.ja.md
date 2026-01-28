@@ -50,5 +50,6 @@
 
 - `index.html`
 - `styles.css`
+- `utilities.css`
 - `game.js`
 - `assets/`

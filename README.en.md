@@ -50,5 +50,6 @@ Mahjong tenpai training game.
 
 - `index.html`
 - `styles.css`
+- `utilities.css`
 - `game.js`
 - `assets/`

@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聴牌で GO!</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>聴牌で GO! (R20260128-000)</title>
+    <meta name="theme-color" content="#0a0e27">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+    </noscript>
+
+    <link rel="stylesheet" href="utilities.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen text-white transition-all duration-700">
@@ -51,13 +59,17 @@
 
         <div id="mode-screen" class="screen-container hidden">
             <button id="mode-back-btn" class="nav-back-btn" type="button" aria-label="Back">
-                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M20 11H7.83l5.58-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
                 <span id="mode-back-text">Back</span>
             </button>
             <div class="flex items-center justify-center relative mb-8">
                 <h2 id="mode-title" class="text-4xl font-bold text-center">Select Game Mode</h2>
                 <button id="tutorial-btn" class="tutorial-btn" type="button" aria-label="Tutorial">
-                    <i class="fa fa-book" aria-hidden="true"></i>
+                    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M18 2H6a2 2 0 0 0-2 2v15a3 3 0 0 1 3-3h13v-2H7a1 1 0 0 0-1 1V4h12v13h2V4a2 2 0 0 0-2-2z"/>
+                    </svg>
                     <span id="tutorial-btn-text" class="tutorial-btn-text">Tutorial</span>
                 </button>
             </div>
@@ -112,7 +124,9 @@
 
         <div id="difficulty-screen" class="screen-container hidden">
             <button id="difficulty-back-btn" class="nav-back-btn" type="button" aria-label="Back">
-                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M20 11H7.83l5.58-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
                 <span id="difficulty-back-text">Back</span>
             </button>
             <h2 id="difficulty-title" class="text-4xl font-bold mb-8 text-center">Select Difficulty</h2>
@@ -252,11 +266,11 @@
         </main>
 
         <footer class="text-center py-6 mt-auto border-t-0 border-purple-600">
-            <p id="footer-text" class="text-lg font-bold">聴牌で GO! &copy; 2026 Akira Akiyama</p>
+            <p id="footer-text" class="text-lg font-bold">聴牌で GO! (R20260128-000) &copy; 2026 Akira Akiyama</p>
         </footer>
     </div>
     </div>
 
-    <script src="game.js"></script>
+    <script src="game.js" defer></script>
 </body>
 </html>

@@ -706,14 +706,15 @@ const tileNames = {
 // アセット（assets/）配下を事前にすべてプリロードして、プレイ中の引っかかりを防ぐ
 //（ブラウザ上では実行時にディレクトリ一覧を取得できないため、静的リストにする）
 const ASSET_FILES = [
-    'Back.png', 'Blank.png', 'Chun.png', 'continue.mp3', 'correct.mp3',
-    'Front.png', 'gameover.mp3', 'Haku.png', 'Hatsu.png', 'incorrect.mp3',
+    // Images only (audio is initialized lazily on interaction)
+    'Back.png', 'Blank.png', 'Chun.png',
+    'Front.png', 'Haku.png', 'Hatsu.png',
     'Man1.png', 'Man2.png', 'Man3.png', 'Man4.png', 'Man5-Dora.png', 'Man5.png', 'Man6.png', 'Man7.png', 'Man8.png', 'Man9.png',
     'Nan.png', 'Pei.png',
     'Pin1.png', 'Pin2.png', 'Pin3.png', 'Pin4.png', 'Pin5-Dora.png', 'Pin5.png', 'Pin6.png', 'Pin7.png', 'Pin8.png', 'Pin9.png',
-    'select.mp3', 'Shaa.png',
+    'Shaa.png',
     'Sou1.png', 'Sou2.png', 'Sou3.png', 'Sou4.png', 'Sou5-Dora.png', 'Sou5.png', 'Sou6.png', 'Sou7.png', 'Sou8.png', 'Sou9.png',
-    'tap.mp3', 'timer.mp3', 'timeup.mp3', 'Ton.png', 'victory.mp3'
+    'Ton.png'
 ];
 
 function preloadImage(url) {
@@ -799,6 +800,8 @@ const soundPools = new Map();
 const extraSoundInstances = new Map();
 
 let audioUnlocked = false;
+let soundsInitialized = false;
+let timerInitialized = false;
 
 // WebAudio（AudioContext）を使える環境では、HTMLAudio の「同時再生が詰まる/止まる」問題を避ける
 // ※ iOS などはユーザー操作起点で resume() が必要
@@ -930,6 +933,10 @@ function playSoundViaWebAudio(name, { loop = false } = {}) {
 function unlockAudioOnce() {
     if (audioUnlocked) return;
 
+    // ユーザー操作のタイミングで初期化して、初回ロードの負荷を下げる
+    initSounds();
+    initTimerSound();
+
     // WebAudio を優先的に解放（HTMLAudio が詰まる端末向け）
     const webAudioPrimed = primeWebAudioOnce();
 
@@ -971,6 +978,7 @@ function unlockAudioOnce() {
 }
 
 function initSounds() {
+    if (soundsInitialized) return;
     for (const [name, cfg] of Object.entries(soundConfig)) {
         const poolSize = Math.max(1, cfg.pool || 1);
         const pool = [];
@@ -982,11 +990,30 @@ function initSounds() {
         soundPools.set(name, pool);
         extraSoundInstances.set(name, []);
     }
+    soundsInitialized = true;
+}
+
+function ensureSoundPool(name) {
+    if (soundPools.has(name)) return;
+    const cfg = soundConfig[name];
+    if (!cfg) return;
+
+    const poolSize = Math.max(1, cfg.pool || 1);
+    const pool = [];
+    for (let i = 0; i < poolSize; i++) {
+        const audio = new Audio(cfg.src);
+        audio.preload = 'auto';
+        pool.push(audio);
+    }
+    soundPools.set(name, pool);
+    extraSoundInstances.set(name, []);
 }
 
 function playSound(name) {
     // WebAudio のバッファが使える場合はそちらを優先（多重再生・詰まり対策）
     if (playSoundViaWebAudio(name)) return;
+
+    ensureSoundPool(name);
 
     const pool = soundPools.get(name);
     if (!pool || pool.length === 0) return;
@@ -1047,12 +1074,15 @@ function playSound(name) {
 let timerAudio = null;
 
 function initTimerSound() {
+    if (timerInitialized) return;
     timerAudio = new Audio('assets/timer.mp3');
     timerAudio.preload = 'auto';
     timerAudio.loop = true;
+    timerInitialized = true;
 }
 
 function startTimerSound() {
+    if (!timerAudio) initTimerSound();
     // WebAudio で鳴らせるなら優先（ループ）
     const ctx = getWebAudioContext();
     if (ctx && ctx.state === 'running' && webAudioBuffers.has('timer') && webAudioMasterGain) {
@@ -2595,27 +2625,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (preloadScreen) preloadScreen.classList.remove('hidden');
     if (languageScreen) languageScreen.classList.add('hidden');
 
-    initSounds();
-    initTimerSound();
     applyUiScale();
     window.addEventListener('resize', applyUiScale);
     window.visualViewport?.addEventListener('resize', applyUiScale);
 
-    // 進捗表示付きでアセットをプリロード
-    const progressFill = getElementByIdCached('preload-progress-fill');
-    const progressText = getElementByIdCached('preload-progress-text');
-    preloadAssets({
-        onProgress: ({ loaded, total }) => {
-            const pct = total > 0 ? Math.round((loaded / total) * 100) : 0;
-            if (progressFill) progressFill.style.width = `${pct}%`;
-            if (progressText) progressText.textContent = `${pct}% (${loaded}/${total})`;
-        }
-    }).then(() => {
-        if (preloadScreen) preloadScreen.classList.add('hidden');
-        if (languageScreen) {
-            languageScreen.classList.remove('hidden');
-            languageScreen.classList.add('fade-in');
-        }
+    // 初回描画を優先してから、進捗表示付きでアセットをプリロード
+    const runAfterFirstPaint = (cb) => {
+        requestAnimationFrame(() => requestAnimationFrame(cb));
+    };
+
+    runAfterFirstPaint(() => {
+        const progressFill = getElementByIdCached('preload-progress-fill');
+        const progressText = getElementByIdCached('preload-progress-text');
+        preloadAssets({
+            onProgress: ({ loaded, total }) => {
+                const pct = total > 0 ? Math.round((loaded / total) * 100) : 0;
+                if (progressFill) progressFill.style.width = `${pct}%`;
+                if (progressText) progressText.textContent = `${pct}% (${loaded}/${total})`;
+            }
+        }).then(() => {
+            if (preloadScreen) preloadScreen.classList.add('hidden');
+            if (languageScreen) {
+                languageScreen.classList.remove('hidden');
+                languageScreen.classList.add('fade-in');
+            }
+        });
     });
 
     // 最初のユーザー操作で音声を解放（iOS 対策）
