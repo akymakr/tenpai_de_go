@@ -1240,25 +1240,23 @@ function calculateWinningTiles(counts) {
 // 難易度に応じて待ちの数が条件を満たすか判定
 function isValidWinningTilesCount(count, difficulty, attempts) {
     if (difficulty === 'easy') {
-        if (attempts <= 4) return count === 3;
-        if (attempts <= 8) return count >= 2 && count <= 3;
         return count >= 1 && count <= 3;
     } else if (difficulty === 'medium') {
-        if (attempts <= 16) return count === 6;
-        if (attempts <= 32) return count >= 5 && count <= 6;
-        if (attempts <= 64) return count >= 4 && count <= 6;
-        if (attempts <= 256) return count >= 3 && count <= 6;
-        if (attempts <= 1024) return count >= 2 && count <= 6;
+        if (attempts <= 8) return count === 6;
+        if (attempts <= 16) return count >= 5 && count <= 6;
+        if (attempts <= 24) return count >= 4 && count <= 6;
+        if (attempts <= 40) return count >= 3 && count <= 6;
+        if (attempts <= 56) return count >= 2 && count <= 6;
         return count >= 1 && count <= 6;
     } else { // 上級
-        if (attempts <= 16) return count === 9;
-        if (attempts <= 32) return count >= 8 && count <= 9;
-        if (attempts <= 64) return count >= 7 && count <= 9;
-        if (attempts <= 256) return count >= 6 && count <= 9;
-        if (attempts <= 1024) return count >= 5 && count <= 9;
-        if (attempts <= 4096) return count >= 4 && count <= 9;
-        if (attempts <= 8192) return count >= 3 && count <= 9;
-        if (attempts <= 16384) return count >= 2 && count <= 9;
+        if (attempts <= 64) return count === 9;
+        if (attempts <= 128) return count >= 8 && count <= 9;
+        if (attempts <= 256) return count >= 7 && count <= 9;
+        if (attempts <= 280) return count >= 6 && count <= 9;
+        if (attempts <= 304) return count >= 5 && count <= 9;
+        if (attempts <= 328) return count >= 4 && count <= 9;
+        if (attempts <= 352) return count >= 3 && count <= 9;
+        if (attempts <= 376) return count >= 2 && count <= 9;
         return count >= 1 && count <= 9;
     }
 }
