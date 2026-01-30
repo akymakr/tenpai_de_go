@@ -1,49 +1,49 @@
-// 聴牌で GO! - ゲームロジック
+// 聴牌でGO! - ゲームロジック
 
 const translations = {
     ja: {
-        gameTitle: "🀄 聴牌で GO! 🀄",
+        gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
         selectMode: "モードを選択してください",
         casualMode: "カジュアル",
-        casualDesc: "全 9 問 + BOSS ステージ\n各問 45 秒 / 3 ライフ制",
+        casualDesc: "全{casualStagesBeforeBoss}問+BOSSステージ\n各問{casualStartSeconds}秒 / {lives}ライフ制",
         storyMode: "ストーリー",
-        storyDesc: "初級 → 中級 → 上級の各 3 問 + BOSS\n各問 30 秒 / 3ライフ制",
+        storyDesc: "初級→中級→上級の各{storyDifficultyStep}問+BOSS\n各問{storyStartSeconds}秒 / {lives}ライフ制",
         survivalMode: "サバイバル",
-        survivalDesc: "60 秒からスタート\n正解でタイム回復 / ライフなし",
+        survivalDesc: "{survivalStartSeconds}秒からスタート\n正解でタイム回復 / ライフなし",
         selectDifficulty: "難易度を選択してください",
         easy: "初級",
-        easyDesc: "最大 3 面張まで",
+        easyDesc: "最大3面張まで",
         medium: "中級",
-        mediumDesc: "最大 6 面張まで",
+        mediumDesc: "最大6面張まで",
         hard: "上級",
-        hardDesc: "最大 9 面張まで",
-        handTitle: "🎴 手牌 🎴",
+        hardDesc: "最大9面張まで",
+        handTitle: "🀄 手牌 🀄",
         selectWaiting: "🎯 待ち牌をすべて選んでください 🎯",
         submitAnswer: "✨ 回答する ✨",
-        correct: "🎉 正解！ナイスアガリ！ 🎉",
-        incorrect: "❌ 不正解です...",
+        correct: "🎉 素晴らしい！ 🎉",
+        incorrect: "❌ 惜しい...",
         timeUp: "⏰ 時間切れ！",
-        correctAnswer: "💡 正解の待ち：",
+        correctAnswer: "💡 正解：",
         nextQuestion: "➡️ 次の問題へ",
         question: "第",
-        bossStage: "🔥 BOSS ステージ 🔥",
+        bossStage: "🔥 BOSSステージ 🔥",
         bossChallenge: "貯めたタイムで挑戦！",
-        bossComplete: "BOSS 撃破！クリアおめでとう！",
+        bossComplete: "BOSSステージクリア！",
         victory: "🎊 完全制覇！ 🎊",
         gameOver: "ゲームオーバー",
-        finalQuestions: "到達問題数：",
-        finalScore: "合計正解数：",
+        finalQuestions: "ステージ到達：",
+        finalScore: "正解数：",
         timeLeftLabel: "残り時間：",
         answerTimeLabel: "解答時間：",
         secondsUnit: "秒",
         livesLeftLabel: "残りライフ：",
         modeLabel: "モード：",
-        playAgain: "もう一度遊ぶ",
+        playAgain: "もう一回遊ぶ",
         backToMenu: "メニューに戻る",
         back: "戻る",
-        footer: "聴牌で GO!",
-        selectLanguage: "言語を選択 / Select Language",
+        footer: "聴牌でGO!",
+        selectLanguage: "言語を選択 / Select Language / 選擇語言",
         japanese: "日本語",
         english: "English",
         chinese: "繁體中文",
@@ -67,12 +67,13 @@ const translations = {
         correctCount: "正解数：",
         paused: "⏸️ 一時停止中",
         tapToResume: "画面をタップして再開",
-        timeExtension: "⏱️ 長考（タイム延長）",
-        timeExtensionDesc: "+30 秒",
+        timeExtension: "⏲️ 長考",
+        timeExtensionDesc: "+{timeExtensionSeconds}秒",
         extensionsLeft: "あと",
+        cooldown: "クールダウン",
         ok: "OK",
 
-        tutorial: "チュートリアル",
+        tutorial: "遊び方",
         tutorialTitle: "遊び方",
         tutorialPrev: "戻る",
         tutorialNext: "次へ",
@@ -80,30 +81,30 @@ const translations = {
         tutorialFinish: "完了",
 
         tutorialP1Title: "ゲームの目的",
-        tutorialP1Body: "表示された聴牌（テンパイ）の手牌から、アガリ牌（待ち牌）をすべて見つけ出しましょう。\n\nポイント：\n・待ちは複数ある場合があります\n・手牌で 4 枚使っている牌は、待ち牌にはなりません",
+        tutorialP1Body: "表示された聴牌（テンパイ）の手牌から、アガリ牌（待ち牌）をすべて見つけ出しましょう。\n\nポイント：\n・待ちは複数ある場合があります\n・手牌で4枚使っている牌は、待ち牌にはなりません",
 
         tutorialP2Title: "操作方法",
-        tutorialP2Body: "1) 画面下の 1 〜 9 のボタンから、待ち牌をすべて選択\n2) 「回答する」ボタンで判定\n\nヒント：\n・もう一度タップすると選択解除できます\n・時間切れになっても、牌を一枚でも選択していれば自動的に提出されます",
+        tutorialP2Body: "1) 画面下の1から9の牌から、待ち牌をすべて選択\n2) 「回答する」ボタンで正誤判定\n\nヒント：\n・もう一度タップすると選択解除できます\n・時間切れになっても、牌を一枚でも選択していれば自動的に回答として提出されます",
 
         tutorialP3Title: "難易度について",
-        tutorialP3Body: "初級：最大 3 面張\n中級：最大 6 面張\n上級：最大 9 面張\n\nストーリーモードでは、ステージが進むごとに難易度が上がります。",
+        tutorialP3Body: "初級：最大3面張\n中級：最大6面張\n上級：最大9面張\n\nストーリーモードでは、ステージが進むごとに難易度が上がります。",
 
-        tutorialP4Title: "長考（タイム延長）",
-        tutorialP4Body: "「長考」ボタンで時間を増やせます。\n・1 回につき +30 秒\n・残り時間が少なくなると迷わず使ってしまいましょう\n\n※ BOSS ステージでは使用できませんが、残った回数分が BOSS ステージの制限時間に加算されます。",
+        tutorialP4Title: "長考",
+        tutorialP4Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・残り時間が少なくなると迷わず使ってしまいましょう\n\n※ BOSSステージでは使用できませんが、残った回数分がBOSSステージの制限時間に加算されます。",
 
-        tutorialP5Title: "BOSS ステージ",
-        tutorialP5Body: "ステージ 10 は BOSS 戦です。\nこれまでのステージで余った「残り時間の合計」が制限時間になります。正解すればクリアです！"
+        tutorialP5Title: "BOSSステージ",
+        tutorialP5Body: "ステージ{bossStageNumber}はBOSSステージです。\nこれまでのステージで余った「残り時間+長考の合計」が制限時間になります。正解すればゲームクリアです！"
     },
     en: {
-        gameTitle: "🀄 Tenpai de GO! 🀄",
+        gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
         selectMode: "Select Mode",
         casualMode: "Casual",
-        casualDesc: "9 Questions + BOSS\n45s per tile / 3 Lives",
+        casualDesc: "{casualStagesBeforeBoss} Questions + BOSS\n{casualStartSeconds}s each stage / {lives} Lives",
         storyMode: "Story",
-        storyDesc: "Easy → Med → Hard (3 levels each) + BOSS\n30s per tile / 3 Lives",
+        storyDesc: "Easy→Med→Hard ({storyDifficultyStep} stages each) + BOSS\n{storyStartSeconds}s each stage / {lives} Lives",
         survivalMode: "Survival",
-        survivalDesc: "Start with 60s\nCorrect answers restore time / No lives",
+        survivalDesc: "Starting with {survivalStartSeconds}s\nTime extension each stage / No lives",
         selectDifficulty: "Select Difficulty",
         easy: "Easy",
         easyDesc: "Up to 3-way waits",
@@ -111,32 +112,32 @@ const translations = {
         mediumDesc: "Up to 6-way waits",
         hard: "Hard",
         hardDesc: "Up to 9-way waits",
-        handTitle: "🎴 Your Hand 🎴",
+        handTitle: "🀄 Your Hand 🀄",
         selectWaiting: "🎯 Select ALL Winning Tiles (Waits) 🎯",
         submitAnswer: "✨ Submit ✨",
-        correct: "🎉 Correct! Nice Hand! 🎉",
-        incorrect: "❌ Wrong Answer...",
+        correct: "🎉 Fantastic! 🎉",
+        incorrect: "❌ So close...",
         timeUp: "⏰ Time's Up!",
         correctAnswer: "💡 Correct Waits:",
         nextQuestion: "➡️ Next Question",
         question: "Stage",
         bossStage: "🔥 BOSS STAGE 🔥",
         bossChallenge: "Use your saved time!",
-        bossComplete: "BOSS Defeated! Congratulations!",
+        bossComplete: "BOSS STAGE cleared! Congratulations!",
         victory: "🎊 ALL CLEARED! 🎊",
         gameOver: "GAME OVER",
-        finalQuestions: "Stages Completed:",
-        finalScore: "Total Correct:",
+        finalQuestions: "Stages Reached:",
+        finalScore: "Correct:",
         timeLeftLabel: "Time Left:",
         answerTimeLabel: "Answer Time:",
-        secondsUnit: "s",
+        secondsUnit: "sec",
         livesLeftLabel: "Lives:",
         modeLabel: "Mode:",
         playAgain: "Play Again",
         backToMenu: "Main Menu",
         back: "Back",
         footer: "Tenpai de GO!",
-        selectLanguage: "Select Language",
+        selectLanguage: "言語を選択 / Select Language / 選擇語言",
         japanese: "Japanese",
         english: "English",
         chinese: "繁體中文",
@@ -160,9 +161,10 @@ const translations = {
         correctCount: "Correct:",
         paused: "⏸️ PAUSED",
         tapToResume: "Tap to Resume",
-        timeExtension: "⏱️ Think Time (+30s)",
-        timeExtensionDesc: "+30s",
+        timeExtension: "⏲️ Think Time",
+        timeExtensionDesc: "+{timeExtensionSeconds}s",
         extensionsLeft: "Left:",
+        cooldown: "Cooldown",
         ok: "OK",
 
         tutorial: "Tutorial",
@@ -179,47 +181,47 @@ const translations = {
         tutorialP2Body: "1) Tap the tile icons (1-9) to select your waits.\n2) Tap 'Submit' to check your answer.\n\nTips:\n- Tap a selected tile again to unselect it.\n- If time runs out, your current selection will be auto-submitted.",
 
         tutorialP3Title: "Difficulty Levels",
-        tutorialP3Body: "Easy: Up to 3-way waits.\nMedium: Up to 6-way waits.\nHard: Up to 9-way waits.\n\nIn Story Mode, the difficulty increases every 3 stages.",
+        tutorialP3Body: "Easy: Up to 3-way waits.\nMedium: Up to 6-way waits.\nHard: Up to 9-way waits.\n\nIn Story Mode, the difficulty increases every {storyDifficultyStep} stages.",
 
-        tutorialP4Title: "Think Time (+30s)",
-        tutorialP4Body: "Use 'Think Time' to extend 30 seconds to your current stage.\n- Use it when the timer turns red.\n\nNote: Cannot be used during the BOSS Stage, but unused charges will be converted into extra time for the BOSS battle.",
+        tutorialP4Title: "Think Time (+{timeExtensionSeconds}s)",
+        tutorialP4Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Use it when the timer turns red.\n\nNote: Cannot be used during the BOSS Stage, but unused charges will be converted into extra time for the BOSS Stage.",
 
         tutorialP5Title: "The BOSS Stage",
-        tutorialP5Body: "Stage 10 is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!"
+        tutorialP5Body: "Stage {bossStageNumber} is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!"
     },
     zh: {
-        gameTitle: "🀄 聽牌 GO! 🀄",
+        gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
         selectMode: "請選擇遊戲模式",
         casualMode: "休閒模式",
-        casualDesc: "全 9 題 + BOSS關卡\n每題 45 秒 / 3 條生命",
+        casualDesc: "全{casualStagesBeforeBoss}題 + BOSS關卡\n每題{casualStartSeconds}秒 / {lives}條生命",
         storyMode: "闖關模式",
-        storyDesc: "初級 → 中級 → 高級各 3 題 + BOSS\n每題 30 秒 / 3 條生命",
+        storyDesc: "初級→中級→高級各{storyDifficultyStep}題 + BOSS關卡\n每題{storyStartSeconds}秒 / {lives}條生命",
         survivalMode: "生存模式",
-        survivalDesc: "60 秒開始\n答對可回復時間 / 無生命限制",
+        survivalDesc: "由{survivalStartSeconds}秒倒計時開始\n答對可回復時間 / 無生命",
         selectDifficulty: "請選擇難度",
         easy: "初級",
-        easyDesc: "最多 3 面聽",
+        easyDesc: "最多聽3張",
         medium: "中級",
-        mediumDesc: "最多 6 面聽",
+        mediumDesc: "最多聽6張",
         hard: "高級",
-        hardDesc: "最多 9 面聽",
-        handTitle: "🎴 目前手牌 🎴",
+        hardDesc: "最多聽9張",
+        handTitle: "🀄 目前手牌 🀄",
         selectWaiting: "🎯 請選出所有聽的牌 🎯",
         submitAnswer: "✨ 確認答案 ✨",
-        correct: "🎉 正確！高手！ 🎉",
-        incorrect: "❌ 答錯了...",
-        timeUp: "⏰ 時間到！",
+        correct: "🎉 高手！ 🎉",
+        incorrect: "❌ 可惜...",
+        timeUp: "⏰ 時間到了！",
         correctAnswer: "💡 正確聽牌：",
         nextQuestion: "➡️ 下一題",
         question: "第",
-        bossStage: "🔥 BOSS 關卡 🔥",
+        bossStage: "🔥 BOSS關卡 🔥",
         bossChallenge: "使用累積時間挑戰！",
-        bossComplete: "擊敗 BOSS！恭喜通關！",
+        bossComplete: "恭喜您挑戰BOSS關卡成功！",
         victory: "🎊 全部通關！ 🎊",
         gameOver: "遊戲結束",
-        finalQuestions: "到達題目數：",
-        finalScore: "總正確數：",
+        finalQuestions: "到達關卡：",
+        finalScore: "正確數：",
         timeLeftLabel: "剩餘時間：",
         answerTimeLabel: "答題時間：",
         secondsUnit: "秒",
@@ -229,7 +231,7 @@ const translations = {
         backToMenu: "返回選單",
         back: "返回",
         footer: "聽牌 GO!",
-        selectLanguage: "選擇語言 / Select Language",
+        selectLanguage: "言語を選択 / Select Language / 選擇語言",
         japanese: "日本語",
         english: "English",
         chinese: "繁體中文",
@@ -253,9 +255,10 @@ const translations = {
         correctCount: "正確數：",
         paused: "⏸️ 已暫停",
         tapToResume: "點擊螢幕繼續",
-        timeExtension: "⏱️ 長考（增加時間）",
-        timeExtensionDesc: "+30 秒",
+        timeExtension: "⏲️ 思考時間",
+        timeExtensionDesc: "+{timeExtensionSeconds}秒",
         extensionsLeft: "剩餘",
+        cooldown: "冷卻",
         ok: "確認",
 
         tutorial: "教學",
@@ -266,25 +269,67 @@ const translations = {
         tutorialFinish: "完成",
 
         tutorialP1Title: "遊戲目標",
-        tutorialP1Body: "根據顯示的手牌（聽牌狀態），找出所有可以食胡的「聽牌」。\n\n注意點：\n・聽牌可能不只一張（多面聽）\n・手牌中已經使用了 4 張的牌，不能作為聽牌",
+        tutorialP1Body: "根據顯示的手牌（聽牌狀態），找出所有可以食胡的「聽牌」。\n\n注意點：\n・聽牌可能不只一張（聽多張）\n・手牌中已經使用了4張的牌，不能作為聽牌",
 
         tutorialP2Title: "操作方式",
-        tutorialP2Body: "1) 點擊下方 1 ～ 9 的按鈕，選出所有聽牌\n2) 點擊「確認答案」進行判定\n\n提示：\n・再次點擊已選中的牌可取消選擇\n・時間結束時，若已有選牌會自動提交",
+        tutorialP2Body: "1) 點擊下方1至9的麻雀牌，選出所有聽牌\n2) 點擊「確認答案」進行判定\n\n提示：\n・再次點擊已選中的牌可取消選擇\n・時間結束時，若已有選牌會自動提交",
 
         tutorialP3Title: "難度說明",
-        tutorialP3Body: "初級：最多 3 面聽\n中級：最多 6 面聽\n高級：最多 9 面聽\n\n在「闖關模式」中，難度會隨著關卡進度提升。",
+        tutorialP3Body: "初級：最多聽3張\n中級：最多聽6張\n高級：最多聽9張\n\n在「闖關模式」中，難度會隨著關卡進度提升。",
 
-        tutorialP4Title: "長考（增加時間）",
-        tutorialP4Body: "可使用「長考」按鈕。\n・每次使用可增加 30 秒\n・時間快結束時，按鈕會閃爍提示\n\n※ BOSS 關卡不能使用，但剩餘次數會自動轉化為 BOSS 關卡的額外時間。",
+        tutorialP4Title: "思考時間",
+        tutorialP4Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・時間快結束時，按鈕會閃爍提示\n\n※ BOSS關卡不能使用，但剩餘次數會自動轉化為BOSS關卡的額外時間。",
 
-        tutorialP5Title: "BOSS 關卡",
-        tutorialP5Body: "第 10 關為 BOSS 關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！"
+        tutorialP5Title: "BOSS關卡",
+        tutorialP5Body: "第{bossStageNumber}關為BOSS關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！"
     }
 };
+
+// ========== ゲーム設定（変数化）==========
+const gameConfig = {
+    modeStartSeconds: {
+        casual: 45,
+        story: 30,
+        survival: 60
+    },
+    lives: 3,
+    survivalRecoverySeconds: {
+        easy: 5,
+        medium: 10,
+        hard: 15
+    },
+    timeExtensionSeconds: 30,
+    maxTimeExtensions: 3,
+    // BOSS ステージ番号
+    storyBossStageNumber: 10,
+    casualBossStageNumber: 10,
+    // ストーリーの難易度アップ間隔（N ステージごと）
+    storyDifficultyStep: 3
+};
+
+function getBossStageNumberForMode(mode) {
+    if (mode === 'story') return gameConfig.storyBossStageNumber;
+    if (mode === 'casual') return gameConfig.casualBossStageNumber;
+    return null;
+}
+
+function getStagesBeforeBossForMode(mode) {
+    const boss = getBossStageNumberForMode(mode);
+    return boss ? Math.max(0, boss - 1) : 0;
+}
+
+function getStoryDifficultyForStage(stageNumber) {
+    const step = Math.max(1, gameConfig.storyDifficultyStep || 1);
+    if (stageNumber <= step) return 'easy';
+    if (stageNumber <= step * 2) return 'medium';
+    return 'hard';
+}
 
 let tutorialPageIndex = 0;
 
 const domCache = new Map();
+
+const nativeGetElementById = document.getElementById.bind(document);
 
 function getElementByIdCached(id) {
     if (domCache.has(id)) {
@@ -292,10 +337,14 @@ function getElementByIdCached(id) {
         if (cached && cached.isConnected) return cached;
         domCache.delete(id);
     }
-    const element = document.getElementById(id);
+    const element = nativeGetElementById(id);
     if (element) domCache.set(id, element);
     return element;
 }
+
+// 互換性のため：以後の document.getElementById はキャッシュ経由にする
+// （getElementByIdCached 内部は nativeGetElementById を使うため再帰しない）
+document.getElementById = (id) => getElementByIdCached(id);
 
 let resultActionCache = {};
 
@@ -360,7 +409,35 @@ function renderTutorialPage() {
 }
 
 let currentLang = 'ja';
-const t = (key) => translations[currentLang][key] || key;
+
+function formatTemplateString(str, vars) {
+    if (typeof str !== 'string') return str;
+    return str.replace(/\{(\w+)\}/g, (_, k) => {
+        const v = vars && Object.prototype.hasOwnProperty.call(vars, k) ? vars[k] : undefined;
+        return v === undefined || v === null ? `{${k}}` : String(v);
+    });
+}
+
+function getDefaultTranslationVars() {
+    return {
+        casualStartSeconds: gameConfig.modeStartSeconds.casual,
+        storyStartSeconds: gameConfig.modeStartSeconds.story,
+        survivalStartSeconds: gameConfig.modeStartSeconds.survival,
+        lives: gameConfig.lives,
+        timeExtensionSeconds: gameConfig.timeExtensionSeconds,
+        maxTimeExtensions: gameConfig.maxTimeExtensions,
+        bossStageNumber: getBossStageNumberForMode(gameState.mode) || gameConfig.storyBossStageNumber,
+        casualStagesBeforeBoss: getStagesBeforeBossForMode('casual'),
+        storyDifficultyStep: gameConfig.storyDifficultyStep
+    };
+}
+
+const t = (key, vars) => {
+    const table = translations[currentLang] || {};
+    const value = table[key] || key;
+    if (typeof value !== 'string') return value;
+    return formatTemplateString(value, { ...getDefaultTranslationVars(), ...(vars || {}) });
+};
 
 let stageIntroTimeoutId = null;
 
@@ -576,7 +653,7 @@ function showResultLifeAction() {
     }
     if (body) {
         const lives = Math.max(0, gameState.lives);
-        const maxLives = Math.max(0, gameState.maxLives || 3);
+        const maxLives = Math.max(0, gameState.maxLives || gameConfig.lives);
 
         let heartsHtml = '<div class="result-lives" aria-label="lives">';
         for (let i = 0; i < maxLives; i++) {
@@ -785,15 +862,15 @@ function pickRandomTileType() {
 // ========== サウンド ==========
 const soundConfig = {
     // 重ね再生を許可する場合、プールが埋まっていれば一時的に追加インスタンスを生成して同時に鳴らす
-    // 勝利/敗北系の音は重ねない（混ざりを防ぐ）
+    // 方針：効果音はすべて重ね再生を許可し、必要な転場タイミングで明示的に止める
     select: { src: 'assets/select.mp3', pool: 4, allowOverlap: true, maxExtra: 6 },
     tap: { src: 'assets/tap.mp3', pool: 6, allowOverlap: true, maxExtra: 8 },
     correct: { src: 'assets/correct.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
     incorrect: { src: 'assets/incorrect.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
     continue: { src: 'assets/continue.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
-    gameover: { src: 'assets/gameover.mp3', pool: 2, allowOverlap: false },
-    victory: { src: 'assets/victory.mp3', pool: 2, allowOverlap: false },
-    timeup: { src: 'assets/timeup.mp3', pool: 2, allowOverlap: false }
+    gameover: { src: 'assets/gameover.mp3', pool: 2, allowOverlap: true, maxExtra: 0 },
+    victory: { src: 'assets/victory.mp3', pool: 2, allowOverlap: true, maxExtra: 0 },
+    timeup: { src: 'assets/timeup.mp3', pool: 2, allowOverlap: true, maxExtra: 1 }
 };
 
 const soundPools = new Map();
@@ -813,6 +890,9 @@ let webAudioLoadPromise = null;
 
 // allowOverlap=false の音だけ「多重再生を抑制」するためのトラッキング
 const webAudioNonOverlapActive = new Map(); // name -> { source: AudioBufferSourceNode }
+
+// 明示的に stop できるよう、WebAudio の再生中ソースをトラッキング
+const webAudioActiveSources = new Map(); // name -> Set<AudioBufferSourceNode>
 
 // タイマー（ループ）用
 let timerWebAudioSource = null;
@@ -915,13 +995,22 @@ function playSoundViaWebAudio(name, { loop = false } = {}) {
         source.connect(gain);
         gain.connect(webAudioMasterGain);
 
+        if (!webAudioActiveSources.has(name)) webAudioActiveSources.set(name, new Set());
+        webAudioActiveSources.get(name).add(source);
+
         if (!allowOverlap) {
             webAudioNonOverlapActive.set(name, { source });
-            source.onended = () => {
-                const current = webAudioNonOverlapActive.get(name);
-                if (current && current.source === source) webAudioNonOverlapActive.delete(name);
-            };
         }
+
+        source.onended = () => {
+            const activeSet = webAudioActiveSources.get(name);
+            if (activeSet) {
+                activeSet.delete(source);
+                if (activeSet.size === 0) webAudioActiveSources.delete(name);
+            }
+            const current = webAudioNonOverlapActive.get(name);
+            if (current && current.source === source) webAudioNonOverlapActive.delete(name);
+        };
 
         source.start(0);
         return true;
@@ -1070,6 +1159,48 @@ function playSound(name) {
     }
 }
 
+function stopSound(name) {
+    // WebAudio
+    const activeSet = webAudioActiveSources.get(name);
+    if (activeSet && activeSet.size) {
+        for (const src of Array.from(activeSet)) {
+            try { src.stop(); } catch {}
+        }
+        webAudioActiveSources.delete(name);
+    }
+
+    const nonOverlap = webAudioNonOverlapActive.get(name);
+    if (nonOverlap && nonOverlap.source) {
+        try { nonOverlap.source.stop(); } catch {}
+        webAudioNonOverlapActive.delete(name);
+    }
+
+    // HTMLAudio
+    ensureSoundPool(name);
+    const pool = soundPools.get(name) || [];
+    for (const audio of pool) {
+        try {
+            audio.pause();
+            audio.currentTime = 0;
+        } catch {
+            // 無視
+        }
+    }
+
+    const extras = extraSoundInstances.get(name) || [];
+    for (const audio of extras) {
+        try {
+            audio.pause();
+            audio.currentTime = 0;
+        } catch {
+            // 無視
+        }
+    }
+
+    // extra は再利用していないのでクリアして GC 可能にする
+    if (extras.length) extraSoundInstances.set(name, []);
+}
+
 // カウントダウン音（assets/timer.mp3）は「残り 5 秒以内でループ再生」する専用音
 let timerAudio = null;
 
@@ -1158,10 +1289,50 @@ const gameState = {
     mode: null, difficulty: null, currentQuestion: 0, currentStage: 0, correctCount: 0,
     hand: [], counts: {}, waitingTiles: [], selectedTiles: new Set(), tileType: 'pin',
     timeLeft: 0, maxTime: 0, timeBonus: 0, timerInterval: null, isBossStage: false, isAnswered: false,
-    lives: 3, maxLives: 3, isPaused: false,
-    timeExtensions: 3, maxTimeExtensions: 3, extendedTime: 0, // 長考（タイム延長）の仕組み
+    lives: gameConfig.lives, maxLives: gameConfig.lives, isPaused: false,
+    timeExtensions: gameConfig.maxTimeExtensions, maxTimeExtensions: gameConfig.maxTimeExtensions, extendedTime: 0, // 長考（タイム延長）の仕組み
+    timeExtensionCooldownUntil: 0,
+    timeExtensionCooldownInterval: null,
     timerCuePlayed: false
 };
+
+function getTimeExtensionCooldownRemainingMs() {
+    const until = gameState.timeExtensionCooldownUntil || 0;
+    return Math.max(0, until - Date.now());
+}
+
+function clearTimeExtensionCooldown() {
+    gameState.timeExtensionCooldownUntil = 0;
+    if (gameState.timeExtensionCooldownInterval) {
+        clearInterval(gameState.timeExtensionCooldownInterval);
+        gameState.timeExtensionCooldownInterval = null;
+    }
+}
+
+function startTimeExtensionCooldown(seconds = 5) {
+    const durationMs = Math.max(0, Math.floor(seconds * 1000));
+    gameState.timeExtensionCooldownUntil = Date.now() + durationMs;
+
+    if (gameState.timeExtensionCooldownInterval) {
+        clearInterval(gameState.timeExtensionCooldownInterval);
+        gameState.timeExtensionCooldownInterval = null;
+    }
+
+    gameState.timeExtensionCooldownInterval = setInterval(() => {
+        updateTimeExtensionButton();
+        if (getTimeExtensionCooldownRemainingMs() <= 0) {
+            clearTimeExtensionCooldown();
+            updateTimeExtensionButton();
+        }
+    }, 250);
+}
+
+function getTimeExtensionButtonLabel() {
+    const base = t('timeExtension');
+    const desc = t('timeExtensionDesc');
+    if (!desc) return base;
+    return `${base} ${desc}`;
+}
 
 // 正確な和了判定（4面子1雀頭）
 function isWinningHand(counts) {
@@ -1242,21 +1413,21 @@ function isValidWinningTilesCount(count, difficulty, attempts) {
     if (difficulty === 'easy') {
         return count >= 1 && count <= 3;
     } else if (difficulty === 'medium') {
-        if (attempts <= 8) return count === 6;
-        if (attempts <= 16) return count >= 5 && count <= 6;
-        if (attempts <= 24) return count >= 4 && count <= 6;
-        if (attempts <= 40) return count >= 3 && count <= 6;
-        if (attempts <= 56) return count >= 2 && count <= 6;
+        if (attempts <= 12) return count === 6;
+        if (attempts <= 24) return count >= 5 && count <= 6;
+        if (attempts <= 36) return count >= 4 && count <= 6;
+        if (attempts <= 48) return count >= 3 && count <= 6;
+        if (attempts <= 60) return count >= 2 && count <= 6;
         return count >= 1 && count <= 6;
     } else { // 上級
-        if (attempts <= 64) return count === 9;
-        if (attempts <= 128) return count >= 8 && count <= 9;
-        if (attempts <= 256) return count >= 7 && count <= 9;
-        if (attempts <= 280) return count >= 6 && count <= 9;
-        if (attempts <= 304) return count >= 5 && count <= 9;
-        if (attempts <= 328) return count >= 4 && count <= 9;
-        if (attempts <= 352) return count >= 3 && count <= 9;
-        if (attempts <= 376) return count >= 2 && count <= 9;
+        if (attempts <= 60) return count === 9;
+        if (attempts <= 120) return count >= 8 && count <= 9;
+        if (attempts <= 240) return count >= 7 && count <= 9;
+        if (attempts <= 360) return count >= 6 && count <= 9;
+        if (attempts <= 400) return count >= 5 && count <= 9;
+        if (attempts <= 440) return count >= 4 && count <= 9;
+        if (attempts <= 480) return count >= 3 && count <= 9;
+        if (attempts <= 520) return count >= 2 && count <= 9;
         return count >= 1 && count <= 9;
     }
 }
@@ -1373,10 +1544,10 @@ function isActiveQuestion() {
 }
 
 function updateInteractionState() {
-    const submitBtn = document.getElementById('submit-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const possibleTiles = document.getElementById('possible-tiles');
-    const resultSection = document.getElementById('result-section');
+    const submitBtn = getElementByIdCached('submit-btn');
+    const nextBtn = getElementByIdCached('next-btn');
+    const possibleTiles = getElementByIdCached('possible-tiles');
+    const resultSection = getElementByIdCached('result-section');
 
     const active = isActiveQuestion();
     const hasSelection = gameState.selectedTiles && gameState.selectedTiles.size > 0;
@@ -1398,8 +1569,8 @@ function updateInteractionState() {
 }
 
 function updateTimerDisplay() {
-    const timerElement = document.getElementById('timer-display');
-    const timerBar = document.getElementById('timer-bar');
+    const timerElement = getElementByIdCached('timer-display');
+    const timerBar = getElementByIdCached('timer-bar');
     if (!timerElement || !timerBar) return;
     
     // 現在ステージの maxTime を使って割合を計算
@@ -1441,10 +1612,7 @@ function updateTimerDisplay() {
 }
 
 function getMaxTime() {
-    if (gameState.mode === 'casual') return 45;
-    if (gameState.mode === 'story') return 30;
-    if (gameState.mode === 'survival') return 60;
-    return 0;
+    return Math.max(0, gameConfig.modeStartSeconds?.[gameState.mode] || 0);
 }
 
 function handleTimeUp() {
@@ -1533,6 +1701,11 @@ function restartCurrentRun() {
         return;
     }
 
+    // リスタート時に勝利/敗北系の音が残らないように止める
+    stopSound('victory');
+    stopSound('gameover');
+    stopSound('timeup');
+
     stopTimer();
     // 念のため：再開時にカウントダウン音が残らないよう完全停止
     stopTimerSound();
@@ -1566,9 +1739,10 @@ function restartCurrentRun() {
     gameState.isBossStage = false;
     gameState.isAnswered = false;
     gameState.isPaused = false;
-    gameState.lives = 3;
+    gameState.lives = gameConfig.lives;
     gameState.timeExtensions = gameState.maxTimeExtensions;
     gameState.extendedTime = 0;
+    clearTimeExtensionCooldown();
     gameState.timerCuePlayed = false;
 
     if (mode === 'story') {
@@ -1591,7 +1765,7 @@ function restartCurrentRun() {
 
 function startGameMode(mode) {
     gameState.mode = mode;
-    gameState.lives = 3; // ライフをリセット
+    gameState.lives = gameConfig.lives; // ライフをリセット
     document.getElementById('mode-screen').classList.add('hidden');
     if (mode === 'story') {
         gameState.difficulty = 'easy';
@@ -1601,6 +1775,7 @@ function startGameMode(mode) {
         gameState.timeBonus = 0;
         gameState.timeExtensions = gameState.maxTimeExtensions; // タイム延長をリセット
         gameState.extendedTime = 0;
+        clearTimeExtensionCooldown();
         document.getElementById('difficulty-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.remove('hidden');
         document.body.classList.add('in-game');
@@ -1617,13 +1792,14 @@ function startGameWithDifficulty(difficulty) {
     gameState.currentStage = 0;
     gameState.correctCount = 0;
     gameState.timeBonus = 0;
-    gameState.lives = 3; // ライフをリセット
+    gameState.lives = gameConfig.lives; // ライフをリセット
     gameState.timeExtensions = gameState.maxTimeExtensions; // タイム延長をリセット
     gameState.extendedTime = 0;
+    clearTimeExtensionCooldown();
     document.getElementById('difficulty-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     document.body.classList.add('in-game');
-    if (gameState.mode === 'survival') gameState.timeLeft = 60; // サバイバルの初期時間
+    if (gameState.mode === 'survival') gameState.timeLeft = getMaxTime(); // サバイバルの初期時間
     updateLivesDisplay();
     startNewQuestion();
 }
@@ -1640,13 +1816,12 @@ async function startNewQuestion() {
     // すべてのモードで currentStage を進める
     gameState.currentStage++;
     
-    const isBossEntry = (gameState.mode === 'casual' || gameState.mode === 'story') && gameState.currentStage === 10;
+    const bossStageNumber = getBossStageNumberForMode(gameState.mode);
+    const isBossEntry = !!bossStageNumber && gameState.currentStage === bossStageNumber;
 
     // ストーリーはステージに応じて難易度を調整（過場表示にも反映）
     if (gameState.mode === 'story' && !isBossEntry) {
-        if (gameState.currentStage <= 3) gameState.difficulty = 'easy';
-        else if (gameState.currentStage <= 6) gameState.difficulty = 'medium';
-        else gameState.difficulty = 'hard';
+        gameState.difficulty = getStoryDifficultyForStage(gameState.currentStage);
     }
 
     gameState.isBossStage = !!isBossEntry;
@@ -1679,9 +1854,7 @@ function generateAndShowQuestion() {
     
     // ストーリーはステージに応じて難易度を調整
     if (gameState.mode === 'story') {
-        if (gameState.currentStage <= 3) gameState.difficulty = 'easy';
-        else if (gameState.currentStage <= 6) gameState.difficulty = 'medium';
-        else gameState.difficulty = 'hard';
+        gameState.difficulty = getStoryDifficultyForStage(gameState.currentStage);
     }
     
     // ランダム花色（筒/萬/索）
@@ -1725,7 +1898,7 @@ function startBossStage() {
     if (gameState.mode === 'casual' || gameState.mode === 'story') {
         const unusedExtensions = Math.max(0, gameState.timeExtensions || 0);
         if (unusedExtensions > 0) {
-            gameState.timeBonus += unusedExtensions * 30;
+            gameState.timeBonus += unusedExtensions * gameConfig.timeExtensionSeconds;
             gameState.timeExtensions = 0;
         }
     }
@@ -1891,10 +2064,7 @@ function handleCorrectAnswer() {
     }
     
     if (gameState.mode === 'survival') {
-        let recovery = 0;
-        if (gameState.difficulty === 'easy') recovery = 5;
-        else if (gameState.difficulty === 'medium') recovery = 10;
-        else if (gameState.difficulty === 'hard') recovery = 15;
+        const recovery = Math.max(0, gameConfig.survivalRecoverySeconds?.[gameState.difficulty] || 0);
         gameState.timeLeft += recovery;
     }
     showResult(true);
@@ -2193,8 +2363,15 @@ function updateTimeExtensionButton() {
 
         const btnContainer = document.createElement('div');
         btnContainer.innerHTML = `
-            <button id="time-extension-btn" class="time-extension-btn">
-                <span id="time-extension-text"></span>
+            <button id="time-extension-btn" class="time-extension-btn" type="button">
+                <span class="time-extension-main">
+                    <span id="time-extension-text" class="time-extension-text"></span>
+                    <span id="time-extension-cooldown" class="time-extension-cooldown hidden"></span>
+                </span>
+                <span id="time-extension-badge" class="time-extension-badge" aria-hidden="true">
+                    <span class="time-extension-badge-emoji">⏰</span>
+                    <span id="time-extension-count" class="time-extension-count"></span>
+                </span>
             </button>
         `;
         slot.appendChild(btnContainer);
@@ -2204,23 +2381,38 @@ function updateTimeExtensionButton() {
     
     // ボタン表示と状態を更新
     const textSpan = document.getElementById('time-extension-text');
+    const cooldownSpan = document.getElementById('time-extension-cooldown');
+    const countSpan = document.getElementById('time-extension-count');
 
     const active = isActiveQuestion();
-    const canUseExtension = gameState.timeExtensions > 0 && !gameState.isBossStage && active;
+    const cooldownRemainingMs = getTimeExtensionCooldownRemainingMs();
+    const isCoolingDown = cooldownRemainingMs > 0;
+    const cooldownRemainingSec = Math.ceil(cooldownRemainingMs / 1000);
+    const canUseExtension = gameState.timeExtensions > 0 && !gameState.isBossStage && active && !isCoolingDown;
+
+    if (countSpan) countSpan.textContent = String(Math.max(0, gameState.timeExtensions || 0));
 
     if (canUseExtension) {
         extensionBtn.disabled = false;
-        extensionBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        textSpan.textContent = `${t('timeExtension')} ${t('timeExtensionDesc')} (${t('extensionsLeft')} ${gameState.timeExtensions})`;
+        extensionBtn.classList.remove('cooldown');
+        textSpan.textContent = getTimeExtensionButtonLabel();
+        if (cooldownSpan) cooldownSpan.classList.add('hidden');
     } else {
         extensionBtn.disabled = true;
-        extensionBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        extensionBtn.classList.toggle('cooldown', !!isCoolingDown);
         if (gameState.isBossStage) {
             textSpan.textContent = `${t('timeExtension')} (BOSS ${t('stage')})`;
-        } else if (!active) {
-            textSpan.textContent = `${t('timeExtension')} (${t('extensionsLeft')} ${gameState.timeExtensions})`;
         } else {
-            textSpan.textContent = `${t('timeExtension')} (${t('extensionsLeft')} 0)`;
+            textSpan.textContent = getTimeExtensionButtonLabel();
+        }
+
+        if (cooldownSpan) {
+            if (isCoolingDown) {
+                cooldownSpan.classList.remove('hidden');
+                cooldownSpan.textContent = `(${t('cooldown')} ${cooldownRemainingSec} ${t('secondsUnit')})`;
+            } else {
+                cooldownSpan.classList.add('hidden');
+            }
         }
     }
 
@@ -2232,12 +2424,16 @@ function updateTimeExtensionButton() {
 function useTimeExtension() {
     if (!isActiveQuestion()) return;
     if (gameState.timeExtensions <= 0 || gameState.isBossStage || gameState.isAnswered) return;
+    if (getTimeExtensionCooldownRemainingMs() > 0) return;
 
     playSound('select');
     
     gameState.timeExtensions--;
-    gameState.timeLeft += 30;
-    gameState.extendedTime += 30; // このステージで使った延長時間を記録
+    gameState.timeLeft += gameConfig.timeExtensionSeconds;
+    gameState.extendedTime += gameConfig.timeExtensionSeconds; // このステージで使った延長時間を記録
+
+    // 連打防止：5 秒クールダウン
+    startTimeExtensionCooldown(5);
 
     // 延長で 5秒以上に戻る可能性があるため、カウントダウン音は止める
     if (gameState.timeLeft > 5) {
@@ -2253,6 +2449,12 @@ function useTimeExtension() {
     setTimeout(() => {
         timerDisplay.classList.remove('time-extended');
     }, 1000);
+
+    const extensionBtn = document.getElementById('time-extension-btn');
+    if (extensionBtn) {
+        extensionBtn.classList.add('used');
+        setTimeout(() => extensionBtn.classList.remove('used'), 650);
+    }
 }
 
 function showContinueOption() {
@@ -2325,7 +2527,7 @@ function showVictory() {
     if (livesEl && livesLabelEl) {
         if (gameState.mode === 'casual' || gameState.mode === 'story') {
             livesEl.textContent = '';
-            for (let i = 0; i < (gameState.maxLives || 3); i++) {
+            for (let i = 0; i < (gameState.maxLives || gameConfig.lives); i++) {
                 livesEl.textContent += i < (gameState.lives || 0) ? '❤️' : '🖤';
             }
             livesLabelEl.parentElement?.classList.remove('hidden');
@@ -2494,6 +2696,10 @@ function updateUILanguage() {
 }
 
 function resetGame() {
+    // メニューへ戻る遷移では、勝利/敗北系の音が残らないように止める
+    stopSound('victory');
+    stopSound('gameover');
+    stopSound('timeup');
     stopTimer();
     stopTimerSound();
     gameState.mode = null;
@@ -2509,9 +2715,10 @@ function resetGame() {
     gameState.isBossStage = false;
     gameState.isAnswered = false;
     gameState.isPaused = false;
-    gameState.lives = 3;
+    gameState.lives = gameConfig.lives;
     gameState.timeExtensions = gameState.maxTimeExtensions;
     gameState.extendedTime = 0;
+    clearTimeExtensionCooldown();
     gameState.timeLeft = 0;
     gameState.maxTime = 0;
     gameState.timerCuePlayed = false;

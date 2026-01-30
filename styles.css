@@ -27,6 +27,14 @@ body {
     padding: 8px;
 }
 
+button,
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
 /* ========== ゲーム中レイアウト圧縮（問題エリアの余白確保） ========== */
 body.in-game header {
     display: none;
@@ -1366,6 +1374,55 @@ body.in-game .time-extension-slot {
     cursor: pointer;
     transition: var(--transition-soft);
     box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.time-extension-btn:disabled {
+    opacity: 0.58;
+    cursor: not-allowed;
+    filter: saturate(0.85);
+    transform: none;
+}
+
+.time-extension-main {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+}
+
+.time-extension-cooldown {
+    font-size: 0.92em;
+    font-weight: 900;
+    opacity: 0.95;
+    letter-spacing: 0.02em;
+}
+
+.time-extension-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.22rem 0.5rem;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    font-variant-numeric: tabular-nums;
+}
+
+.time-extension-badge-emoji {
+    line-height: 1;
+}
+
+.time-extension-count {
+    font-weight: 900;
+    line-height: 1;
 }
 
 .time-extension-btn:hover:not(:disabled) {
@@ -1382,6 +1439,35 @@ body.in-game .time-extension-slot {
 .time-extension-btn.attention:not(:disabled) {
     transform-origin: center;
     animation: timeExtensionAttention 0.9s ease-in-out infinite;
+}
+
+.time-extension-btn.cooldown .time-extension-badge {
+    animation: timeExtensionCooldownPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes timeExtensionCooldownPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.08); opacity: 1; }
+}
+
+.time-extension-btn.used:not(:disabled) {
+    animation: timeExtensionUsePop 0.65s ease-out;
+}
+
+.time-extension-btn.used:not(:disabled) .time-extension-badge {
+    animation: timeExtensionBadgePop 0.65s ease-out;
+}
+
+@keyframes timeExtensionUsePop {
+    0% { transform: scale(1); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3); }
+    35% { transform: scale(1.07); box-shadow: 0 10px 36px rgba(16, 185, 129, 0.65); }
+    100% { transform: scale(1); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3); }
+}
+
+@keyframes timeExtensionBadgePop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.18); }
+    100% { transform: scale(1); }
 }
 
 @keyframes timeExtensionAttention {
