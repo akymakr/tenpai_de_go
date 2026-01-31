@@ -230,7 +230,7 @@ const translations = {
         playAgain: "再玩一次",
         backToMenu: "返回選單",
         back: "返回",
-        footer: "聽牌 GO!",
+        footer: "聽牌GO!",
         selectLanguage: "言語を選択 / Select Language / 選擇語言",
         japanese: "日本語",
         english: "English",
@@ -623,6 +623,7 @@ function showResultOkAction({ titleText, titleClassName, bodyText = '', okText =
         okBtn.classList.remove('hidden');
         okBtn.disabled = false;
         okBtn.onclick = () => {
+            playSound('select');
             if (!pendingOkAction) return;
             okBtn.disabled = true;
             const action = pendingOkAction;
@@ -708,6 +709,7 @@ function showResultLifeAction() {
         backBtn.classList.remove('hidden');
         backBtn.disabled = false;
         backBtn.onclick = () => {
+            playSound('select');
             giveUpGame();
         };
     }
@@ -2880,10 +2882,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (survivalBtn) survivalBtn.addEventListener('click', () => { playSound('select'); startGameMode('survival'); });
 
     const modeBackBtn = getElementByIdCached('mode-back-btn');
-    if (modeBackBtn) modeBackBtn.addEventListener('click', () => { playSound('tap'); backToLanguageSelection(); });
+    if (modeBackBtn) modeBackBtn.addEventListener('click', () => { playSound('select'); backToLanguageSelection(); });
 
     const difficultyBackBtn = getElementByIdCached('difficulty-back-btn');
-    if (difficultyBackBtn) difficultyBackBtn.addEventListener('click', () => { playSound('tap'); backToModeSelection(); });
+    if (difficultyBackBtn) difficultyBackBtn.addEventListener('click', () => { playSound('select'); backToModeSelection(); });
 
     const tutorialBtn = getElementByIdCached('tutorial-btn');
     const tutorialScreen = getElementByIdCached('tutorial-screen');
@@ -2893,7 +2895,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openTutorial() {
         if (!tutorialScreen) return;
-        playSound('tap');
+        playSound('select');
         tutorialPageIndex = 0;
         tutorialScreen.classList.remove('hidden');
         tutorialScreen.classList.add('fade-in');
@@ -2904,7 +2906,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function closeTutorial() {
         if (!tutorialScreen) return;
-        playSound('tap');
+        playSound('select');
         tutorialScreen.classList.add('hidden');
         tutorialScreen.setAttribute('aria-hidden', 'true');
     }
@@ -2922,7 +2924,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (tutorialPrevBtn) {
         tutorialPrevBtn.addEventListener('click', () => {
-            playSound('tap');
+            playSound('select');
             tutorialPageIndex = Math.max(0, tutorialPageIndex - 1);
             renderTutorialPage();
         });
@@ -2936,7 +2938,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeTutorial();
                 return;
             }
-            playSound('tap');
+            playSound('select');
             tutorialPageIndex = Math.min(last, tutorialPageIndex + 1);
             renderTutorialPage();
         });
