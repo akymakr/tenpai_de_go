@@ -4,6 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
+        gameVersion: "v1.6.0204.3",
         selectMode: "モードを選択してください",
         casualMode: "カジュアル",
         casualDesc: "全{casualStagesBeforeBoss}問+BOSSステージ\n各問{casualStartSeconds}秒 / {lives}ライフ制",
@@ -98,6 +99,7 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
+        gameVersion: "v1.6.0204.3",
         selectMode: "Select Mode",
         casualMode: "Casual",
         casualDesc: "{casualStagesBeforeBoss} Questions + BOSS\n{casualStartSeconds}s each stage / {lives} Lives",
@@ -192,6 +194,7 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
+        gameVersion: "v1.6.0204.3",
         selectMode: "請選擇遊戲模式",
         casualMode: "休閒模式",
         casualDesc: "全{casualStagesBeforeBoss}題 + BOSS關卡\n每題{casualStartSeconds}秒 / {lives}條生命",
@@ -2802,12 +2805,49 @@ function updateUILanguage() {
     document.getElementById('menu-gameover').textContent = t('backToMenu');
     
     // フッター
-    document.getElementById('footer-text').innerHTML = `${t('footer')} &copy; 2026 Akira Akiyama`;
+    updateFooterMeta();
 
     // チュートリアル
     const tutorialTitle = document.getElementById('tutorial-title');
     if (tutorialTitle) tutorialTitle.textContent = t('tutorialTitle');
     renderTutorialPage();
+}
+
+function updateFooterMeta() {
+    try {
+        const footerText = document.getElementById('footer-text');
+        if (!footerText) return;
+
+        const versionEl = document.getElementById('game-version');
+        if (versionEl) {
+            // Keep it optional: translations may omit this key in some forks.
+            const version = t?.('gameVersion');
+            versionEl.textContent = typeof version === 'string' ? version : '';
+        }
+
+        const yearEl = document.getElementById('current-year');
+        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+        // Update only the leading label text node (before #game-version) without clobbering spans.
+        const label = t?.('footer');
+        const leading = `${typeof label === 'string' ? label : ''} `;
+
+        let leadingTextNode = null;
+        for (const node of footerText.childNodes) {
+            if (node && node.nodeType === 3) {
+                leadingTextNode = node;
+                break;
+            }
+        }
+
+        if (leadingTextNode) {
+            leadingTextNode.textContent = leading;
+        } else {
+            footerText.insertBefore(document.createTextNode(leading), footerText.firstChild);
+        }
+    } catch {
+        // Footer meta update failure is non-fatal.
+    }
 }
 
 function resetGame() {
@@ -2856,6 +2896,12 @@ function selectLanguage(lang) {
     currentLang = lang;
     document.documentElement.lang = lang;
     document.title = t('gameTitle').replace(/🀄/g, '').trim();
+
+    // 繁體中文（zh）は初期ロードで Google Fonts を遅延し、選択時に必要なフォントのみ読み込む
+    if (currentLang === 'zh') {
+        ensureGoogleFontsTcLoaded();
+    }
+
     updateUILanguage();
 
     // 英語へ切り替えた場合、途中でも萬子が出ないようにする
@@ -2884,6 +2930,24 @@ function selectLanguage(lang) {
         modeScreen.classList.remove('hidden');
         modeScreen.classList.add('fade-in');
     }, 400);
+}
+
+function ensureGoogleFontsTcLoaded() {
+    try {
+        if (document.getElementById('google-fonts-tc')) return;
+
+        const link = document.createElement('link');
+        link.id = 'google-fonts-tc';
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap';
+        link.media = 'print';
+        link.onload = function () {
+            this.media = 'all';
+        };
+        document.head.appendChild(link);
+    } catch {
+        // フォント最適化失敗は致命的ではないため無視する
+    }
 }
 
 function backToLanguageSelection() {
@@ -2980,6 +3044,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Footer meta (year/version) should be correct even before language selection.
+    updateFooterMeta();
 
     // 最初のユーザー操作で音声を解放（iOS 対策）
     document.addEventListener('pointerdown', unlockAudioOnce, { capture: true, once: true });

@@ -27,6 +27,10 @@ body {
     padding: 8px;
 }
 
+html[lang="zh"] body {
+    font-family: 'Noto Sans TC', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 button,
 input,
 select,
@@ -391,7 +395,7 @@ body.time-critical::after {
 }
 
 .tutorial-btn-text {
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0.02em;
 }
 
@@ -403,7 +407,7 @@ body.time-critical::after {
 }
 
 .tutorial-page-indicator {
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
@@ -1439,7 +1443,7 @@ body.low-power .confetti {
     color: #a78bfa;
     margin-right: 0;
     margin-bottom: 0.1rem;
-    font-weight: 600;
+    font-weight: 700;
     min-width: 0;
 }
 
