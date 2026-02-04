@@ -327,6 +327,53 @@ function getStoryDifficultyForStage(stageNumber) {
 
 let tutorialPageIndex = 0;
 
+function getQueryParam(name) {
+    try {
+        return new URLSearchParams(window.location.search).get(name);
+    } catch {
+        return null;
+    }
+}
+
+function isProbablyMobileDevice() {
+    // 2026+: UA/Platform は縮退・非推奨化が進んでいるため、可能なら UA-CH を優先
+    const uaData = navigator.userAgentData;
+    const coarsePointer = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    if (uaData && typeof uaData.mobile === 'boolean') {
+        // iPad は mobile=false の場合があるため、タッチ指標も併用
+        const isTouchLike = (navigator.maxTouchPoints || 0) > 1;
+        return !!(uaData.mobile || (isTouchLike && coarsePointer));
+    }
+
+    // フォールバック（古いブラウザ / Safari）
+    const ua = (navigator.userAgent || '').toLowerCase();
+    const isMobileUa = /android|iphone|ipod|ipad/.test(ua);
+    // iPadOS 13+ は UA が Mac っぽいことがある（navigator.platform も縮退しうるが最後の手段）
+    const isIpadOsLegacy = navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1;
+    return !!(isMobileUa || isIpadOsLegacy || coarsePointer);
+}
+
+function prefersReducedMotion() {
+    try {
+        return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch {
+        return false;
+    }
+}
+
+function shouldEnableLowPowerMode() {
+    const forced = getQueryParam('lowpower');
+    if (forced === '1' || forced === 'true') return true;
+    if (forced === '0' || forced === 'false') return false;
+
+    const saveData = !!navigator.connection?.saveData;
+    return prefersReducedMotion() || saveData || isProbablyMobileDevice();
+}
+
+function applyLowPowerClass() {
+    document.body.classList.toggle('low-power', shouldEnableLowPowerMode());
+}
+
 const domCache = new Map();
 
 const nativeGetElementById = document.getElementById.bind(document);
@@ -560,7 +607,12 @@ function applyUiScale() {
     // 極小画面向けに最小値は維持
     const clamped = Math.max(0.05, scale);
 
-    document.documentElement.style.setProperty('--ui-scale', clamped.toFixed(4));
+    const scaleStr = clamped.toFixed(4);
+    // 連続 resize（モバイルのアドレスバー伸縮など）で同じ値を何度も適用しない
+    if (applyUiScale._lastScaleStr !== scaleStr) {
+        applyUiScale._lastScaleStr = scaleStr;
+        document.documentElement.style.setProperty('--ui-scale', scaleStr);
+    }
 
     // 表示倍率/サイズ問題の調査用デバッグ表示（任意）
     const overlay = ensureScaleDebugOverlay();
@@ -577,6 +629,16 @@ function applyUiScale() {
     } else {
         stage.classList.remove('debug-outline');
     }
+}
+
+// resize/visualViewport の連発を rAF で合流する（iOS/Android での発熱対策）
+let uiScaleRafId = 0;
+function scheduleApplyUiScale() {
+    if (uiScaleRafId) return;
+    uiScaleRafId = requestAnimationFrame(() => {
+        uiScaleRafId = 0;
+        applyUiScale();
+    });
 }
 
 function hideResultActions() {
@@ -1320,13 +1382,14 @@ function startTimeExtensionCooldown(seconds = 5) {
         gameState.timeExtensionCooldownInterval = null;
     }
 
+    // 表示は秒単位なので 500ms で十分（250ms はモバイルで無駄に負荷）
     gameState.timeExtensionCooldownInterval = setInterval(() => {
         updateTimeExtensionButton();
         if (getTimeExtensionCooldownRemainingMs() <= 0) {
             clearTimeExtensionCooldown();
             updateTimeExtensionButton();
         }
-    }, 250);
+    }, 500);
 }
 
 function getTimeExtensionButtonLabel() {
@@ -1417,19 +1480,19 @@ function isValidWinningTilesCount(count, difficulty, attempts) {
     } else if (difficulty === 'medium') {
         if (attempts <= 12) return count === 6;
         if (attempts <= 24) return count >= 5 && count <= 6;
-        if (attempts <= 36) return count >= 4 && count <= 6;
-        if (attempts <= 48) return count >= 3 && count <= 6;
-        if (attempts <= 60) return count >= 2 && count <= 6;
+        if (attempts <= 48) return count >= 4 && count <= 6;
+        if (attempts <= 72) return count >= 3 && count <= 6;
+        if (attempts <= 96) return count >= 2 && count <= 6;
         return count >= 1 && count <= 6;
     } else { // 上級
         if (attempts <= 60) return count === 9;
         if (attempts <= 120) return count >= 8 && count <= 9;
         if (attempts <= 240) return count >= 7 && count <= 9;
-        if (attempts <= 360) return count >= 6 && count <= 9;
-        if (attempts <= 400) return count >= 5 && count <= 9;
-        if (attempts <= 440) return count >= 4 && count <= 9;
-        if (attempts <= 480) return count >= 3 && count <= 9;
-        if (attempts <= 520) return count >= 2 && count <= 9;
+        if (attempts <= 480) return count >= 6 && count <= 9;
+        if (attempts <= 720) return count >= 5 && count <= 9;
+        if (attempts <= 960) return count >= 4 && count <= 9;
+        if (attempts <= 1200) return count >= 3 && count <= 9;
+        if (attempts <= 1440) return count >= 2 && count <= 9;
         return count >= 1 && count <= 9;
     }
 }
@@ -1579,12 +1642,11 @@ function updateTimerDisplay() {
     const percentage = (gameState.timeLeft / gameState.maxTime) * 100;
     timerElement.textContent = gameState.timeLeft;
     
-    // 幅の変化を滑らかに見せる
-    timerBar.style.transition = 'width 1s linear';
     timerBar.style.width = `${Math.max(0, percentage)}%`;
-    
-    timerElement.className = 'timer-value';
-    timerBar.className = 'timer-bar';
+
+    // className 全置換はスタイル再計算の原因になりやすいので、差分で更新
+    timerElement.classList.remove('timer-warning', 'timer-danger');
+    timerBar.classList.remove('timer-bar-warning', 'timer-bar-danger');
     
     // 時間が少ないときに背景エフェクトを追加
     if (gameState.timeLeft <= 5) {
@@ -1612,6 +1674,23 @@ function updateTimerDisplay() {
     // 残り時間に応じて延長ボタンの表示状態も追随させる（毎秒更新）
     updateTimeExtensionButton();
 }
+
+const timeExtensionDom = {
+    btn: null,
+    text: null,
+    cooldown: null,
+    count: null,
+    slot: null,
+    last: {
+        canUse: null,
+        cooling: null,
+        cooldownSec: null,
+        count: null,
+        attention: null,
+        boss: null,
+        active: null
+    }
+};
 
 function getMaxTime() {
     return Math.max(0, gameConfig.modeStartSeconds?.[gameState.mode] || 0);
@@ -2356,11 +2435,17 @@ function updateLivesDisplay() {
 }
 
 function updateTimeExtensionButton() {
-    let extensionBtn = document.getElementById('time-extension-btn');
-    
-    // ボタンが無ければ作成
-    if (!extensionBtn) {
-        const slot = document.getElementById('time-extension-slot') || document.querySelector('.timer-container');
+    if (!timeExtensionDom.btn || !timeExtensionDom.btn.isConnected) {
+        timeExtensionDom.btn = document.getElementById('time-extension-btn');
+        timeExtensionDom.text = document.getElementById('time-extension-text');
+        timeExtensionDom.cooldown = document.getElementById('time-extension-cooldown');
+        timeExtensionDom.count = document.getElementById('time-extension-count');
+        timeExtensionDom.slot = document.getElementById('time-extension-slot') || null;
+    }
+
+    // ボタンが無ければ作成（初回のみ）
+    if (!timeExtensionDom.btn) {
+        const slot = timeExtensionDom.slot || document.getElementById('time-extension-slot');
         if (!slot) return;
 
         const btnContainer = document.createElement('div');
@@ -2377,50 +2462,72 @@ function updateTimeExtensionButton() {
             </button>
         `;
         slot.appendChild(btnContainer);
-        extensionBtn = document.getElementById('time-extension-btn');
-        extensionBtn.addEventListener('click', useTimeExtension);
+
+        timeExtensionDom.btn = document.getElementById('time-extension-btn');
+        timeExtensionDom.text = document.getElementById('time-extension-text');
+        timeExtensionDom.cooldown = document.getElementById('time-extension-cooldown');
+        timeExtensionDom.count = document.getElementById('time-extension-count');
+        if (timeExtensionDom.btn) timeExtensionDom.btn.addEventListener('click', useTimeExtension);
     }
-    
-    // ボタン表示と状態を更新
-    const textSpan = document.getElementById('time-extension-text');
-    const cooldownSpan = document.getElementById('time-extension-cooldown');
-    const countSpan = document.getElementById('time-extension-count');
+
+    const extensionBtn = timeExtensionDom.btn;
+    const textSpan = timeExtensionDom.text;
+    const cooldownSpan = timeExtensionDom.cooldown;
+    const countSpan = timeExtensionDom.count;
+    if (!extensionBtn || !textSpan) return;
 
     const active = isActiveQuestion();
     const cooldownRemainingMs = getTimeExtensionCooldownRemainingMs();
     const isCoolingDown = cooldownRemainingMs > 0;
     const cooldownRemainingSec = Math.ceil(cooldownRemainingMs / 1000);
-    const canUseExtension = gameState.timeExtensions > 0 && !gameState.isBossStage && active && !isCoolingDown;
+    const canUseExtension = (gameState.timeExtensions > 0) && !gameState.isBossStage && active && !isCoolingDown;
 
-    if (countSpan) countSpan.textContent = String(Math.max(0, gameState.timeExtensions || 0));
+    const countValue = String(Math.max(0, gameState.timeExtensions || 0));
+    if (countSpan && timeExtensionDom.last.count !== countValue) {
+        timeExtensionDom.last.count = countValue;
+        countSpan.textContent = countValue;
+    }
 
-    if (canUseExtension) {
-        extensionBtn.disabled = false;
-        extensionBtn.classList.remove('cooldown');
-        textSpan.textContent = getTimeExtensionButtonLabel();
-        if (cooldownSpan) cooldownSpan.classList.add('hidden');
-    } else {
-        extensionBtn.disabled = true;
+    if (timeExtensionDom.last.canUse !== canUseExtension) {
+        timeExtensionDom.last.canUse = canUseExtension;
+        extensionBtn.disabled = !canUseExtension;
+    }
+
+    if (timeExtensionDom.last.cooling !== isCoolingDown) {
+        timeExtensionDom.last.cooling = isCoolingDown;
         extensionBtn.classList.toggle('cooldown', !!isCoolingDown);
-        if (gameState.isBossStage) {
-            textSpan.textContent = `${t('timeExtension')} (BOSS ${t('stage')})`;
-        } else {
-            textSpan.textContent = getTimeExtensionButtonLabel();
-        }
+    }
 
-        if (cooldownSpan) {
-            if (isCoolingDown) {
-                cooldownSpan.classList.remove('hidden');
-                cooldownSpan.textContent = `(${t('cooldown')} ${cooldownRemainingSec} ${t('secondsUnit')})`;
-            } else {
-                cooldownSpan.classList.add('hidden');
+    const isBoss = !!gameState.isBossStage;
+    if (timeExtensionDom.last.boss !== isBoss || timeExtensionDom.last.active !== active || timeExtensionDom.last.cooldownSec !== cooldownRemainingSec) {
+        timeExtensionDom.last.boss = isBoss;
+        timeExtensionDom.last.active = active;
+        timeExtensionDom.last.cooldownSec = cooldownRemainingSec;
+
+        if (canUseExtension) {
+            textSpan.textContent = getTimeExtensionButtonLabel();
+            if (cooldownSpan) cooldownSpan.classList.add('hidden');
+        } else {
+            textSpan.textContent = isBoss
+                ? `${t('timeExtension')} (BOSS ${t('stage')})`
+                : getTimeExtensionButtonLabel();
+
+            if (cooldownSpan) {
+                if (isCoolingDown) {
+                    cooldownSpan.classList.remove('hidden');
+                    cooldownSpan.textContent = `(${t('cooldown')} ${cooldownRemainingSec} ${t('secondsUnit')})`;
+                } else {
+                    cooldownSpan.classList.add('hidden');
+                }
             }
         }
     }
 
-    // 残り時間が少ない & 延長可能なら、ボタンを少し目立たせる
     const shouldAttention = canUseExtension && gameState.timeLeft <= 5;
-    extensionBtn.classList.toggle('attention', !!shouldAttention);
+    if (timeExtensionDom.last.attention !== shouldAttention) {
+        timeExtensionDom.last.attention = shouldAttention;
+        extensionBtn.classList.toggle('attention', !!shouldAttention);
+    }
 }
 
 function useTimeExtension() {
@@ -2539,7 +2646,10 @@ function showVictory() {
         }
     }
 
-    createConfetti();
+    // 低電力モード（主にモバイル）では紙吹雪を生成しない（DOM/アニメーション負荷が高い）
+    if (!document.body.classList.contains('low-power')) {
+        createConfetti();
+    }
     // 16:9 固定フレーム設計：ページスクロールは使わない
 }
 
@@ -2594,7 +2704,9 @@ function showGameOverOverlay(timeUp) {
 }
 
 function createConfetti() {
+    if (document.body.classList.contains('low-power')) return;
     const screen = document.getElementById('victory-screen');
+    if (!screen) return;
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#FFD93D'];
     for (let i = 0; i < 50; i++) {
         const confetti = document.createElement('div');
@@ -2832,9 +2944,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (preloadScreen) preloadScreen.classList.remove('hidden');
     if (languageScreen) languageScreen.classList.add('hidden');
 
-    applyUiScale();
-    window.addEventListener('resize', applyUiScale);
-    window.visualViewport?.addEventListener('resize', applyUiScale);
+    applyLowPowerClass();
+    // prefers-reduced-motion の変更にも追随
+    try {
+        const m = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+        if (m && typeof m.addEventListener === 'function') {
+            m.addEventListener('change', applyLowPowerClass);
+        }
+    } catch {}
+
+    scheduleApplyUiScale();
+    window.addEventListener('resize', scheduleApplyUiScale);
+    window.visualViewport?.addEventListener('resize', scheduleApplyUiScale);
 
     // 初回描画を優先してから、進捗表示付きでアセットをプリロード
     const runAfterFirstPaint = (cb) => {

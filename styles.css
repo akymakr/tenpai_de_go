@@ -1000,6 +1000,7 @@ body.in-game .time-extension-slot {
     background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
+    transition: width 1s linear;
     border-radius: 12px;
     box-shadow: 
         0 0 20px rgba(76, 175, 80, 0.6),
@@ -1007,6 +1008,126 @@ body.in-game .time-extension-slot {
     position: relative;
     /* トランジションを外し、CSS 変数でアニメーションを制御 */
     will-change: width;
+}
+
+/* ========== Low Power / Reduced Motion (Mobile performance) ========== */
+/* JS may add body.low-power automatically on mobile/save-data/reduced-motion.
+   You can force it with ?lowpower=1 or disable with ?lowpower=0 */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+body.low-power::before,
+body.low-power::after {
+    animation: none !important;
+}
+
+body.low-power #header-title {
+    animation: none !important;
+    filter: none;
+}
+
+body.low-power .screen-container {
+    backdrop-filter: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+body.low-power .timer-bar,
+body.low-power .timer-bar-danger {
+    animation: none !important;
+}
+
+body.low-power .timer-warning,
+body.low-power .timer-danger {
+    animation: none !important;
+}
+
+body.low-power .animate-bounce,
+body.low-power .animate-pulse {
+    animation: none !important;
+}
+
+/* Reduce expensive effects in-game */
+body.low-power .screen-container::before {
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+body.low-power #result-section,
+body.low-power .victory-screen,
+body.low-power .gameover-screen {
+    backdrop-filter: none !important;
+}
+
+body.low-power .result-container {
+    backdrop-filter: none !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+body.low-power .timer-container {
+    backdrop-filter: none !important;
+}
+
+body.low-power .mode-btn,
+body.low-power .hand-tile,
+body.low-power .selectable-tile {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22) !important;
+}
+
+body.low-power .mode-btn:hover,
+body.low-power .selectable-tile:hover {
+    transform: none !important;
+}
+
+body.low-power .mode-btn::before,
+body.low-power .selectable-tile::before {
+    display: none !important;
+}
+
+body.low-power .selected,
+body.low-power .correct-selected,
+body.low-power .correct-missed,
+body.low-power .incorrect-selected {
+    animation: none !important;
+}
+
+body.low-power .selected {
+    box-shadow:
+        0 0 18px rgba(255, 23, 68, 0.45),
+        0 10px 22px rgba(0, 0, 0, 0.22) !important;
+}
+
+body.low-power .timer-value,
+body.low-power #timer-display,
+body.low-power .text-shadow-glow {
+    text-shadow: none !important;
+}
+
+body.low-power .boss-stage::before {
+    animation: none !important;
+    filter: none !important;
+}
+
+body.low-power .boss-title {
+    animation: none !important;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45) !important;
+    filter: none !important;
+}
+
+body.low-power .victory-content,
+body.low-power .gameover-content {
+    animation: none !important;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.low-power .confetti {
+    display: none !important;
 }
 
 .timer-bar::after {
