@@ -8,27 +8,29 @@ Mahjong tenpai training game.
 
 ### CASUAL
 - 9 questions + BOSS stage
-- 45 seconds per question, 3 lives
+- 60 seconds per question, 3 lives
 - Wrong answer or time up costs 1 life; you can choose **Continue** (spend a life) or **Give Up**
 - Correct answers (Q1–Q9) accumulate time for the BOSS stage
 
 ### STORY
-- Progressive difficulty: Easy (Q1–3) → Medium (Q4–6) → Hard (Q7–9) → BOSS (Q10)
+- Progressive difficulty: Easy (Q1–5) → Medium (Q6-10) → Hard (Q11-15) → BOSS (Q16)
 - 30 seconds per question, 3 lives
+- Wrong answer or time up costs 1 life; you can choose **Continue** (spend a life) or **Give Up**
+- Correct answers (Q1–Q15) accumulate time for the BOSS stage
 
 ### SURVIVAL
 - Endless questions
-- Start with 60 seconds, no lives
+- Start with 15 seconds, no lives
 - Time recovery on correct answers:
-  - Easy: +5s
-  - Medium: +10s
-  - Hard: +15s
+  - Easy: +4s
+  - Medium: +8s
+  - Hard: +12s
 
 ## BOSS Stage Rules
 
-- The BOSS stage uses **only** the accumulated time from previous correct answers (no extra 45/30 seconds added).
+- The BOSS stage uses **only** the accumulated time from previous correct answers (no extra 60/30 seconds added).
 - Minimum time is guaranteed when the accumulated time is too small:
-  - Casual: at least 45 seconds
+  - Casual: at least 60 seconds
   - Story: at least 30 seconds
 
 ## Difficulty

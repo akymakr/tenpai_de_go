@@ -93,7 +93,7 @@ const translations = {
         tutorialP4Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・残り時間が少なくなると迷わず使ってしまいましょう\n\n※ BOSSステージでは使用できませんが、残った回数分がBOSSステージの制限時間に加算されます。",
 
         tutorialP5Title: "BOSSステージ",
-        tutorialP5Body: "ステージ{bossStageNumber}はBOSSステージです。\nこれまでのステージで余った「残り時間+長考の合計」が制限時間になります。正解すればゲームクリアです！"
+        tutorialP5Body: "ステージ{casualBossStageNumber}（カジュアルモード）/ステージ{storyBossStageNumber}（ストーリーモード）はBOSSステージです。\nこれまでのステージで余った「残り時間+長考の合計」が制限時間になります。正解すればゲームクリアです！"
     },
     en: {
         gameTitle: "Tenpai de GO!",
@@ -187,7 +187,7 @@ const translations = {
         tutorialP4Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Use it when the timer turns red.\n\nNote: Cannot be used during the BOSS Stage, but unused charges will be converted into extra time for the BOSS Stage.",
 
         tutorialP5Title: "The BOSS Stage",
-        tutorialP5Body: "Stage {bossStageNumber} is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!"
+        tutorialP5Body: "Stage {casualBossStageNumber} (Casual Mode) / Stage {storyBossStageNumber} (Story Mode) is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!"
     },
     zh: {
         gameTitle: "聽牌GO!",
@@ -281,30 +281,30 @@ const translations = {
         tutorialP4Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・時間快結束時，按鈕會閃爍提示\n\n※ BOSS關卡不能使用，但剩餘次數會自動轉化為BOSS關卡的額外時間。",
 
         tutorialP5Title: "BOSS關卡",
-        tutorialP5Body: "第{bossStageNumber}關為BOSS關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！"
+        tutorialP5Body: "第{casualBossStageNumber}關 (休閒模式) / 第{storyBossStageNumber}關 (闖關模式) 為BOSS關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！"
     }
 };
 
 // ========== ゲーム設定（変数化）==========
 const gameConfig = {
     modeStartSeconds: {
-        casual: 45,
+        casual: 60,
         story: 30,
-        survival: 60
+        survival: 15
     },
     lives: 3,
     survivalRecoverySeconds: {
-        easy: 5,
-        medium: 10,
-        hard: 15
+        easy: 4,
+        medium: 8,
+        hard: 12
     },
     timeExtensionSeconds: 30,
     maxTimeExtensions: 3,
-    // BOSS ステージ番号
-    storyBossStageNumber: 10,
+    // BOSS ステージ
+    storyBossStageNumber: 16,
     casualBossStageNumber: 10,
     // ストーリーの難易度アップ間隔（N ステージごと）
-    storyDifficultyStep: 3
+    storyDifficultyStep: 5
 };
 
 function getBossStageNumberForMode(mode) {
