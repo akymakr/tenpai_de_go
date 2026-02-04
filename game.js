@@ -473,7 +473,8 @@ function getDefaultTranslationVars() {
         lives: gameConfig.lives,
         timeExtensionSeconds: gameConfig.timeExtensionSeconds,
         maxTimeExtensions: gameConfig.maxTimeExtensions,
-        bossStageNumber: getBossStageNumberForMode(gameState.mode) || gameConfig.storyBossStageNumber,
+        casualBossStageNumber: gameConfig.casualBossStageNumber,
+        storyBossStageNumber: gameConfig.storyBossStageNumber,
         casualStagesBeforeBoss: getStagesBeforeBossForMode('casual'),
         storyDifficultyStep: gameConfig.storyDifficultyStep
     };
