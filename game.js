@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v1.6.0204.3",
+        gameVersion: "v1.6.0210.0",
         selectMode: "モードを選択してください",
         casualMode: "カジュアル",
         casualDesc: "全{casualStagesBeforeBoss}問+BOSSステージ\n各問{casualStartSeconds}秒 / {lives}ライフ制",
@@ -99,7 +99,7 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v1.6.0204.3",
+        gameVersion: "v1.6.0210.0",
         selectMode: "Select Mode",
         casualMode: "Casual",
         casualDesc: "{casualStagesBeforeBoss} Questions + BOSS\n{casualStartSeconds}s each stage / {lives} Lives",
@@ -194,7 +194,7 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v1.6.0204.3",
+        gameVersion: "v1.6.0210.0",
         selectMode: "請選擇遊戲模式",
         casualMode: "休閒模式",
         casualDesc: "全{casualStagesBeforeBoss}題 + BOSS關卡\n每題{casualStartSeconds}秒 / {lives}條生命",
@@ -370,7 +370,14 @@ function shouldEnableLowPowerMode() {
     if (forced === '0' || forced === 'false') return false;
 
     const saveData = !!navigator.connection?.saveData;
-    return prefersReducedMotion() || saveData || isProbablyMobileDevice();
+    const effectiveType = navigator.connection?.effectiveType || '';
+    const slowNetwork = /^(slow-2g|2g|3g)$/.test(effectiveType);
+    const deviceMemory = navigator.deviceMemory;
+    const lowMemory = typeof deviceMemory === 'number' && deviceMemory > 0 && deviceMemory <= 4;
+    const cpuCores = navigator.hardwareConcurrency;
+    const lowCpu = typeof cpuCores === 'number' && cpuCores > 0 && cpuCores <= 4;
+
+    return prefersReducedMotion() || saveData || slowNetwork || lowMemory || lowCpu || isProbablyMobileDevice();
 }
 
 function applyLowPowerClass() {
@@ -882,7 +889,7 @@ async function preloadAssets({ onProgress } = {}) {
     report();
 
     // 画面操作の反応を落とさない程度の並列数に抑える
-    const concurrency = 6;
+    const concurrency = shouldEnableLowPowerMode() ? 3 : 6;
     const queue = urls.slice();
 
     const worker = async () => {
@@ -1586,6 +1593,7 @@ function stopTimer() {
     gameState.isPaused = false;
     // 時間切迫エフェクトを解除
     document.body.classList.remove('time-critical');
+    document.body.classList.remove('effects-paused');
     hidePauseOverlay();
     updateInteractionState();
 }
@@ -1594,6 +1602,7 @@ function pauseTimer() {
     if (!gameState.timerInterval || gameState.isAnswered) return;
     gameState.isPaused = true;
     pauseTimerSound();
+    document.body.classList.add('effects-paused');
     showPauseOverlay();
     updateInteractionState();
 }
@@ -1602,6 +1611,7 @@ function resumeTimer() {
     if (!gameState.timerInterval) return;
     gameState.isPaused = false;
     hidePauseOverlay();
+    document.body.classList.remove('effects-paused');
     if (gameState.timerCuePlayed && gameState.timeLeft <= 5 && !gameState.isAnswered) {
         startTimerSound();
     }

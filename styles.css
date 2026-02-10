@@ -1134,6 +1134,23 @@ body.low-power .confetti {
     display: none !important;
 }
 
+/* Pause heavy animations when the game is paused (no visual impact while paused). */
+body.effects-paused::before,
+body.effects-paused::after {
+    animation: none !important;
+}
+
+body.effects-paused #header-title,
+body.effects-paused .timer-bar,
+body.effects-paused .timer-bar-danger,
+body.effects-paused .animate-bounce,
+body.effects-paused .animate-pulse,
+body.effects-paused .screen-container::before,
+body.effects-paused .boss-stage::before,
+body.effects-paused .confetti {
+    animation: none !important;
+}
+
 .timer-bar::after {
     content: '';
     position: absolute;
