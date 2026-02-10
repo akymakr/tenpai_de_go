@@ -590,6 +590,11 @@ body.time-critical::after {
     font-size: 1.1rem;
 }
 
+#time-bonus-display {
+    font-size: 1.05rem;
+    color: #fde047;
+}
+
 .hud-left,
 .hud-center,
 .hud-right {

@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v1.6.0210.1",
+        gameVersion: "v1.6.0211.0",
         selectMode: "モードを選択してください",
         casualMode: "カジュアル",
         casualDesc: "全{casualStagesBeforeBoss}問+BOSSステージ\n各問{casualStartSeconds}秒 / {lives}ライフ制",
@@ -36,6 +36,7 @@ const translations = {
         finalQuestions: "ステージ到達：",
         finalScore: "正解数：",
         timeLeftLabel: "残り時間：",
+        timeBonusLabel: "累計時間：",
         answerTimeLabel: "解答時間：",
         secondsUnit: "秒",
         livesLeftLabel: "残りライフ：",
@@ -91,7 +92,7 @@ const translations = {
         tutorialP3Body: "初級：最大3面張\n中級：最大6面張\n上級：最大9面張\n\nストーリーモードでは、ステージが進むごとに難易度が上がります。",
 
         tutorialP4Title: "長考",
-        tutorialP4Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・長考の回数は5ステージごと（第1/6/11...）に1回分だけ追加\n・残り時間が少なくなると迷わず使ってしまいましょう\n\n※ BOSSステージでは使用できませんが、残った回数分がBOSSステージの制限時間に加算されます。",
+        tutorialP4Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・長考の回数は5ステージごと（第1/6/11...）に1回分だけ追加\n・残り時間が少なくなると迷わず使ってしまいましょう",
 
         tutorialP5Title: "BOSSステージ",
         tutorialP5Body: "ステージ{casualBossStageNumber}（カジュアルモード）/ステージ{storyBossStageNumber}（ストーリーモード）はBOSSステージです。\nこれまでのステージで余った「残り時間+長考の合計」が制限時間になります。正解すればゲームクリアです！"
@@ -99,7 +100,7 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v1.6.0210.1",
+        gameVersion: "v1.6.0211.0",
         selectMode: "Select Mode",
         casualMode: "Casual",
         casualDesc: "{casualStagesBeforeBoss} Questions + BOSS\n{casualStartSeconds}s each stage / {lives} Lives",
@@ -131,6 +132,7 @@ const translations = {
         finalQuestions: "Stages Reached:",
         finalScore: "Correct:",
         timeLeftLabel: "Time Left:",
+        timeBonusLabel: "Saved Time:",
         answerTimeLabel: "Answer Time:",
         secondsUnit: "sec",
         livesLeftLabel: "Lives:",
@@ -186,7 +188,7 @@ const translations = {
         tutorialP3Body: "Easy: Up to 3-way waits.\nMedium: Up to 6-way waits.\nHard: Up to 9-way waits.\n\nIn Story Mode, the difficulty increases every {storyDifficultyStep} stages.",
 
         tutorialP4Title: "Think Time (+{timeExtensionSeconds}s)",
-        tutorialP4Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Gain 1 charge every 5 stages (Stage 1/6/11...).\n- Use it when the timer turns red.\n\nNote: Cannot be used during the BOSS Stage, but unused charges will be converted into extra time for the BOSS Stage.",
+        tutorialP4Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Gain 1 charge every 5 stages (Stage 1/6/11...).\n- Use it when the timer turns red.",
 
         tutorialP5Title: "The BOSS Stage",
         tutorialP5Body: "Stage {casualBossStageNumber} (Casual Mode) / Stage {storyBossStageNumber} (Story Mode) is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!"
@@ -194,7 +196,7 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v1.6.0210.1",
+        gameVersion: "v1.6.0211.0",
         selectMode: "請選擇遊戲模式",
         casualMode: "休閒模式",
         casualDesc: "全{casualStagesBeforeBoss}題 + BOSS關卡\n每題{casualStartSeconds}秒 / {lives}條生命",
@@ -226,6 +228,7 @@ const translations = {
         finalQuestions: "到達關卡：",
         finalScore: "正確數：",
         timeLeftLabel: "剩餘時間：",
+        timeBonusLabel: "累積時間：",
         answerTimeLabel: "答題時間：",
         secondsUnit: "秒",
         livesLeftLabel: "剩餘生命：",
@@ -281,7 +284,7 @@ const translations = {
         tutorialP3Body: "初級：最多聽3張\n中級：最多聽6張\n高級：最多聽9張\n\n在「闖關模式」中，難度會隨著關卡進度提升。",
 
         tutorialP4Title: "思考時間",
-        tutorialP4Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・每 5 關（第 1/6/11... 關）才增加 1 次\n・時間快結束時，按鈕會閃爍提示\n\n※ BOSS關卡不能使用，但剩餘次數會自動轉化為BOSS關卡的額外時間。",
+        tutorialP4Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・每 5 關（第 1/6/11... 關）才增加 1 次\n・時間快結束時，按鈕會閃爍提示",
 
         tutorialP5Title: "BOSS關卡",
         tutorialP5Body: "第{casualBossStageNumber}關 (休閒模式) / 第{storyBossStageNumber}關 (闖關模式) 為BOSS關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！"
@@ -2005,16 +2008,6 @@ function startBossStage() {
     gameState.isAnswered = false;
     gameState.selectedTiles.clear();
 
-    // 未使用の延長回数は、BOSS の挑戦時間にまとめて加算する
-    // （BOSS では延長を使えない設計のため、ここで自動変換して公平にする）
-    if (gameState.mode === 'casual' || gameState.mode === 'story') {
-        const unusedExtensions = Math.max(0, gameState.timeExtensions || 0);
-        if (unusedExtensions > 0) {
-            gameState.timeBonus += unusedExtensions * gameConfig.timeExtensionSeconds;
-            gameState.timeExtensions = 0;
-        }
-    }
-
     generateAndShowBossQuestion({ resetTime: true });
 }
 
@@ -2091,6 +2084,7 @@ function updateQuestionDisplay() {
     }
     stageInfo.innerHTML = `<small>${diffInfoHtml}</small>`;
 
+    updateTimeBonusDisplay();
     updateLivesDisplay();
     updateInteractionState();
 }
@@ -2173,6 +2167,7 @@ function handleCorrectAnswer() {
         const maxTimeForStage = getMaxTime(); // このステージの元の最大時間
         const actualBonus = Math.min(gameState.timeLeft, maxTimeForStage); // 元の時間分までを上限に加算
         gameState.timeBonus += actualBonus;
+        updateTimeBonusDisplay();
     }
     
     if (gameState.mode === 'survival') {
@@ -2465,6 +2460,22 @@ function updateLivesDisplay() {
     }
 }
 
+function updateTimeBonusDisplay() {
+    const timeBonusEl = document.getElementById('time-bonus-display');
+    if (!timeBonusEl) return;
+
+    const shouldShow = !gameState.isBossStage && (gameState.mode === 'casual' || gameState.mode === 'story');
+    if (!shouldShow) {
+        timeBonusEl.classList.add('hidden');
+        timeBonusEl.textContent = '';
+        return;
+    }
+
+    const total = Math.max(0, Math.floor(gameState.timeBonus || 0));
+    timeBonusEl.classList.remove('hidden');
+    timeBonusEl.innerHTML = `<span class="font-bold">${t('timeBonusLabel')}</span> ${total}${t('secondsUnit')}`;
+}
+
 function updateTimeExtensionButton() {
     if (!timeExtensionDom.btn || !timeExtensionDom.btn.isConnected) {
         timeExtensionDom.btn = document.getElementById('time-extension-btn');
@@ -2511,7 +2522,7 @@ function updateTimeExtensionButton() {
     const cooldownRemainingMs = getTimeExtensionCooldownRemainingMs();
     const isCoolingDown = cooldownRemainingMs > 0;
     const cooldownRemainingSec = Math.ceil(cooldownRemainingMs / 1000);
-    const canUseExtension = (gameState.timeExtensions > 0) && !gameState.isBossStage && active && !isCoolingDown;
+    const canUseExtension = (gameState.timeExtensions > 0) && active && !isCoolingDown;
 
     const countValue = String(Math.max(0, gameState.timeExtensions || 0));
     const countDisplay = `x${countValue}`;
@@ -2530,9 +2541,7 @@ function updateTimeExtensionButton() {
         extensionBtn.classList.toggle('cooldown', !!isCoolingDown);
     }
 
-    const isBoss = !!gameState.isBossStage;
-    if (timeExtensionDom.last.boss !== isBoss || timeExtensionDom.last.active !== active || timeExtensionDom.last.cooldownSec !== cooldownRemainingSec) {
-        timeExtensionDom.last.boss = isBoss;
+    if (timeExtensionDom.last.active !== active || timeExtensionDom.last.cooldownSec !== cooldownRemainingSec) {
         timeExtensionDom.last.active = active;
         timeExtensionDom.last.cooldownSec = cooldownRemainingSec;
 
@@ -2540,9 +2549,7 @@ function updateTimeExtensionButton() {
             textSpan.textContent = getTimeExtensionButtonLabel();
             if (cooldownSpan) cooldownSpan.classList.add('hidden');
         } else {
-            textSpan.textContent = isBoss
-                ? `${t('timeExtension')} (BOSS ${t('stage')})`
-                : getTimeExtensionButtonLabel();
+            textSpan.textContent = getTimeExtensionButtonLabel();
 
             if (cooldownSpan) {
                 if (isCoolingDown) {
@@ -2564,7 +2571,7 @@ function updateTimeExtensionButton() {
 
 function useTimeExtension() {
     if (!isActiveQuestion()) return;
-    if (gameState.timeExtensions <= 0 || gameState.isBossStage || gameState.isAnswered) return;
+    if (gameState.timeExtensions <= 0 || gameState.isAnswered) return;
     if (getTimeExtensionCooldownRemainingMs() > 0) return;
 
     playSound('select');
@@ -2918,6 +2925,7 @@ function resetGame() {
     hideResultActions();
     
     document.getElementById('mode-screen').classList.remove('hidden');
+    updateTimeBonusDisplay();
     updateInteractionState();
 }
 
