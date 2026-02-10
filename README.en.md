@@ -36,7 +36,7 @@ Mahjong tenpai training game.
 ## Think Time (Time Extension)
 
 - Gain 1 charge every 5 stages (Stage 1/6/11...), no hard cap
-- Cannot be used during the BOSS stage; unused charges are converted into extra time for the BOSS stage
+- Can be used during the BOSS stage
 
 ## Difficulty
 
