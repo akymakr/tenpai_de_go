@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v1.6.0210.0",
+        gameVersion: "v1.6.0210.1",
         selectMode: "モードを選択してください",
         casualMode: "カジュアル",
         casualDesc: "全{casualStagesBeforeBoss}問+BOSSステージ\n各問{casualStartSeconds}秒 / {lives}ライフ制",
@@ -91,7 +91,7 @@ const translations = {
         tutorialP3Body: "初級：最大3面張\n中級：最大6面張\n上級：最大9面張\n\nストーリーモードでは、ステージが進むごとに難易度が上がります。",
 
         tutorialP4Title: "長考",
-        tutorialP4Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・残り時間が少なくなると迷わず使ってしまいましょう\n\n※ BOSSステージでは使用できませんが、残った回数分がBOSSステージの制限時間に加算されます。",
+        tutorialP4Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・長考の回数は5ステージごと（第1/6/11...）に1回分だけ追加\n・残り時間が少なくなると迷わず使ってしまいましょう\n\n※ BOSSステージでは使用できませんが、残った回数分がBOSSステージの制限時間に加算されます。",
 
         tutorialP5Title: "BOSSステージ",
         tutorialP5Body: "ステージ{casualBossStageNumber}（カジュアルモード）/ステージ{storyBossStageNumber}（ストーリーモード）はBOSSステージです。\nこれまでのステージで余った「残り時間+長考の合計」が制限時間になります。正解すればゲームクリアです！"
@@ -99,14 +99,14 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v1.6.0210.0",
+        gameVersion: "v1.6.0210.1",
         selectMode: "Select Mode",
         casualMode: "Casual",
         casualDesc: "{casualStagesBeforeBoss} Questions + BOSS\n{casualStartSeconds}s each stage / {lives} Lives",
         storyMode: "Story",
         storyDesc: "Easy→Med→Hard ({storyDifficultyStep} stages each) + BOSS\n{storyStartSeconds}s each stage / {lives} Lives",
         survivalMode: "Survival",
-        survivalDesc: "Starting with {survivalStartSeconds}s\nTime extension each stage / No lives",
+        survivalDesc: "Starting with {survivalStartSeconds}s\nThink Time +1 every 5 stages / No lives",
         selectDifficulty: "Select Difficulty",
         easy: "Easy",
         easyDesc: "Up to 3-way waits",
@@ -186,7 +186,7 @@ const translations = {
         tutorialP3Body: "Easy: Up to 3-way waits.\nMedium: Up to 6-way waits.\nHard: Up to 9-way waits.\n\nIn Story Mode, the difficulty increases every {storyDifficultyStep} stages.",
 
         tutorialP4Title: "Think Time (+{timeExtensionSeconds}s)",
-        tutorialP4Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Use it when the timer turns red.\n\nNote: Cannot be used during the BOSS Stage, but unused charges will be converted into extra time for the BOSS Stage.",
+        tutorialP4Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Gain 1 charge every 5 stages (Stage 1/6/11...).\n- Use it when the timer turns red.\n\nNote: Cannot be used during the BOSS Stage, but unused charges will be converted into extra time for the BOSS Stage.",
 
         tutorialP5Title: "The BOSS Stage",
         tutorialP5Body: "Stage {casualBossStageNumber} (Casual Mode) / Stage {storyBossStageNumber} (Story Mode) is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!"
@@ -194,7 +194,7 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v1.6.0210.0",
+        gameVersion: "v1.6.0210.1",
         selectMode: "請選擇遊戲模式",
         casualMode: "休閒模式",
         casualDesc: "全{casualStagesBeforeBoss}題 + BOSS關卡\n每題{casualStartSeconds}秒 / {lives}條生命",
@@ -281,7 +281,7 @@ const translations = {
         tutorialP3Body: "初級：最多聽3張\n中級：最多聽6張\n高級：最多聽9張\n\n在「闖關模式」中，難度會隨著關卡進度提升。",
 
         tutorialP4Title: "思考時間",
-        tutorialP4Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・時間快結束時，按鈕會閃爍提示\n\n※ BOSS關卡不能使用，但剩餘次數會自動轉化為BOSS關卡的額外時間。",
+        tutorialP4Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・每 5 關（第 1/6/11... 關）才增加 1 次\n・時間快結束時，按鈕會閃爍提示\n\n※ BOSS關卡不能使用，但剩餘次數會自動轉化為BOSS關卡的額外時間。",
 
         tutorialP5Title: "BOSS關卡",
         tutorialP5Body: "第{casualBossStageNumber}關 (休閒模式) / 第{storyBossStageNumber}關 (闖關模式) 為BOSS關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！"
@@ -293,19 +293,18 @@ const gameConfig = {
     modeStartSeconds: {
         casual: 60,
         story: 30,
-        survival: 15
+        survival: 30
     },
     lives: 3,
     survivalRecoverySeconds: {
-        easy: 4,
-        medium: 8,
+        easy: 3,
+        medium: 6,
         hard: 12
     },
     timeExtensionSeconds: 30,
-    maxTimeExtensions: 3,
     // BOSS ステージ
     storyBossStageNumber: 16,
-    casualBossStageNumber: 10,
+    casualBossStageNumber: 11,
     // ストーリーの難易度アップ間隔（N ステージごと）
     storyDifficultyStep: 5
 };
@@ -482,7 +481,6 @@ function getDefaultTranslationVars() {
         survivalStartSeconds: gameConfig.modeStartSeconds.survival,
         lives: gameConfig.lives,
         timeExtensionSeconds: gameConfig.timeExtensionSeconds,
-        maxTimeExtensions: gameConfig.maxTimeExtensions,
         casualBossStageNumber: gameConfig.casualBossStageNumber,
         storyBossStageNumber: gameConfig.storyBossStageNumber,
         casualStagesBeforeBoss: getStagesBeforeBossForMode('casual'),
@@ -1365,7 +1363,8 @@ const gameState = {
     hand: [], counts: {}, waitingTiles: [], selectedTiles: new Set(), tileType: 'pin',
     timeLeft: 0, maxTime: 0, timeBonus: 0, timerInterval: null, isBossStage: false, isAnswered: false,
     lives: gameConfig.lives, maxLives: gameConfig.lives, isPaused: false,
-    timeExtensions: gameConfig.maxTimeExtensions, maxTimeExtensions: gameConfig.maxTimeExtensions, extendedTime: 0, // 長考（タイム延長）の仕組み
+    timeExtensions: 0, extendedTime: 0, // 長考（タイム延長）の仕組み
+    lastExtensionStageGranted: 0,
     timeExtensionCooldownUntil: 0,
     timeExtensionCooldownInterval: null,
     timerCuePlayed: false
@@ -1408,6 +1407,20 @@ function getTimeExtensionButtonLabel() {
     const desc = t('timeExtensionDesc');
     if (!desc) return base;
     return `${base} ${desc}`;
+}
+
+function shouldGrantTimeExtensionForStage(stageNumber) {
+    return Number.isInteger(stageNumber) && stageNumber > 0 && stageNumber % 5 === 1;
+}
+
+function grantTimeExtensionForStage(stageNumber) {
+    if (!shouldGrantTimeExtensionForStage(stageNumber)) return false;
+    if (gameState.lastExtensionStageGranted === stageNumber) return false;
+
+    const current = Math.max(0, gameState.timeExtensions || 0);
+    gameState.timeExtensions = current + 1;
+    gameState.lastExtensionStageGranted = stageNumber;
+    return true;
 }
 
 // 正確な和了判定（4面子1雀頭）
@@ -1835,7 +1848,8 @@ function restartCurrentRun() {
     gameState.isAnswered = false;
     gameState.isPaused = false;
     gameState.lives = gameConfig.lives;
-    gameState.timeExtensions = gameState.maxTimeExtensions;
+    gameState.timeExtensions = 0;
+    gameState.lastExtensionStageGranted = 0;
     gameState.extendedTime = 0;
     clearTimeExtensionCooldown();
     gameState.timerCuePlayed = false;
@@ -1868,7 +1882,8 @@ function startGameMode(mode) {
         gameState.currentStage = 0;
         gameState.correctCount = 0;
         gameState.timeBonus = 0;
-        gameState.timeExtensions = gameState.maxTimeExtensions; // タイム延長をリセット
+        gameState.timeExtensions = 0; // タイム延長をリセット
+        gameState.lastExtensionStageGranted = 0;
         gameState.extendedTime = 0;
         clearTimeExtensionCooldown();
         document.getElementById('difficulty-screen').classList.add('hidden');
@@ -1888,7 +1903,8 @@ function startGameWithDifficulty(difficulty) {
     gameState.correctCount = 0;
     gameState.timeBonus = 0;
     gameState.lives = gameConfig.lives; // ライフをリセット
-    gameState.timeExtensions = gameState.maxTimeExtensions; // タイム延長をリセット
+    gameState.timeExtensions = 0; // タイム延長をリセット
+    gameState.lastExtensionStageGranted = 0;
     gameState.extendedTime = 0;
     clearTimeExtensionCooldown();
     document.getElementById('difficulty-screen').classList.add('hidden');
@@ -1920,6 +1936,7 @@ async function startNewQuestion() {
     }
 
     gameState.isBossStage = !!isBossEntry;
+    grantTimeExtensionForStage(gameState.currentStage);
     updateQuestionDisplay();
 
     const stageTitle = isBossEntry
@@ -1929,7 +1946,7 @@ async function startNewQuestion() {
 
     await showStageIntro({ titleText: stageTitle, subtitleHtml: subtitle, durationMs: 3800 });
 
-    // ボス（第10ステージ）に入るか判定
+    // ボスに入るか判定
     if (isBossEntry) {
         startBossStage();
         return;
@@ -2221,7 +2238,7 @@ function showResult(isCorrect) {
         if (gameState.mode === 'survival') {
             nextBtn.classList.remove('hidden');
         } else if (gameState.mode === 'casual' || gameState.mode === 'story') {
-            // カジュアル/ストーリー：第1〜9問は「次へ」を表示
+            // カジュアル/ストーリー：第1〜10問は「次へ」を表示
             nextBtn.classList.remove('hidden');
         }
     } else {
@@ -2497,9 +2514,10 @@ function updateTimeExtensionButton() {
     const canUseExtension = (gameState.timeExtensions > 0) && !gameState.isBossStage && active && !isCoolingDown;
 
     const countValue = String(Math.max(0, gameState.timeExtensions || 0));
+    const countDisplay = `x${countValue}`;
     if (countSpan && timeExtensionDom.last.count !== countValue) {
         timeExtensionDom.last.count = countValue;
-        countSpan.textContent = countValue;
+        countSpan.textContent = countDisplay;
     }
 
     if (timeExtensionDom.last.canUse !== canUseExtension) {
@@ -2881,7 +2899,8 @@ function resetGame() {
     gameState.isAnswered = false;
     gameState.isPaused = false;
     gameState.lives = gameConfig.lives;
-    gameState.timeExtensions = gameState.maxTimeExtensions;
+    gameState.timeExtensions = 0;
+    gameState.lastExtensionStageGranted = 0;
     gameState.extendedTime = 0;
     clearTimeExtensionCooldown();
     gameState.timeLeft = 0;

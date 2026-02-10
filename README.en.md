@@ -7,10 +7,10 @@ Mahjong tenpai training game.
 ## Game Modes
 
 ### CASUAL
-- 9 questions + BOSS stage
+- 10 questions + BOSS stage
 - 60 seconds per question, 3 lives
 - Wrong answer or time up costs 1 life; you can choose **Continue** (spend a life) or **Give Up**
-- Correct answers (Q1–Q9) accumulate time for the BOSS stage
+- Correct answers (Q1–Q10) accumulate time for the BOSS stage
 
 ### STORY
 - Progressive difficulty: Easy (Q1–5) → Medium (Q6-10) → Hard (Q11-15) → BOSS (Q16)
@@ -22,8 +22,8 @@ Mahjong tenpai training game.
 - Endless questions
 - Start with 15 seconds, no lives
 - Time recovery on correct answers:
-  - Easy: +4s
-  - Medium: +8s
+  - Easy: +3s
+  - Medium: +6s
   - Hard: +12s
 
 ## BOSS Stage Rules
@@ -32,6 +32,11 @@ Mahjong tenpai training game.
 - Minimum time is guaranteed when the accumulated time is too small:
   - Casual: at least 60 seconds
   - Story: at least 30 seconds
+
+## Think Time (Time Extension)
+
+- Gain 1 charge every 5 stages (Stage 1/6/11...), no hard cap
+- Cannot be used during the BOSS stage; unused charges are converted into extra time for the BOSS stage
 
 ## Difficulty
 
@@ -52,6 +57,5 @@ Mahjong tenpai training game.
 
 - `index.html`
 - `styles.css`
-- `utilities.css`
 - `game.js`
 - `assets/`
