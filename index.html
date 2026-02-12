@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Mahjong Tenpai Training Game - Improve your mahjong skills by identifying waiting tiles in various hands.">
     <title>聴牌でGO!</title>
-    <meta name="theme-color" content="#0a0e27">
+    <meta name="theme-color" content="#0b1f15">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap">
@@ -67,8 +67,8 @@
         .text-6xl { font-size: 3.75rem; line-height: 1; }
         .text-7xl { font-size: 4.5rem; line-height: 1; }
         .text-white { color: #ffffff; }
-        .text-purple-300 { color: #d8b4fe; }
-        .text-purple-200 { color: #e9d5ff; }
+        .text-purple-300 { color: #d9b26f; }
+        .text-purple-200 { color: #f2d08a; }
         .text-green-300 { color: #86efac; }
         .text-red-300 { color: #fca5a5; }
         .text-yellow-300 { color: #fde047; }
@@ -84,7 +84,7 @@
 
         /* Borders (minimal) */
         .border-t-0 { border-top-width: 0; }
-        .border-purple-600 { border-color: #9333ea; }
+        .border-purple-600 { border-color: #7a4a28; }
 
         /* Animations (approx Tailwind) */
         @keyframes util-bounce {
@@ -330,6 +330,7 @@
                     <button id="play-again-victory" class="reset-btn mode-btn">Play Again</button>
                     <button id="menu-victory" class="reset-btn mode-btn">Back to Menu</button>
                 </div>
+                <p class="mt-4 text-sm opacity-80"><span id="score-version-label">Scoring Version:</span> <span id="score-version" class="font-bold text-yellow-200">1.0</span></p>
             </div>
         </div>
 
@@ -346,6 +347,7 @@
                     <button id="play-again-gameover" class="reset-btn mode-btn">Play Again</button>
                     <button id="menu-gameover" class="reset-btn mode-btn">Back to Menu</button>
                 </div>
+                <p class="mt-4 text-sm opacity-80"><span id="score-version-label-gameover">Scoring Version:</span> <span id="score-version-gameover" class="font-bold text-yellow-200">1.0</span></p>
             </div>
         </div>
 

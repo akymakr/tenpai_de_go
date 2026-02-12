@@ -4,7 +4,9 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v1.6.0211.0",
+        gameVersion: "v1.6.0212.0",
+        scoreVersionLabel: "採点バージョン",
+        scoreVersion: "1.0",
         selectMode: "モードを選択してください",
         casualMode: "カジュアル",
         casualDesc: "全{casualStagesBeforeBoss}問+BOSSステージ\n各問{casualStartSeconds}秒 / {lives}ライフ制",
@@ -100,7 +102,9 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v1.6.0211.0",
+        gameVersion: "v1.6.0212.0",
+        scoreVersionLabel: "Scoring Version",
+        scoreVersion: "1.0",
         selectMode: "Select Mode",
         casualMode: "Casual",
         casualDesc: "{casualStagesBeforeBoss} Questions + BOSS\n{casualStartSeconds}s each stage / {lives} Lives",
@@ -196,7 +200,9 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v1.6.0211.0",
+        gameVersion: "v1.6.0212.0",
+        scoreVersionLabel: "計分版本",
+        scoreVersion: "1.0",
         selectMode: "請選擇遊戲模式",
         casualMode: "休閒模式",
         casualDesc: "全{casualStagesBeforeBoss}題 + BOSS關卡\n每題{casualStartSeconds}秒 / {lives}條生命",
@@ -2668,7 +2674,12 @@ function showVictory() {
     }
 
     const timeLeftEl = document.getElementById('final-time-left');
-    if (timeLeftEl) timeLeftEl.textContent = String(Math.max(0, gameState.timeLeft || 0));
+    if (timeLeftEl) {
+        const unusedExtension = getUnusedTimeExtensionSeconds();
+        const totalTimeLeft = Math.max(0, gameState.timeLeft || 0) + unusedExtension;
+        gameState.timeLeft = totalTimeLeft;
+        timeLeftEl.textContent = String(totalTimeLeft);
+    }
 
     const livesEl = document.getElementById('final-lives-left');
     const livesLabelEl = document.getElementById('final-lives-left-label');
@@ -2690,6 +2701,12 @@ function showVictory() {
         createConfetti();
     }
     // 16:9 固定フレーム設計：ページスクロールは使わない
+}
+
+function getUnusedTimeExtensionSeconds() {
+    const count = Math.max(0, gameState.timeExtensions || 0);
+    const seconds = Math.max(0, gameConfig.timeExtensionSeconds || 0);
+    return count * seconds;
 }
 
 function showGameOver(timeUp) {
@@ -2834,6 +2851,14 @@ function updateUILanguage() {
     if (timeLeftLabel) timeLeftLabel.textContent = t('timeLeftLabel');
     if (livesLeftLabel) livesLeftLabel.textContent = t('livesLeftLabel');
     document.getElementById('final-score-label').textContent = t('finalScore');
+    const scoreVersionLabel = document.getElementById('score-version-label');
+    const scoreVersionValue = document.getElementById('score-version');
+    if (scoreVersionLabel) scoreVersionLabel.textContent = `${t('scoreVersionLabel')}:`;
+    if (scoreVersionValue) scoreVersionValue.textContent = t('scoreVersion');
+    const scoreVersionLabelGameOver = document.getElementById('score-version-label-gameover');
+    const scoreVersionValueGameOver = document.getElementById('score-version-gameover');
+    if (scoreVersionLabelGameOver) scoreVersionLabelGameOver.textContent = `${t('scoreVersionLabel')}:`;
+    if (scoreVersionValueGameOver) scoreVersionValueGameOver.textContent = t('scoreVersion');
     document.getElementById('play-again-victory').textContent = t('playAgain');
     document.getElementById('play-again-gameover').textContent = t('playAgain');
     document.getElementById('menu-victory').textContent = t('backToMenu');
