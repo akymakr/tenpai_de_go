@@ -471,6 +471,7 @@ body.time-critical::after {
     line-height: 1.5;
     text-align: center;
     opacity: 0.92;
+    white-space: pre-line;
 }
 
 .tutorial-tile-row {

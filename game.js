@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v1.6.0213.0",
+        gameVersion: "v1.6.0213.1",
         scoreVersionLabel: "採点バージョン",
         scoreVersion: "1.0",
         selectMode: "モードを選択してください",
@@ -91,7 +91,7 @@ const translations = {
         tutorialP2Body: "1) 画面下の1から9の牌から、待ち牌をすべて選択\n2) 「回答する」ボタンで正誤判定\n\nヒント：\n・もう一度タップすると選択解除できます\n・時間切れになっても、牌を一枚でも選択していれば自動的に回答として提出されます",
 
         tutorialP3Title: "待ち牌の見つけ方（基本手順）",
-        tutorialP3Body: "迷ったら、次の手順で判定しましょう。\n1) 手牌で4枚使っている牌を除外\n2) 1〜9を1枚ずつ『仮に追加』して14枚にする\n3) 『4面子1雀頭』に分解できる牌だけが待ち\n\nまずはこの手順だけ覚えればOKです。",
+        tutorialP3Body: "迷ったら、次の手順で判定しましょう。\n1) 手牌で4枚使っている牌を除外\n2) 端牌の速攻除外（例：9待ちは 7/8 か 9 が手牌に必要）\n3) その牌で面子/雀頭の形が作れないものを除外\n4) 残りだけ 1〜9 を仮追加して『4面子1雀頭』判定\n\nまずはこの手順だけ覚えればOKです。",
 
         tutorialP4Title: "よく出る待ちの形（局所）",
         tutorialP4Body: "手牌全体を一気に見るより、部分形の当たりを覚えると速くなります。\n・両面待ち：34 → 2/5\n・嵌張待ち：35 → 4\n・辺張待ち：12 → 3、89 → 7\n・双碰待ち：44 + 77 → 4/7\n・単騎待ち：6 → 6",
@@ -128,14 +128,20 @@ const translations = {
         tutorialRealNewBtn: "別の問題",
         tutorialRealResetBtn: "最初から",
         tutorialRealHintUsedFour: "ヒント：{tiles} は手牌で4枚使っているので、待ち候補から除外します。",
-        tutorialRealHintNoUsedFour: "ヒント：4枚使い切りの牌はありません。1〜9 を順に仮追加して判定しましょう。",
+        tutorialRealHintNoUsedFour: "ヒント：4枚使い切りの牌はありません。",
+        tutorialRealHintStructure: "ヒント：{tiles} は必要な形を作れないため先に除外できます（例：9待ちは 7/8 または 9 が必要）。",
         tutorialRealAnswerText: "正解：待ちは {waits}。",
-        tutorialRealBreakdownTitle: "待ち牌ごとの分解（4面子1雀頭）"
+        tutorialRealBreakdownTitle: "待ち牌ごとの分解（4面子1雀頭）",
+        tutorialWaitTierLabel: "教學難易度：",
+        tutorialWaitTierEasyDesc: "1〜3面待ち",
+        tutorialWaitTierMediumDesc: "4〜6面待ち",
+        tutorialWaitTierHardDesc: "7〜9面待ち",
+        tutorialWaitCountLabel: "待ちの数：{count}"
     },
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v1.6.0213.0",
+        gameVersion: "v1.6.0213.1",
         scoreVersionLabel: "Scoring Version",
         scoreVersion: "1.0",
         selectMode: "Select Mode",
@@ -222,7 +228,7 @@ const translations = {
         tutorialP2Body: "1) Tap the tile icons (1-9) to select your waits.\n2) Tap 'Submit' to check your answer.\n\nTips:\n- Tap a selected tile again to unselect it.\n- If time runs out, your current selection will be auto-submitted.",
 
         tutorialP3Title: "How to Judge Waits (Beginner Flow)",
-        tutorialP3Body: "When unsure, follow this exact flow.\n1) Exclude tiles already used 4 times in your hand.\n2) Try adding each tile 1-9 (one at a time) to make 14 tiles.\n3) A tile is a valid wait only if the hand can be split into 4 melds + 1 pair.\n\nYou can clear most problems with just this method.",
+        tutorialP3Body: "When unsure, follow this exact flow.\n1) Exclude tiles already used 4 times in your hand.\n2) Quick edge pruning (e.g. waiting on 9 needs 7/8 or an existing 9).\n3) Exclude tiles that cannot form any meld/head shape.\n4) Only then test remaining tiles 1-9 with the 4 melds + 1 pair rule.\n\nYou can clear most problems with just this method.",
 
         tutorialP4Title: "Common Wait Shapes (Local Patterns)",
         tutorialP4Body: "Spotting small patterns is faster than reading all 13 tiles at once.\n- Ryanmen (open wait): 34 -> 2/5\n- Kanchan (closed wait): 35 -> 4\n- Penchan (edge wait): 12 -> 3, 89 -> 7\n- Shanpon (pair wait): 44 + 77 -> 4/7\n- Tanki (single wait): 6 -> 6",
@@ -259,14 +265,20 @@ const translations = {
         tutorialRealNewBtn: "New Question",
         tutorialRealResetBtn: "Reset",
         tutorialRealHintUsedFour: "Hint: {tiles} is already used 4 times in hand, so exclude it from wait candidates.",
-        tutorialRealHintNoUsedFour: "Hint: No tile is used 4 times. Try adding 1-9 one by one and test each shape.",
+        tutorialRealHintNoUsedFour: "Hint: No tile is used 4 times.",
+        tutorialRealHintStructure: "Hint: {tiles} cannot form required shapes, so eliminate them first (e.g. waiting on 9 needs 7/8 or an existing 9).",
         tutorialRealAnswerText: "Answer: waits are {waits}.",
-        tutorialRealBreakdownTitle: "Breakdown per wait (4 melds + 1 pair)"
+        tutorialRealBreakdownTitle: "Breakdown per wait (4 melds + 1 pair)",
+        tutorialWaitTierLabel: "Tutorial Tier:",
+        tutorialWaitTierEasyDesc: "1-3 waits",
+        tutorialWaitTierMediumDesc: "4-6 waits",
+        tutorialWaitTierHardDesc: "7-9 waits",
+        tutorialWaitCountLabel: "Waits: {count}"
     },
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v1.6.0213.0",
+        gameVersion: "v1.6.0213.1",
         scoreVersionLabel: "計分版本",
         scoreVersion: "1.0",
         selectMode: "請選擇遊戲模式",
@@ -353,7 +365,7 @@ const translations = {
         tutorialP2Body: "1) 點擊下方1至9的麻雀牌，選出所有聽牌\n2) 點擊「確認答案」進行判定\n\n提示：\n・再次點擊已選中的牌可取消選擇\n・時間結束時，若已有選牌會自動提交",
 
         tutorialP3Title: "新手判斷流程（重點）",
-        tutorialP3Body: "如果不確定聽哪張，就照這個流程：\n1) 先排除「手牌已用滿4張」的牌\n2) 把 1~9 各自『假設補1張』，變成14張\n3) 只有能拆成「4組面子 + 1組雀頭」的牌，才是正確聽牌\n\n先熟這三步，解題成功率會明顯提升。",
+        tutorialP3Body: "如果不確定聽哪張，就照這個流程：\n1) 先排除「手牌已用滿4張」的牌\n2) 先做邊張速排（例：要聽 9，手上至少要有 7/8 或已有 9）\n3) 再排除「連面子/雀頭基本形都做不出來」的牌\n4) 最後把 1~9 逐張假設補入，檢查是否成 4面子+1雀頭\n\n先熟這流程，解題成功率會明顯提升。",
 
         tutorialP4Title: "常見待型（局部記憶）",
         tutorialP4Body: "先看局部形狀，通常比整副牌硬算更快。\n・兩面：34 → 2/5\n・嵌張：35 → 4\n・邊張：12 → 3、89 → 7\n・雙碰：44 + 77 → 4/7\n・單騎：6 → 6",
@@ -390,9 +402,15 @@ const translations = {
         tutorialRealNewBtn: "換一題",
         tutorialRealResetBtn: "重設",
         tutorialRealHintUsedFour: "提示：{tiles} 在手牌中已經出現4張，因此要先從候選中排除。",
-        tutorialRealHintNoUsedFour: "提示：沒有牌被用滿4張，請把 1~9 逐張假設補入再判斷。",
+        tutorialRealHintNoUsedFour: "提示：沒有牌被用滿4張。",
+        tutorialRealHintStructure: "提示：{tiles} 無法形成必要形狀，可先淘汰（例如聽 9 至少要有 7/8 或已有 9）。",
         tutorialRealAnswerText: "答案：聽 {waits}。",
-        tutorialRealBreakdownTitle: "各聽牌拆解（4面子+1雀頭）"
+        tutorialRealBreakdownTitle: "各聽牌拆解（4面子+1雀頭）",
+        tutorialWaitTierLabel: "教學難度：",
+        tutorialWaitTierEasyDesc: "1-3 面聽",
+        tutorialWaitTierMediumDesc: "4-6 面聽",
+        tutorialWaitTierHardDesc: "7-9 面聽",
+        tutorialWaitCountLabel: "面聽數：{count}"
     }
 };
 
@@ -571,31 +589,63 @@ function getExhaustedTilesFromCounts(counts) {
     return exhausted;
 }
 
+function getStructurallyImpossibleTilesFromCounts(counts) {
+    const impossible = [];
+    for (let tile = 1; tile <= 9; tile++) {
+        const sameTileExists = (counts?.[tile] || 0) > 0;
+        const canMakeLeftSequence = tile >= 3 && (counts?.[tile - 1] || 0) > 0 && (counts?.[tile - 2] || 0) > 0;
+        const canMakeMiddleSequence = tile >= 2 && tile <= 8 && (counts?.[tile - 1] || 0) > 0 && (counts?.[tile + 1] || 0) > 0;
+        const canMakeRightSequence = tile <= 7 && (counts?.[tile + 1] || 0) > 0 && (counts?.[tile + 2] || 0) > 0;
+
+        if (!sameTileExists && !canMakeLeftSequence && !canMakeMiddleSequence && !canMakeRightSequence) {
+            impossible.push(tile);
+        }
+    }
+    return impossible;
+}
+
+function pickTutorialRandomDifficulty() {
+    const levels = ['easy', 'medium', 'hard'];
+    return levels[Math.floor(Math.random() * levels.length)];
+}
+
+function getTutorialTierByWaitCount(waitCount) {
+    const count = Math.max(0, Number(waitCount) || 0);
+    if (count >= 7) return 'hard';
+    if (count >= 4) return 'medium';
+    return 'easy';
+}
+
 function generateTutorialRealQuestion() {
     const backupHand = gameState.hand;
     const backupCounts = gameState.counts;
     const backupWaiting = gameState.waitingTiles;
 
     try {
-        const generated = generateTenpaiHand('easy');
+        const difficulty = pickTutorialRandomDifficulty();
+        const generated = generateTenpaiHand(difficulty);
         const hand = Array.isArray(generated?.hand)
             ? generated.hand.slice().sort((a, b) => a - b)
             : [1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9];
         const counts = buildCountsFromTiles(hand);
         const waits = calculateWinningTiles(counts);
         return {
+            difficulty,
             hand,
             counts,
             waits,
-            exhausted: getExhaustedTilesFromCounts(counts)
+            exhausted: getExhaustedTilesFromCounts(counts),
+            structurallyImpossible: getStructurallyImpossibleTilesFromCounts(counts)
         };
     } catch {
         const fallback = solveTutorialHand([1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9]);
         return {
+            difficulty: 'easy',
             hand: fallback.hand.slice().sort((a, b) => a - b),
             counts: fallback.counts,
             waits: fallback.waits,
-            exhausted: getExhaustedTilesFromCounts(fallback.counts)
+            exhausted: getExhaustedTilesFromCounts(fallback.counts),
+            structurallyImpossible: getStructurallyImpossibleTilesFromCounts(fallback.counts)
         };
     } finally {
         gameState.hand = backupHand;
@@ -811,9 +861,14 @@ function renderTutorialVisual(page) {
 
     if (page.visualType === 'realQuestion') {
         const question = getTutorialRealQuestionData();
+        const waitCount = (question.waits || []).length;
+        const tier = getTutorialTierByWaitCount(waitCount);
         const hand = question.hand;
         const candidates = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         const exhausted = question.exhausted || [];
+        const structural = (question.structurallyImpossible || []).filter((tile) => !exhausted.includes(tile));
+        const eliminated = Array.from(new Set([...exhausted, ...structural]));
+        const hasHint = exhausted.length > 0 || structural.length > 0;
 
         const step = Math.max(0, Math.min(2, tutorialRealQuestionStep || 0));
         tutorialRealQuestionStep = step;
@@ -823,11 +878,21 @@ function renderTutorialVisual(page) {
             tiles: hand
         }));
 
+        const difficultyLine = document.createElement('div');
+        difficultyLine.className = 'tutorial-visual-text';
+        const tierBadgeClass = tier === 'hard'
+            ? 'difficulty-badge difficulty-badge--hard'
+            : tier === 'medium'
+                ? 'difficulty-badge difficulty-badge--medium'
+                : 'difficulty-badge difficulty-badge--easy';
+        difficultyLine.innerHTML = `<span class="${tierBadgeClass}">${t('tutorialWaitCountLabel', { count: waitCount })}</span>`;
+        visualEl.appendChild(difficultyLine);
+
         visualEl.appendChild(createTutorialTileRow({
             label: t('tutorialVisualCandidates'),
             tiles: candidates,
-            disabled: step >= 1 ? exhausted : [],
-            crossed: step >= 1 ? exhausted : [],
+            disabled: step >= 1 ? eliminated : [],
+            crossed: step >= 1 ? eliminated : [],
             selected: step >= 2 ? question.waits : []
         }));
 
@@ -836,11 +901,11 @@ function renderTutorialVisual(page) {
         if (step >= 2) {
             message.textContent = t('tutorialRealAnswerText', { waits: (question.waits || []).join(' / ') });
         } else if (step >= 1) {
-            if (exhausted.length > 0) {
-                message.textContent = t('tutorialRealHintUsedFour', { tiles: exhausted.join(' / ') });
-            } else {
-                message.textContent = t('tutorialRealHintNoUsedFour');
-            }
+            const lines = [];
+            if (exhausted.length > 0) lines.push(t('tutorialRealHintUsedFour', { tiles: exhausted.join(' / ') }));
+            else lines.push(t('tutorialRealHintNoUsedFour'));
+            if (structural.length > 0) lines.push(t('tutorialRealHintStructure', { tiles: structural.join(' / ') }));
+            message.textContent = lines.join('\n');
         } else {
             message.textContent = '';
         }
@@ -853,7 +918,7 @@ function renderTutorialVisual(page) {
         hintBtn.type = 'button';
         hintBtn.className = 'tutorial-step-btn';
         hintBtn.textContent = t('tutorialRealHintBtn');
-        hintBtn.disabled = step >= 1;
+        hintBtn.disabled = step >= 1 || !hasHint;
         hintBtn.addEventListener('click', () => {
             tutorialRealQuestionStep = 1;
             renderTutorialVisual(page);
