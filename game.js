@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v1.6.0212.0",
+        gameVersion: "v1.6.0213.0",
         scoreVersionLabel: "採点バージョン",
         scoreVersion: "1.0",
         selectMode: "モードを選択してください",
@@ -90,19 +90,52 @@ const translations = {
         tutorialP2Title: "操作方法",
         tutorialP2Body: "1) 画面下の1から9の牌から、待ち牌をすべて選択\n2) 「回答する」ボタンで正誤判定\n\nヒント：\n・もう一度タップすると選択解除できます\n・時間切れになっても、牌を一枚でも選択していれば自動的に回答として提出されます",
 
-        tutorialP3Title: "難易度について",
-        tutorialP3Body: "初級：最大3面張\n中級：最大6面張\n上級：最大9面張\n\nストーリーモードでは、ステージが進むごとに難易度が上がります。",
+        tutorialP3Title: "待ち牌の見つけ方（基本手順）",
+        tutorialP3Body: "迷ったら、次の手順で判定しましょう。\n1) 手牌で4枚使っている牌を除外\n2) 1〜9を1枚ずつ『仮に追加』して14枚にする\n3) 『4面子1雀頭』に分解できる牌だけが待ち\n\nまずはこの手順だけ覚えればOKです。",
 
-        tutorialP4Title: "長考",
-        tutorialP4Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・長考の回数は5ステージごと（第1/6/11...）に1回分だけ追加\n・残り時間が少なくなると迷わず使ってしまいましょう",
+        tutorialP4Title: "よく出る待ちの形（局所）",
+        tutorialP4Body: "手牌全体を一気に見るより、部分形の当たりを覚えると速くなります。\n・両面待ち：34 → 2/5\n・嵌張待ち：35 → 4\n・辺張待ち：12 → 3、89 → 7\n・双碰待ち：44 + 77 → 4/7\n・単騎待ち：6 → 6",
 
-        tutorialP5Title: "BOSSステージ",
-        tutorialP5Body: "ステージ{casualBossStageNumber}（カジュアルモード）/ステージ{storyBossStageNumber}（ストーリーモード）はBOSSステージです。\nこれまでのステージで余った「残り時間+長考の合計」が制限時間になります。正解すればゲームクリアです！"
+        tutorialP5Title: "難易度について",
+        tutorialP5Body: "初級：最大3面張\n中級：最大6面張\n上級：最大9面張\n\nストーリーモードでは、ステージが進むごとに難易度が上がります。",
+
+        tutorialP6Title: "長考",
+        tutorialP6Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・長考の回数は5ステージごと（第1/6/11...）に1回分だけ追加\n・残り時間が少なくなると迷わず使ってしまいましょう",
+
+        tutorialP7Title: "BOSSステージ",
+        tutorialP7Body: "ステージ{casualBossStageNumber}（カジュアルモード）/ステージ{storyBossStageNumber}（ストーリーモード）はBOSSステージです。\nこれまでのステージで余った「残り時間+長考の合計」が制限時間になります。正解すればゲームクリアです！",
+
+        tutorialVisualExample: "図解",
+        tutorialVisualHand: "手牌（13枚）",
+        tutorialVisualWait: "待ち牌",
+        tutorialVisualCandidates: "候補（1〜9）",
+        tutorialVisualSelected: "選択中",
+        tutorialVisualUsedFour: "手牌で4枚使い切り",
+        tutorialVisualNotWait: "この牌は待ちにならない",
+        tutorialVisualFlow1: "4枚使い牌を除外",
+        tutorialVisualFlow2: "1〜9を仮追加",
+        tutorialVisualFlow3: "4面子1雀頭で判定",
+        tutorialPatternRyanmen: "両面 34 → 2/5",
+        tutorialPatternKanchan: "嵌張 35 → 4",
+        tutorialPatternPenchanA: "辺張 12 → 3",
+        tutorialPatternPenchanB: "辺張 89 → 7",
+        tutorialPatternShanpon: "双碰 44+77 → 4/7",
+        tutorialPatternTanki: "単騎 6 → 6",
+        tutorialRealTitle: "実戦問題（手順で解く）",
+        tutorialRealBody: "この13枚は実戦で出る形です。\n先に自力で待ちを考えてから、下の『ヒント』→『答え』を押して確認してください。",
+        tutorialRealHintBtn: "ヒントを表示",
+        tutorialRealAnswerBtn: "答えを表示",
+        tutorialRealNewBtn: "別の問題",
+        tutorialRealResetBtn: "最初から",
+        tutorialRealHintUsedFour: "ヒント：{tiles} は手牌で4枚使っているので、待ち候補から除外します。",
+        tutorialRealHintNoUsedFour: "ヒント：4枚使い切りの牌はありません。1〜9 を順に仮追加して判定しましょう。",
+        tutorialRealAnswerText: "正解：待ちは {waits}。",
+        tutorialRealBreakdownTitle: "待ち牌ごとの分解（4面子1雀頭）"
     },
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v1.6.0212.0",
+        gameVersion: "v1.6.0213.0",
         scoreVersionLabel: "Scoring Version",
         scoreVersion: "1.0",
         selectMode: "Select Mode",
@@ -188,19 +221,52 @@ const translations = {
         tutorialP2Title: "Controls",
         tutorialP2Body: "1) Tap the tile icons (1-9) to select your waits.\n2) Tap 'Submit' to check your answer.\n\nTips:\n- Tap a selected tile again to unselect it.\n- If time runs out, your current selection will be auto-submitted.",
 
-        tutorialP3Title: "Difficulty Levels",
-        tutorialP3Body: "Easy: Up to 3-way waits.\nMedium: Up to 6-way waits.\nHard: Up to 9-way waits.\n\nIn Story Mode, the difficulty increases every {storyDifficultyStep} stages.",
+        tutorialP3Title: "How to Judge Waits (Beginner Flow)",
+        tutorialP3Body: "When unsure, follow this exact flow.\n1) Exclude tiles already used 4 times in your hand.\n2) Try adding each tile 1-9 (one at a time) to make 14 tiles.\n3) A tile is a valid wait only if the hand can be split into 4 melds + 1 pair.\n\nYou can clear most problems with just this method.",
 
-        tutorialP4Title: "Think Time (+{timeExtensionSeconds}s)",
-        tutorialP4Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Gain 1 charge every 5 stages (Stage 1/6/11...).\n- Use it when the timer turns red.",
+        tutorialP4Title: "Common Wait Shapes (Local Patterns)",
+        tutorialP4Body: "Spotting small patterns is faster than reading all 13 tiles at once.\n- Ryanmen (open wait): 34 -> 2/5\n- Kanchan (closed wait): 35 -> 4\n- Penchan (edge wait): 12 -> 3, 89 -> 7\n- Shanpon (pair wait): 44 + 77 -> 4/7\n- Tanki (single wait): 6 -> 6",
 
-        tutorialP5Title: "The BOSS Stage",
-        tutorialP5Body: "Stage {casualBossStageNumber} (Casual Mode) / Stage {storyBossStageNumber} (Story Mode) is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!"
+        tutorialP5Title: "Difficulty Levels",
+        tutorialP5Body: "Easy: Up to 3-way waits.\nMedium: Up to 6-way waits.\nHard: Up to 9-way waits.\n\nIn Story Mode, the difficulty increases every {storyDifficultyStep} stages.",
+
+        tutorialP6Title: "Think Time (+{timeExtensionSeconds}s)",
+        tutorialP6Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Gain 1 charge every 5 stages (Stage 1/6/11...).\n- Use it when the timer turns red.",
+
+        tutorialP7Title: "The BOSS Stage",
+        tutorialP7Body: "Stage {casualBossStageNumber} (Casual Mode) / Stage {storyBossStageNumber} (Story Mode) is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!",
+
+        tutorialVisualExample: "Visual Guide",
+        tutorialVisualHand: "Hand (13 tiles)",
+        tutorialVisualWait: "Wait tile",
+        tutorialVisualCandidates: "Candidates (1-9)",
+        tutorialVisualSelected: "Selected",
+        tutorialVisualUsedFour: "Already used 4 copies",
+        tutorialVisualNotWait: "Cannot be a wait",
+        tutorialVisualFlow1: "Exclude tiles used 4 times",
+        tutorialVisualFlow2: "Try adding 1-9",
+        tutorialVisualFlow3: "Check 4 melds + 1 pair",
+        tutorialPatternRyanmen: "Ryanmen 34 -> 2/5",
+        tutorialPatternKanchan: "Kanchan 35 -> 4",
+        tutorialPatternPenchanA: "Penchan 12 -> 3",
+        tutorialPatternPenchanB: "Penchan 89 -> 7",
+        tutorialPatternShanpon: "Shanpon 44+77 -> 4/7",
+        tutorialPatternTanki: "Tanki 6 -> 6",
+        tutorialRealTitle: "Practice Question (Step-by-Step)",
+        tutorialRealBody: "This is a realistic 13-tile hand.\nTry solving it first, then use 'Show Hint' and 'Show Answer' below.",
+        tutorialRealHintBtn: "Show Hint",
+        tutorialRealAnswerBtn: "Show Answer",
+        tutorialRealNewBtn: "New Question",
+        tutorialRealResetBtn: "Reset",
+        tutorialRealHintUsedFour: "Hint: {tiles} is already used 4 times in hand, so exclude it from wait candidates.",
+        tutorialRealHintNoUsedFour: "Hint: No tile is used 4 times. Try adding 1-9 one by one and test each shape.",
+        tutorialRealAnswerText: "Answer: waits are {waits}.",
+        tutorialRealBreakdownTitle: "Breakdown per wait (4 melds + 1 pair)"
     },
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v1.6.0212.0",
+        gameVersion: "v1.6.0213.0",
         scoreVersionLabel: "計分版本",
         scoreVersion: "1.0",
         selectMode: "請選擇遊戲模式",
@@ -286,14 +352,47 @@ const translations = {
         tutorialP2Title: "操作方式",
         tutorialP2Body: "1) 點擊下方1至9的麻雀牌，選出所有聽牌\n2) 點擊「確認答案」進行判定\n\n提示：\n・再次點擊已選中的牌可取消選擇\n・時間結束時，若已有選牌會自動提交",
 
-        tutorialP3Title: "難度說明",
-        tutorialP3Body: "初級：最多聽3張\n中級：最多聽6張\n高級：最多聽9張\n\n在「闖關模式」中，難度會隨著關卡進度提升。",
+        tutorialP3Title: "新手判斷流程（重點）",
+        tutorialP3Body: "如果不確定聽哪張，就照這個流程：\n1) 先排除「手牌已用滿4張」的牌\n2) 把 1~9 各自『假設補1張』，變成14張\n3) 只有能拆成「4組面子 + 1組雀頭」的牌，才是正確聽牌\n\n先熟這三步，解題成功率會明顯提升。",
 
-        tutorialP4Title: "思考時間",
-        tutorialP4Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・每 5 關（第 1/6/11... 關）才增加 1 次\n・時間快結束時，按鈕會閃爍提示",
+        tutorialP4Title: "常見待型（局部記憶）",
+        tutorialP4Body: "先看局部形狀，通常比整副牌硬算更快。\n・兩面：34 → 2/5\n・嵌張：35 → 4\n・邊張：12 → 3、89 → 7\n・雙碰：44 + 77 → 4/7\n・單騎：6 → 6",
 
-        tutorialP5Title: "BOSS關卡",
-        tutorialP5Body: "第{casualBossStageNumber}關 (休閒模式) / 第{storyBossStageNumber}關 (闖關模式) 為BOSS關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！"
+        tutorialP5Title: "難度說明",
+        tutorialP5Body: "初級：最多聽3張\n中級：最多聽6張\n高級：最多聽9張\n\n在「闖關模式」中，難度會隨著關卡進度提升。",
+
+        tutorialP6Title: "思考時間",
+        tutorialP6Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・每 5 關（第 1/6/11... 關）才增加 1 次\n・時間快結束時，按鈕會閃爍提示",
+
+        tutorialP7Title: "BOSS關卡",
+        tutorialP7Body: "第{casualBossStageNumber}關 (休閒模式) / 第{storyBossStageNumber}關 (闖關模式) 為BOSS關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！",
+
+        tutorialVisualExample: "圖解",
+        tutorialVisualHand: "手牌（13張）",
+        tutorialVisualWait: "聽牌",
+        tutorialVisualCandidates: "候選（1~9）",
+        tutorialVisualSelected: "目前選擇",
+        tutorialVisualUsedFour: "手牌已用滿4張",
+        tutorialVisualNotWait: "這張不能當聽牌",
+        tutorialVisualFlow1: "先排除用滿4張的牌",
+        tutorialVisualFlow2: "把1~9逐張假設補入",
+        tutorialVisualFlow3: "檢查是否成4面子+1雀頭",
+        tutorialPatternRyanmen: "兩面 34 → 2/5",
+        tutorialPatternKanchan: "嵌張 35 → 4",
+        tutorialPatternPenchanA: "邊張 12 → 3",
+        tutorialPatternPenchanB: "邊張 89 → 7",
+        tutorialPatternShanpon: "雙碰 44+77 → 4/7",
+        tutorialPatternTanki: "單騎 6 → 6",
+        tutorialRealTitle: "實戰題（按步驟解）",
+        tutorialRealBody: "這是常見的13張手牌題型。\n請先自行判斷，再按下方『顯示提示』→『顯示答案』核對。",
+        tutorialRealHintBtn: "顯示提示",
+        tutorialRealAnswerBtn: "顯示答案",
+        tutorialRealNewBtn: "換一題",
+        tutorialRealResetBtn: "重設",
+        tutorialRealHintUsedFour: "提示：{tiles} 在手牌中已經出現4張，因此要先從候選中排除。",
+        tutorialRealHintNoUsedFour: "提示：沒有牌被用滿4張，請把 1~9 逐張假設補入再判斷。",
+        tutorialRealAnswerText: "答案：聽 {waits}。",
+        tutorialRealBreakdownTitle: "各聽牌拆解（4面子+1雀頭）"
     }
 };
 
@@ -337,6 +436,8 @@ function getStoryDifficultyForStage(stageNumber) {
 }
 
 let tutorialPageIndex = 0;
+let tutorialRealQuestionStep = 0;
+let tutorialRealQuestionData = null;
 
 function getQueryParam(name) {
     try {
@@ -433,12 +534,404 @@ function getResultActionElements() {
 
 function getTutorialPages() {
     return [
-        { title: t('tutorialP1Title'), body: t('tutorialP1Body') },
-        { title: t('tutorialP2Title'), body: t('tutorialP2Body') },
-        { title: t('tutorialP3Title'), body: t('tutorialP3Body') },
-        { title: t('tutorialP4Title'), body: t('tutorialP4Body') },
-        { title: t('tutorialP5Title'), body: t('tutorialP5Body') }
+        { title: t('tutorialP1Title'), body: t('tutorialP1Body'), visualType: 'goal' },
+        { title: t('tutorialP2Title'), body: t('tutorialP2Body'), visualType: 'controls' },
+        { title: t('tutorialP3Title'), body: t('tutorialP3Body'), visualType: 'flow' },
+        { title: t('tutorialP4Title'), body: t('tutorialP4Body'), visualType: 'patterns' },
+        { title: t('tutorialRealTitle'), body: t('tutorialRealBody'), visualType: 'realQuestion' },
+        { title: t('tutorialP5Title'), body: t('tutorialP5Body') },
+        { title: t('tutorialP6Title'), body: t('tutorialP6Body') },
+        { title: t('tutorialP7Title'), body: t('tutorialP7Body') }
     ];
+}
+
+function buildCountsFromTiles(tiles) {
+    const counts = {};
+    for (let i = 1; i <= 9; i++) counts[i] = 0;
+    for (const tile of tiles || []) {
+        if (Number.isInteger(tile) && tile >= 1 && tile <= 9) counts[tile]++;
+    }
+    return counts;
+}
+
+function solveTutorialHand(tiles) {
+    const counts = buildCountsFromTiles(tiles);
+    return {
+        hand: Array.isArray(tiles) ? tiles.slice() : [],
+        waits: calculateWinningTiles(counts),
+        counts
+    };
+}
+
+function getExhaustedTilesFromCounts(counts) {
+    const exhausted = [];
+    for (let tile = 1; tile <= 9; tile++) {
+        if ((counts?.[tile] || 0) >= 4) exhausted.push(tile);
+    }
+    return exhausted;
+}
+
+function generateTutorialRealQuestion() {
+    const backupHand = gameState.hand;
+    const backupCounts = gameState.counts;
+    const backupWaiting = gameState.waitingTiles;
+
+    try {
+        const generated = generateTenpaiHand('easy');
+        const hand = Array.isArray(generated?.hand)
+            ? generated.hand.slice().sort((a, b) => a - b)
+            : [1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9];
+        const counts = buildCountsFromTiles(hand);
+        const waits = calculateWinningTiles(counts);
+        return {
+            hand,
+            counts,
+            waits,
+            exhausted: getExhaustedTilesFromCounts(counts)
+        };
+    } catch {
+        const fallback = solveTutorialHand([1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9]);
+        return {
+            hand: fallback.hand.slice().sort((a, b) => a - b),
+            counts: fallback.counts,
+            waits: fallback.waits,
+            exhausted: getExhaustedTilesFromCounts(fallback.counts)
+        };
+    } finally {
+        gameState.hand = backupHand;
+        gameState.counts = backupCounts;
+        gameState.waitingTiles = backupWaiting;
+    }
+}
+
+function getTutorialRealQuestionData({ forceNew = false } = {}) {
+    if (!tutorialRealQuestionData || forceNew) {
+        tutorialRealQuestionData = generateTutorialRealQuestion();
+    }
+    return tutorialRealQuestionData;
+}
+
+function createTutorialMiniTile(tileNumber, { selected = false, disabled = false, crossed = false } = {}) {
+    const tile = document.createElement('span');
+    tile.className = 'tutorial-mini-tile';
+    if (selected) tile.classList.add('is-selected');
+    if (disabled) tile.classList.add('is-disabled');
+    if (crossed) tile.classList.add('is-crossed');
+
+    const tileInfo = getTileInfo('pin', tileNumber);
+    tile.appendChild(createTileImage(tileInfo));
+    tile.title = tileInfo.name;
+    return tile;
+}
+
+function createTutorialTileRow({ label, tiles, selected = [], disabled = [], crossed = [] }) {
+    const row = document.createElement('div');
+    row.className = 'tutorial-tile-row';
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'tutorial-row-label';
+    labelEl.textContent = label || '';
+    row.appendChild(labelEl);
+
+    const tilesWrap = document.createElement('div');
+    tilesWrap.className = 'tutorial-row-tiles';
+
+    const selectedSet = new Set(selected);
+    const disabledSet = new Set(disabled);
+    const crossedSet = new Set(crossed);
+    for (const number of tiles || []) {
+        tilesWrap.appendChild(createTutorialMiniTile(number, {
+            selected: selectedSet.has(number),
+            disabled: disabledSet.has(number),
+            crossed: crossedSet.has(number)
+        }));
+    }
+
+    row.appendChild(tilesWrap);
+    return row;
+}
+
+function createTutorialChipRow(chips) {
+    const chipRow = document.createElement('div');
+    chipRow.className = 'tutorial-chip-row';
+    for (const text of chips || []) {
+        const chip = document.createElement('span');
+        chip.className = 'tutorial-chip';
+        chip.textContent = text;
+        chipRow.appendChild(chip);
+    }
+    return chipRow;
+}
+
+function createTutorialPatternItem({ label, core, waits }) {
+    const item = document.createElement('div');
+    item.className = 'tutorial-pattern-item';
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'tutorial-pattern-label';
+    labelEl.textContent = label || '';
+    item.appendChild(labelEl);
+
+    const groups = document.createElement('div');
+    groups.className = 'tutorial-pattern-groups';
+
+    const coreWrap = document.createElement('div');
+    coreWrap.className = 'tutorial-row-tiles';
+    for (const number of core || []) {
+        coreWrap.appendChild(createTutorialMiniTile(number));
+    }
+
+    const arrow = document.createElement('div');
+    arrow.className = 'tutorial-pattern-arrow';
+    arrow.textContent = '→';
+
+    const waitWrap = document.createElement('div');
+    waitWrap.className = 'tutorial-row-tiles';
+    for (const number of waits || []) {
+        waitWrap.appendChild(createTutorialMiniTile(number, { selected: true }));
+    }
+
+    groups.appendChild(coreWrap);
+    groups.appendChild(arrow);
+    groups.appendChild(waitWrap);
+    item.appendChild(groups);
+
+    return item;
+}
+
+function getTutorialMeldLabel(tiles, isHead = false) {
+    if (isHead) return t('head');
+    if (!Array.isArray(tiles) || tiles.length === 0) return t('meld');
+    if (tiles.length === 2) return t('pair');
+    if (tiles.length === 3 && tiles[0] === tiles[1] && tiles[1] === tiles[2]) return t('triplet');
+    if (tiles.length === 3) return t('sequence');
+    return t('meld');
+}
+
+function createTutorialBreakdownGroup(tiles, { isHead = false } = {}) {
+    const group = document.createElement('div');
+    group.className = 'tutorial-breakdown-group';
+
+    const label = document.createElement('div');
+    label.className = 'tutorial-breakdown-label';
+    label.textContent = getTutorialMeldLabel(tiles, isHead);
+    group.appendChild(label);
+
+    const row = document.createElement('div');
+    row.className = 'tutorial-row-tiles';
+    for (const tile of tiles || []) {
+        row.appendChild(createTutorialMiniTile(tile));
+    }
+    group.appendChild(row);
+
+    return group;
+}
+
+function renderTutorialVisual(page) {
+    const visualEl = getElementByIdCached('tutorial-page-visual');
+    if (!visualEl) return;
+
+    visualEl.innerHTML = '';
+    if (!page || !page.visualType) {
+        visualEl.classList.add('hidden');
+        return;
+    }
+
+    visualEl.classList.remove('hidden');
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'tutorial-visual-title';
+    titleEl.textContent = t('tutorialVisualExample');
+    visualEl.appendChild(titleEl);
+
+    if (page.visualType === 'goal') {
+        const solved = solveTutorialHand([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5]);
+        visualEl.appendChild(createTutorialTileRow({
+            label: t('tutorialVisualHand'),
+            tiles: solved.hand
+        }));
+        visualEl.appendChild(createTutorialTileRow({
+            label: t('tutorialVisualWait'),
+            tiles: solved.waits,
+            selected: solved.waits
+        }));
+        return;
+    }
+
+    if (page.visualType === 'controls') {
+        visualEl.appendChild(createTutorialTileRow({
+            label: t('tutorialVisualCandidates'),
+            tiles: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            selected: [5]
+        }));
+        visualEl.appendChild(createTutorialTileRow({
+            label: t('tutorialVisualSelected'),
+            tiles: [5],
+            selected: [5]
+        }));
+        return;
+    }
+
+    if (page.visualType === 'flow') {
+        visualEl.appendChild(createTutorialChipRow([
+            t('tutorialVisualFlow1'),
+            t('tutorialVisualFlow2'),
+            t('tutorialVisualFlow3')
+        ]));
+        visualEl.appendChild(createTutorialTileRow({
+            label: t('tutorialVisualUsedFour'),
+            tiles: [5, 5, 5, 5],
+            disabled: [5],
+            crossed: [5]
+        }));
+        visualEl.appendChild(createTutorialTileRow({
+            label: t('tutorialVisualNotWait'),
+            tiles: [5],
+            disabled: [5],
+            crossed: [5]
+        }));
+        return;
+    }
+
+    if (page.visualType === 'patterns') {
+        const items = [
+            { label: t('tutorialPatternRyanmen'), core: [3, 4], waits: [2, 5] },
+            { label: t('tutorialPatternKanchan'), core: [3, 5], waits: [4] },
+            { label: t('tutorialPatternPenchanA'), core: [1, 2], waits: [3] },
+            { label: t('tutorialPatternPenchanB'), core: [8, 9], waits: [7] },
+            { label: t('tutorialPatternShanpon'), core: [4, 4, 7, 7], waits: [4, 7] },
+            { label: t('tutorialPatternTanki'), core: [6], waits: [6] }
+        ];
+
+        for (const item of items) {
+            visualEl.appendChild(createTutorialPatternItem(item));
+        }
+        return;
+    }
+
+    if (page.visualType === 'realQuestion') {
+        const question = getTutorialRealQuestionData();
+        const hand = question.hand;
+        const candidates = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        const exhausted = question.exhausted || [];
+
+        const step = Math.max(0, Math.min(2, tutorialRealQuestionStep || 0));
+        tutorialRealQuestionStep = step;
+
+        visualEl.appendChild(createTutorialTileRow({
+            label: t('tutorialVisualHand'),
+            tiles: hand
+        }));
+
+        visualEl.appendChild(createTutorialTileRow({
+            label: t('tutorialVisualCandidates'),
+            tiles: candidates,
+            disabled: step >= 1 ? exhausted : [],
+            crossed: step >= 1 ? exhausted : [],
+            selected: step >= 2 ? question.waits : []
+        }));
+
+        const message = document.createElement('div');
+        message.className = 'tutorial-visual-text';
+        if (step >= 2) {
+            message.textContent = t('tutorialRealAnswerText', { waits: (question.waits || []).join(' / ') });
+        } else if (step >= 1) {
+            if (exhausted.length > 0) {
+                message.textContent = t('tutorialRealHintUsedFour', { tiles: exhausted.join(' / ') });
+            } else {
+                message.textContent = t('tutorialRealHintNoUsedFour');
+            }
+        } else {
+            message.textContent = '';
+        }
+        visualEl.appendChild(message);
+
+        const controls = document.createElement('div');
+        controls.className = 'tutorial-chip-row';
+
+        const hintBtn = document.createElement('button');
+        hintBtn.type = 'button';
+        hintBtn.className = 'tutorial-step-btn';
+        hintBtn.textContent = t('tutorialRealHintBtn');
+        hintBtn.disabled = step >= 1;
+        hintBtn.addEventListener('click', () => {
+            tutorialRealQuestionStep = 1;
+            renderTutorialVisual(page);
+        });
+        controls.appendChild(hintBtn);
+
+        const answerBtn = document.createElement('button');
+        answerBtn.type = 'button';
+        answerBtn.className = 'tutorial-step-btn';
+        answerBtn.textContent = t('tutorialRealAnswerBtn');
+        answerBtn.disabled = step >= 2;
+        answerBtn.addEventListener('click', () => {
+            tutorialRealQuestionStep = 2;
+            renderTutorialVisual(page);
+        });
+        controls.appendChild(answerBtn);
+
+        const newBtn = document.createElement('button');
+        newBtn.type = 'button';
+        newBtn.className = 'tutorial-step-btn tutorial-step-btn--ghost';
+        newBtn.textContent = t('tutorialRealNewBtn');
+        newBtn.addEventListener('click', () => {
+            tutorialRealQuestionStep = 0;
+            getTutorialRealQuestionData({ forceNew: true });
+            renderTutorialVisual(page);
+        });
+        controls.appendChild(newBtn);
+
+        if (step > 0) {
+            const resetBtn = document.createElement('button');
+            resetBtn.type = 'button';
+            resetBtn.className = 'tutorial-step-btn tutorial-step-btn--ghost';
+            resetBtn.textContent = t('tutorialRealResetBtn');
+            resetBtn.addEventListener('click', () => {
+                tutorialRealQuestionStep = 0;
+                renderTutorialVisual(page);
+            });
+            controls.appendChild(resetBtn);
+        }
+
+        visualEl.appendChild(controls);
+
+        if (step >= 2) {
+            const breakdownWrap = document.createElement('div');
+            breakdownWrap.className = 'tutorial-breakdown-wrap';
+
+            const breakdownTitle = document.createElement('div');
+            breakdownTitle.className = 'tutorial-breakdown-title';
+            breakdownTitle.textContent = t('tutorialRealBreakdownTitle');
+            breakdownWrap.appendChild(breakdownTitle);
+
+            for (const waitTile of question.waits || []) {
+                const item = document.createElement('div');
+                item.className = 'tutorial-breakdown-item';
+
+                const waitHeader = document.createElement('div');
+                waitHeader.className = 'tutorial-breakdown-wait';
+                waitHeader.textContent = `${t('winningTile')} `;
+                waitHeader.appendChild(createTutorialMiniTile(waitTile, { selected: true }));
+                item.appendChild(waitHeader);
+
+                const breakdown = getWinningHandBreakdown([...(question.hand || []), waitTile]);
+                if (breakdown) {
+                    const groups = document.createElement('div');
+                    groups.className = 'tutorial-breakdown-groups';
+                    groups.appendChild(createTutorialBreakdownGroup(breakdown.head, { isHead: true }));
+                    for (const meld of breakdown.melds || []) {
+                        groups.appendChild(createTutorialBreakdownGroup(meld));
+                    }
+                    item.appendChild(groups);
+                }
+
+                breakdownWrap.appendChild(item);
+            }
+
+            visualEl.appendChild(breakdownWrap);
+        }
+    }
 }
 
 function renderTutorialPage() {
@@ -463,6 +956,12 @@ function renderTutorialPage() {
     if (indicator) indicator.textContent = `${idx + 1}/${total}`;
     if (titleEl) titleEl.textContent = pages[idx].title || '';
     if (bodyEl) bodyEl.textContent = pages[idx].body || '';
+
+    if (!pages[idx].visualType || pages[idx].visualType !== 'realQuestion') {
+        tutorialRealQuestionStep = 0;
+        tutorialRealQuestionData = null;
+    }
+    renderTutorialVisual(pages[idx]);
 
     if (prevText) prevText.textContent = t('tutorialPrev');
     if (nextText) nextText.textContent = (idx === total - 1) ? t('tutorialFinish') : t('tutorialNext');
@@ -3148,6 +3647,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!tutorialScreen) return;
         playSound('select');
         tutorialPageIndex = 0;
+        tutorialRealQuestionStep = 0;
+        tutorialRealQuestionData = null;
         tutorialScreen.classList.remove('hidden');
         tutorialScreen.classList.add('fade-in');
         tutorialScreen.setAttribute('aria-hidden', 'false');
