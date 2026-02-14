@@ -14,6 +14,7 @@ html {
 }
 
 body {
+    background-color: var(--theme-bg-deep);
     background:
         radial-gradient(circle at 20% 20%, rgba(242, 208, 138, 0.08) 0%, transparent 45%),
         radial-gradient(circle at 80% 80%, rgba(22, 82, 58, 0.35) 0%, transparent 55%),
@@ -187,6 +188,7 @@ body::before {
         repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 6px);
     animation: pulse-bg 8s ease-in-out infinite;
     z-index: -2;
+    pointer-events: none;
 }
 
 /* 回転する光のにじみ - ソフト版 */
@@ -201,6 +203,31 @@ body::after {
         radial-gradient(circle, rgba(217, 178, 111, 0.08) 0%, transparent 45%);
     animation: rotate-bg 30s linear infinite;
     z-index: -1;
+    pointer-events: none;
+}
+
+/* iOS / iPadOS Safari: avoid occasional white background artifacts from fixed pseudo layers + blur */
+body.ios-texture-compat {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(242, 208, 138, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(22, 82, 58, 0.35) 0%, transparent 55%),
+        linear-gradient(145deg, var(--theme-bg) 0%, var(--theme-bg-deep) 100%);
+}
+
+body.ios-texture-compat::before,
+body.ios-texture-compat::after {
+    display: none;
+}
+
+body.ios-texture-compat .screen-container,
+body.ios-texture-compat .tutorial-overlay,
+body.ios-texture-compat #result-section,
+body.ios-texture-compat .timer-container,
+body.ios-texture-compat .result-container,
+body.ios-texture-compat .victory-content,
+body.ios-texture-compat .gameover-content {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 /* 時間切迫時の背景エフェクト */
@@ -256,6 +283,7 @@ body.time-critical::after {
 /* ========== コンテナスタイル ========== */
 .screen-container {
     background: linear-gradient(135deg, rgba(15, 59, 42, 0.85) 0%, rgba(11, 32, 22, 0.75) 100%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
     backdrop-filter: blur(18px) saturate(140%);
     border-radius: 24px;
     padding: 3rem;

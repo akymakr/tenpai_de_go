@@ -3,6 +3,8 @@
 Mahjong tenpai training game.
 
 - Live demo: https://akymakr.github.io/tenpai_de_go/
+- Game version: v1.6.0214.0
+- Scoring version: 1.1
 
 ## Game Modes
 
@@ -22,9 +24,9 @@ Mahjong tenpai training game.
 - Endless questions
 - Start with 30 seconds, no lives
 - Time recovery on correct answers:
-  - Easy: +3s
-  - Medium: +6s
-  - Hard: +12s
+  - Easy: +4s
+  - Medium: +8s
+  - Hard: +16s
 
 ## BOSS Stage Rules
 
@@ -37,6 +39,7 @@ Mahjong tenpai training game.
 
 - Gain 1 charge every 5 stages (Stage 1/6/11...), no hard cap
 - Can be used during the BOSS stage
+- Available in Casual/Story only (disabled in Survival mode)
 
 ## Difficulty
 

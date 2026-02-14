@@ -4,9 +4,9 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v1.6.0213.1",
+        gameVersion: "v1.6.0214.0",
         scoreVersionLabel: "採点バージョン",
-        scoreVersion: "1.0",
+        scoreVersion: "1.1",
         selectMode: "モードを選択してください",
         casualMode: "カジュアル",
         casualDesc: "全{casualStagesBeforeBoss}問+BOSSステージ\n各問{casualStartSeconds}秒 / {lives}ライフ制",
@@ -100,7 +100,7 @@ const translations = {
         tutorialP5Body: "初級：最大3面張\n中級：最大6面張\n上級：最大9面張\n\nストーリーモードでは、ステージが進むごとに難易度が上がります。",
 
         tutorialP6Title: "長考",
-        tutorialP6Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・長考の回数は5ステージごと（第1/6/11...）に1回分だけ追加\n・残り時間が少なくなると迷わず使ってしまいましょう",
+        tutorialP6Body: "「長考」ボタンで回答時間を延長できます。\n・1回につき +{timeExtensionSeconds}秒\n・長考の回数は5ステージごと（第1/6/11...）に1回分だけ追加\n・使用できるのはカジュアル/ストーリーモードのみ（サバイバルでは使用不可）",
 
         tutorialP7Title: "BOSSステージ",
         tutorialP7Body: "ステージ{casualBossStageNumber}（カジュアルモード）/ステージ{storyBossStageNumber}（ストーリーモード）はBOSSステージです。\nこれまでのステージで余った「残り時間+長考の合計」が制限時間になります。正解すればゲームクリアです！",
@@ -130,6 +130,7 @@ const translations = {
         tutorialRealHintUsedFour: "ヒント：{tiles} は手牌で4枚使っているので、待ち候補から除外します。",
         tutorialRealHintNoUsedFour: "ヒント：4枚使い切りの牌はありません。",
         tutorialRealHintStructure: "ヒント：{tiles} は必要な形を作れないため先に除外できます（例：9待ちは 7/8 または 9 が必要）。",
+        tutorialRealHintFallback: "ヒント：この問題は明確な除外牌が少ない形です。中張（4/5/6）から順に仮追加して、4面子1雀頭になるかを確認しましょう。",
         tutorialRealAnswerText: "正解：待ちは {waits}。",
         tutorialRealBreakdownTitle: "待ち牌ごとの分解（4面子1雀頭）",
         tutorialWaitTierLabel: "教學難易度：",
@@ -141,16 +142,16 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v1.6.0213.1",
+        gameVersion: "v1.6.0214.0",
         scoreVersionLabel: "Scoring Version",
-        scoreVersion: "1.0",
+        scoreVersion: "1.1",
         selectMode: "Select Mode",
         casualMode: "Casual",
         casualDesc: "{casualStagesBeforeBoss} Questions + BOSS\n{casualStartSeconds}s each stage / {lives} Lives",
         storyMode: "Story",
         storyDesc: "Easy→Med→Hard ({storyDifficultyStep} stages each) + BOSS\n{storyStartSeconds}s each stage / {lives} Lives",
         survivalMode: "Survival",
-        survivalDesc: "Starting with {survivalStartSeconds}s\nThink Time +1 every 5 stages / No lives",
+        survivalDesc: "Starting with {survivalStartSeconds}s\nRecover time on correct answers / No lives",
         selectDifficulty: "Select Difficulty",
         easy: "Easy",
         easyDesc: "Up to 3-way waits",
@@ -237,7 +238,7 @@ const translations = {
         tutorialP5Body: "Easy: Up to 3-way waits.\nMedium: Up to 6-way waits.\nHard: Up to 9-way waits.\n\nIn Story Mode, the difficulty increases every {storyDifficultyStep} stages.",
 
         tutorialP6Title: "Think Time (+{timeExtensionSeconds}s)",
-        tutorialP6Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Gain 1 charge every 5 stages (Stage 1/6/11...).\n- Use it when the timer turns red.",
+        tutorialP6Body: "Use 'Think Time' to extend {timeExtensionSeconds} seconds to your current stage.\n- Gain 1 charge every 5 stages (Stage 1/6/11...).\n- Available in Casual/Story only (disabled in Survival mode).",
 
         tutorialP7Title: "The BOSS Stage",
         tutorialP7Body: "Stage {casualBossStageNumber} (Casual Mode) / Stage {storyBossStageNumber} (Story Mode) is the BOSS stage.\nYour time limit is the sum of all remaining time from previous stages. If you answer correctly, you win this game!",
@@ -267,6 +268,7 @@ const translations = {
         tutorialRealHintUsedFour: "Hint: {tiles} is already used 4 times in hand, so exclude it from wait candidates.",
         tutorialRealHintNoUsedFour: "Hint: No tile is used 4 times.",
         tutorialRealHintStructure: "Hint: {tiles} cannot form required shapes, so eliminate them first (e.g. waiting on 9 needs 7/8 or an existing 9).",
+        tutorialRealHintFallback: "Hint: This hand has few obvious eliminations. Start by testing middle tiles (4/5/6) and check whether the hand can become 4 melds + 1 pair.",
         tutorialRealAnswerText: "Answer: waits are {waits}.",
         tutorialRealBreakdownTitle: "Breakdown per wait (4 melds + 1 pair)",
         tutorialWaitTierLabel: "Tutorial Tier:",
@@ -278,9 +280,9 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v1.6.0213.1",
+        gameVersion: "v1.6.0214.0",
         scoreVersionLabel: "計分版本",
-        scoreVersion: "1.0",
+        scoreVersion: "1.1",
         selectMode: "請選擇遊戲模式",
         casualMode: "休閒模式",
         casualDesc: "全{casualStagesBeforeBoss}題 + BOSS關卡\n每題{casualStartSeconds}秒 / {lives}條生命",
@@ -374,7 +376,7 @@ const translations = {
         tutorialP5Body: "初級：最多聽3張\n中級：最多聽6張\n高級：最多聽9張\n\n在「闖關模式」中，難度會隨著關卡進度提升。",
 
         tutorialP6Title: "思考時間",
-        tutorialP6Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・每 5 關（第 1/6/11... 關）才增加 1 次\n・時間快結束時，按鈕會閃爍提示",
+        tutorialP6Body: "可使用思考時間按鈕延長該關卡的回答時間。\n・每次使用可增加{timeExtensionSeconds}秒\n・每 5 關（第 1/6/11... 關）才增加 1 次\n・僅限休閒/闖關模式可用（生存模式不可使用）",
 
         tutorialP7Title: "BOSS關卡",
         tutorialP7Body: "第{casualBossStageNumber}關 (休閒模式) / 第{storyBossStageNumber}關 (闖關模式) 為BOSS關卡。\n你的挑戰時間等於之前關卡「節省下來的總時間」。答對即可通關！",
@@ -404,6 +406,7 @@ const translations = {
         tutorialRealHintUsedFour: "提示：{tiles} 在手牌中已經出現4張，因此要先從候選中排除。",
         tutorialRealHintNoUsedFour: "提示：沒有牌被用滿4張。",
         tutorialRealHintStructure: "提示：{tiles} 無法形成必要形狀，可先淘汰（例如聽 9 至少要有 7/8 或已有 9）。",
+        tutorialRealHintFallback: "提示：這題明顯可淘汰的牌較少，建議先從中張（4/5/6）開始逐張假設補入，再檢查是否能成 4 面子 + 1 雀頭。",
         tutorialRealAnswerText: "答案：聽 {waits}。",
         tutorialRealBreakdownTitle: "各聽牌拆解（4面子+1雀頭）",
         tutorialWaitTierLabel: "教學難度：",
@@ -423,9 +426,9 @@ const gameConfig = {
     },
     lives: 3,
     survivalRecoverySeconds: {
-        easy: 3,
-        medium: 6,
-        hard: 12
+        easy: 4,
+        medium: 8,
+        hard: 16
     },
     timeExtensionSeconds: 30,
     // BOSS ステージ
@@ -509,6 +512,17 @@ function shouldEnableLowPowerMode() {
 
 function applyLowPowerClass() {
     document.body.classList.toggle('low-power', shouldEnableLowPowerMode());
+}
+
+function isIOSFamilyDevice() {
+    const ua = (navigator.userAgent || '').toLowerCase();
+    const isIOSUa = /iphone|ipad|ipod/.test(ua);
+    const isIpadOsDesktopMode = navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1;
+    return !!(isIOSUa || isIpadOsDesktopMode);
+}
+
+function applyIosTextureCompatibilityClass() {
+    document.body.classList.toggle('ios-texture-compat', isIOSFamilyDevice());
 }
 
 const domCache = new Map();
@@ -868,7 +882,7 @@ function renderTutorialVisual(page) {
         const exhausted = question.exhausted || [];
         const structural = (question.structurallyImpossible || []).filter((tile) => !exhausted.includes(tile));
         const eliminated = Array.from(new Set([...exhausted, ...structural]));
-        const hasHint = exhausted.length > 0 || structural.length > 0;
+        const hasHint = true;
 
         const step = Math.max(0, Math.min(2, tutorialRealQuestionStep || 0));
         tutorialRealQuestionStep = step;
@@ -903,8 +917,8 @@ function renderTutorialVisual(page) {
         } else if (step >= 1) {
             const lines = [];
             if (exhausted.length > 0) lines.push(t('tutorialRealHintUsedFour', { tiles: exhausted.join(' / ') }));
-            else lines.push(t('tutorialRealHintNoUsedFour'));
             if (structural.length > 0) lines.push(t('tutorialRealHintStructure', { tiles: structural.join(' / ') }));
+            if (lines.length === 0) lines.push(t('tutorialRealHintFallback'));
             message.textContent = lines.join('\n');
         } else {
             message.textContent = '';
@@ -1983,6 +1997,7 @@ function getTimeExtensionButtonLabel() {
 }
 
 function shouldGrantTimeExtensionForStage(stageNumber) {
+    if (gameState.mode === 'survival') return false;
     return Number.isInteger(stageNumber) && stageNumber > 0 && stageNumber % 5 === 1;
 }
 
@@ -3088,6 +3103,19 @@ function updateTimeExtensionButton() {
     const countSpan = timeExtensionDom.count;
     if (!extensionBtn || !textSpan) return;
 
+    const isAvailableMode = gameState.mode !== 'survival';
+    if (timeExtensionDom.slot) {
+        timeExtensionDom.slot.classList.toggle('hidden', !isAvailableMode);
+    }
+    if (!isAvailableMode) {
+        extensionBtn.disabled = true;
+        extensionBtn.classList.remove('attention', 'cooldown');
+        textSpan.textContent = getTimeExtensionButtonLabel();
+        if (cooldownSpan) cooldownSpan.classList.add('hidden');
+        if (countSpan) countSpan.textContent = 'x0';
+        return;
+    }
+
     const active = isActiveQuestion();
     const cooldownRemainingMs = getTimeExtensionCooldownRemainingMs();
     const isCoolingDown = cooldownRemainingMs > 0;
@@ -3140,6 +3168,7 @@ function updateTimeExtensionButton() {
 }
 
 function useTimeExtension() {
+    if (gameState.mode === 'survival') return;
     if (!isActiveQuestion()) return;
     if (gameState.timeExtensions <= 0 || gameState.isAnswered) return;
     if (getTimeExtensionCooldownRemainingMs() > 0) return;
@@ -3636,6 +3665,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (languageScreen) languageScreen.classList.add('hidden');
 
     applyLowPowerClass();
+    applyIosTextureCompatibilityClass();
     // prefers-reduced-motion の変更にも追随
     try {
         const m = window.matchMedia?.('(prefers-reduced-motion: reduce)');
