@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v1.6.0214.0",
+        gameVersion: "v2.0.60312.0",
         scoreVersionLabel: "採点バージョン",
         scoreVersion: "1.1",
         selectMode: "モードを選択してください",
@@ -142,7 +142,7 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v1.6.0214.0",
+        gameVersion: "v2.0.60312.0",
         scoreVersionLabel: "Scoring Version",
         scoreVersion: "1.1",
         selectMode: "Select Mode",
@@ -280,7 +280,7 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v1.6.0214.0",
+        gameVersion: "v2.0.60312.0",
         scoreVersionLabel: "計分版本",
         scoreVersion: "1.1",
         selectMode: "請選擇遊戲模式",
@@ -1440,10 +1440,9 @@ const tileNames = {
     }
 };
 
-// アセット（assets/）配下を事前にすべてプリロードして、プレイ中の引っかかりを防ぐ
+// アセット（assets/）配下を事前にプリロードして、プレイ中の引っかかりを防ぐ
 //（ブラウザ上では実行時にディレクトリ一覧を取得できないため、静的リストにする）
 const ASSET_FILES = [
-    // Images only (audio is initialized lazily on interaction)
     'Back.png', 'Blank.png', 'Chun.png',
     'Front.png', 'Haku.png', 'Hatsu.png',
     'Man1.png', 'Man2.png', 'Man3.png', 'Man4.png', 'Man5-Dora.png', 'Man5.png', 'Man6.png', 'Man7.png', 'Man8.png', 'Man9.png',
@@ -1452,6 +1451,18 @@ const ASSET_FILES = [
     'Shaa.png',
     'Sou1.png', 'Sou2.png', 'Sou3.png', 'Sou4.png', 'Sou5-Dora.png', 'Sou5.png', 'Sou6.png', 'Sou7.png', 'Sou8.png', 'Sou9.png',
     'Ton.png'
+];
+
+const AUDIO_ASSET_ENTRIES = [
+    ['select', 'assets/select.mp3'],
+    ['tap', 'assets/tap.mp3'],
+    ['correct', 'assets/correct.mp3'],
+    ['incorrect', 'assets/incorrect.mp3'],
+    ['continue', 'assets/continue.mp3'],
+    ['gameover', 'assets/gameover.mp3'],
+    ['victory', 'assets/victory.mp3'],
+    ['timeup', 'assets/timeup.mp3'],
+    ['timer', 'assets/timer.mp3']
 ];
 
 function preloadImage(url) {
@@ -1463,9 +1474,63 @@ function preloadImage(url) {
     });
 }
 
+const audioAssetArrayBuffers = new Map();
+const audioAssetFetchPromises = new Map();
+
+// 同じ音声を preload と初回再生で二重取得しないよう、ArrayBuffer を共有する。
+async function fetchAudioAssetArrayBuffer(name, src) {
+    if (audioAssetArrayBuffers.has(name)) return audioAssetArrayBuffers.get(name);
+    if (audioAssetFetchPromises.has(name)) return audioAssetFetchPromises.get(name);
+
+    const promise = (async () => {
+        try {
+            const res = await fetch(src, { cache: 'force-cache' });
+            if (!res || !res.ok) return null;
+            const arrayBuf = await res.arrayBuffer();
+            audioAssetArrayBuffers.set(name, arrayBuf);
+            return arrayBuf;
+        } catch {
+            return null;
+        } finally {
+            audioAssetFetchPromises.delete(name);
+        }
+    })();
+
+    audioAssetFetchPromises.set(name, promise);
+    return promise;
+}
+
+async function ensureWebAudioBuffer(name, src) {
+    if (webAudioBuffers.has(name)) return true;
+
+    const arrayBuf = await fetchAudioAssetArrayBuffer(name, src);
+    if (!arrayBuf) return false;
+
+    // AudioContext が使える端末だけ先に decode しておき、初回再生の待ちを減らす。
+    const ctx = webAudioCtx;
+    if (!ctx) return false;
+    if (webAudioBuffers.has(name)) return true;
+
+    try {
+        const buf = await new Promise((resolve, reject) => {
+            try {
+                ctx.decodeAudioData(arrayBuf.slice(0), resolve, reject);
+            } catch (e) {
+                reject(e);
+            }
+        });
+        webAudioBuffers.set(name, buf);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 async function preloadAssets({ onProgress } = {}) {
-    const urls = ASSET_FILES.map((f) => `assets/${f}`);
-    const total = urls.length;
+    const imageEntries = ASSET_FILES.map((f) => ({ type: 'image', url: `assets/${f}` }));
+    const audioEntries = AUDIO_ASSET_ENTRIES.map(([name, src]) => ({ type: 'audio', name, url: src }));
+    const tasks = [...imageEntries, ...audioEntries];
+    const total = tasks.length;
     let loaded = 0;
 
     const report = () => {
@@ -1475,20 +1540,19 @@ async function preloadAssets({ onProgress } = {}) {
 
     // 画面操作の反応を落とさない程度の並列数に抑える
     const concurrency = shouldEnableLowPowerMode() ? 3 : 6;
-    const queue = urls.slice();
+    const queue = tasks.slice();
 
     const worker = async () => {
         while (queue.length) {
-            const url = queue.shift();
+            const task = queue.shift();
             try {
-                if (url.endsWith('.png')) {
-                    await preloadImage(url);
+                if (!task) continue;
+
+                if (task.type === 'image') {
+                    await preloadImage(task.url);
                 } else {
-                    // 取得してブラウザキャッシュを温める
-                    const res = await fetch(url, { cache: 'force-cache' });
-                    if (res && res.ok) {
-                        await res.blob();
-                    }
+                    // preload 中は通信とブラウザキャッシュだけ温め、AudioContext は作らない。
+                    await fetchAudioAssetArrayBuffer(task.name, task.url);
                 }
             } catch {
                 // 個別のアセット読み込み失敗は無視して、ゲーム自体は続行できるようにする
@@ -1523,18 +1587,25 @@ function pickRandomTileType() {
 const soundConfig = {
     // 重ね再生を許可する場合、プールが埋まっていれば一時的に追加インスタンスを生成して同時に鳴らす
     // 方針：効果音はすべて重ね再生を許可し、必要な転場タイミングで明示的に止める
-    select: { src: 'assets/select.mp3', pool: 4, allowOverlap: true, maxExtra: 6 },
-    tap: { src: 'assets/tap.mp3', pool: 6, allowOverlap: true, maxExtra: 8 },
-    correct: { src: 'assets/correct.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
-    incorrect: { src: 'assets/incorrect.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
-    continue: { src: 'assets/continue.mp3', pool: 2, allowOverlap: true, maxExtra: 2 },
-    gameover: { src: 'assets/gameover.mp3', pool: 2, allowOverlap: true, maxExtra: 0 },
-    victory: { src: 'assets/victory.mp3', pool: 2, allowOverlap: true, maxExtra: 0 },
-    timeup: { src: 'assets/timeup.mp3', pool: 2, allowOverlap: true, maxExtra: 1 }
+    select: { src: 'assets/select.mp3', pool: 4, allowOverlap: true, maxExtra: 6, bus: 'ui', volume: 0.95 },
+    tap: { src: 'assets/tap.mp3', pool: 6, allowOverlap: true, maxExtra: 8, bus: 'ui', volume: 0.92 },
+    correct: { src: 'assets/correct.mp3', pool: 2, allowOverlap: true, maxExtra: 2, bus: 'sfx', volume: 1, duckTimerFactor: 0.28, duckTimerMs: 900 },
+    incorrect: { src: 'assets/incorrect.mp3', pool: 2, allowOverlap: true, maxExtra: 2, bus: 'sfx', volume: 1, duckTimerFactor: 0.34, duckTimerMs: 850 },
+    continue: { src: 'assets/continue.mp3', pool: 2, allowOverlap: true, maxExtra: 2, bus: 'ui', volume: 0.98, duckTimerFactor: 0.45, duckTimerMs: 500 },
+    gameover: { src: 'assets/gameover.mp3', pool: 2, allowOverlap: true, maxExtra: 0, bus: 'sfx', volume: 1, duckTimerFactor: 0.2, duckTimerMs: 1200 },
+    victory: { src: 'assets/victory.mp3', pool: 2, allowOverlap: true, maxExtra: 0, bus: 'sfx', volume: 1, duckTimerFactor: 0.2, duckTimerMs: 1200 },
+    timeup: { src: 'assets/timeup.mp3', pool: 2, allowOverlap: true, maxExtra: 1, bus: 'sfx', volume: 1, duckTimerFactor: 0.12, duckTimerMs: 1400 }
 };
 
 const soundPools = new Map();
 const extraSoundInstances = new Map();
+
+const audioBusVolumes = {
+    master: 1,
+    ui: 0.96,
+    sfx: 1,
+    timer: 0.78
+};
 
 let audioUnlocked = false;
 let soundsInitialized = false;
@@ -1545,8 +1616,14 @@ let timerInitialized = false;
 const WebAudioCtx = window.AudioContext || window.webkitAudioContext;
 let webAudioCtx = null;
 let webAudioMasterGain = null;
+let webAudioUiGain = null;
+let webAudioSfxGain = null;
+let webAudioTimerGain = null;
 const webAudioBuffers = new Map(); // name -> AudioBuffer
 let webAudioLoadPromise = null;
+let audioUnlockPromise = null;
+let timerDuckTimeoutId = 0;
+let timerDuckFactor = 1;
 
 // allowOverlap=false の音だけ「多重再生を抑制」するためのトラッキング
 const webAudioNonOverlapActive = new Map(); // name -> { source: AudioBufferSourceNode }
@@ -1557,53 +1634,125 @@ const webAudioActiveSources = new Map(); // name -> Set<AudioBufferSourceNode>
 // タイマー（ループ）用
 let timerWebAudioSource = null;
 
+function getAudioBusName(name) {
+    if (name === 'timer') return 'timer';
+    return soundConfig[name]?.bus || 'sfx';
+}
+
+// UI / 効果音 / タイマーをバス分離しておくと、後段で個別に音量制御しやすい。
+function ensureWebAudioBusGraph(ctx) {
+    if (webAudioMasterGain && webAudioUiGain && webAudioSfxGain && webAudioTimerGain) return;
+
+    webAudioMasterGain = ctx.createGain();
+    webAudioUiGain = ctx.createGain();
+    webAudioSfxGain = ctx.createGain();
+    webAudioTimerGain = ctx.createGain();
+
+    webAudioMasterGain.gain.value = audioBusVolumes.master;
+    webAudioUiGain.gain.value = audioBusVolumes.ui;
+    webAudioSfxGain.gain.value = audioBusVolumes.sfx;
+    webAudioTimerGain.gain.value = audioBusVolumes.timer * timerDuckFactor;
+
+    webAudioUiGain.connect(webAudioMasterGain);
+    webAudioSfxGain.connect(webAudioMasterGain);
+    webAudioTimerGain.connect(webAudioMasterGain);
+    webAudioMasterGain.connect(ctx.destination);
+}
+
+function getWebAudioBusGain(name) {
+    switch (getAudioBusName(name)) {
+    case 'ui':
+        return webAudioUiGain;
+    case 'timer':
+        return webAudioTimerGain;
+    case 'sfx':
+    default:
+        return webAudioSfxGain;
+    }
+}
+
+function getHtmlAudioVolume(name) {
+    const cfg = soundConfig[name] || {};
+    const baseVolume = typeof cfg.volume === 'number' ? cfg.volume : 1;
+    const busVolume = audioBusVolumes[getAudioBusName(name)] ?? 1;
+    return Math.max(0, Math.min(1, baseVolume * audioBusVolumes.master * busVolume));
+}
+
+function applyTimerDuckFactor(nextFactor) {
+    timerDuckFactor = Math.max(0, Math.min(1, nextFactor));
+
+    const ctx = webAudioCtx;
+    if (ctx && webAudioTimerGain) {
+        // タイマー音量の変化は短いランプでつなぎ、クリックノイズを避ける。
+        const now = ctx.currentTime;
+        const target = audioBusVolumes.timer * timerDuckFactor;
+        webAudioTimerGain.gain.cancelScheduledValues(now);
+        webAudioTimerGain.gain.setValueAtTime(webAudioTimerGain.gain.value, now);
+        webAudioTimerGain.gain.linearRampToValueAtTime(target, now + 0.05);
+    }
+
+    if (timerAudio) {
+        timerAudio.volume = Math.max(0, Math.min(1, audioBusVolumes.master * audioBusVolumes.timer * timerDuckFactor));
+    }
+}
+
+function duckTimerAudio({ factor = 0.35, durationMs = 700 } = {}) {
+    if (timerDuckTimeoutId) {
+        clearTimeout(timerDuckTimeoutId);
+        timerDuckTimeoutId = 0;
+    }
+
+    // 正誤音や終了音を優先して聞かせるため、一時的にタイマーだけを下げる。
+    applyTimerDuckFactor(factor);
+    timerDuckTimeoutId = window.setTimeout(() => {
+        timerDuckTimeoutId = 0;
+        applyTimerDuckFactor(1);
+    }, Math.max(0, durationMs));
+}
+
+function maybeDuckTimerForSound(name) {
+    const cfg = soundConfig[name];
+    if (!cfg || typeof cfg.duckTimerFactor !== 'number') return;
+    if (!timerWebAudioSource && (!timerAudio || timerAudio.paused)) return;
+
+    duckTimerAudio({
+        factor: cfg.duckTimerFactor,
+        durationMs: cfg.duckTimerMs || 700
+    });
+}
+
 function getWebAudioContext() {
     if (!WebAudioCtx) return null;
     if (webAudioCtx) return webAudioCtx;
 
     try {
         webAudioCtx = new WebAudioCtx();
-        webAudioMasterGain = webAudioCtx.createGain();
-        webAudioMasterGain.gain.value = 1;
-        webAudioMasterGain.connect(webAudioCtx.destination);
+        ensureWebAudioBusGraph(webAudioCtx);
         return webAudioCtx;
     } catch {
         webAudioCtx = null;
         webAudioMasterGain = null;
+        webAudioUiGain = null;
+        webAudioSfxGain = null;
+        webAudioTimerGain = null;
         return null;
     }
 }
 
 function startLoadingWebAudioBuffers() {
     if (webAudioLoadPromise) return webAudioLoadPromise;
-    const ctx = getWebAudioContext();
+    const ctx = webAudioCtx;
     if (!ctx) {
         webAudioLoadPromise = Promise.resolve();
         return webAudioLoadPromise;
     }
 
-    const entries = [
-        ...Object.entries(soundConfig).map(([name, cfg]) => [name, cfg?.src]),
-        ['timer', 'assets/timer.mp3']
-    ].filter(([, src]) => typeof src === 'string' && src.length > 0);
+    const entries = AUDIO_ASSET_ENTRIES;
 
     webAudioLoadPromise = (async () => {
         await Promise.all(entries.map(async ([name, src]) => {
-            if (webAudioBuffers.has(name)) return;
             try {
-                const res = await fetch(src, { cache: 'force-cache' });
-                if (!res || !res.ok) return;
-                const arrayBuf = await res.arrayBuffer();
-                // decodeAudioData は引数の ArrayBuffer を破壊的に扱う実装があるため slice で複製
-                // 互換性のためコールバック形式で Promise 化（古い Safari 対応）
-                const buf = await new Promise((resolve, reject) => {
-                    try {
-                        ctx.decodeAudioData(arrayBuf.slice(0), resolve, reject);
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
-                webAudioBuffers.set(name, buf);
+                await ensureWebAudioBuffer(name, src);
             } catch {
                 // 失敗しても HTMLAudio にフォールバックできる
             }
@@ -1615,19 +1764,65 @@ function startLoadingWebAudioBuffers() {
 
 function primeWebAudioOnce() {
     const ctx = getWebAudioContext();
-    if (!ctx) return false;
-    // iOS: ユーザー操作内で resume() する必要がある
-    if (ctx.state !== 'running') {
-        try {
-            const p = ctx.resume();
-            if (p && typeof p.catch === 'function') p.catch(() => {});
-        } catch {
-            // 無視
-        }
-    }
+    if (!ctx) return Promise.resolve(false);
     // バッファ読み込みは非同期で開始しておく（再生はロード完了前なら HTMLAudio に落ちる）
     startLoadingWebAudioBuffers();
-    return true;
+    if (ctx.state === 'running') return Promise.resolve(true);
+
+    // iOS: ユーザー操作内で resume() する必要がある
+    try {
+        const p = ctx.resume();
+        if (p && typeof p.then === 'function') {
+            return p.then(() => true).catch(() => false);
+        }
+        return Promise.resolve(ctx.state === 'running');
+    } catch {
+        return Promise.resolve(false);
+    }
+}
+
+function resumeWebAudioContextIfNeeded() {
+    const ctx = webAudioCtx;
+    if (!ctx) return null;
+    if (ctx.state === 'running') return null;
+
+    try {
+        const p = ctx.resume();
+        if (p && typeof p.catch === 'function') {
+            p.catch(() => {});
+            return p;
+        }
+    } catch {
+        // 無視
+    }
+
+    return null;
+}
+
+function suspendWebAudioContextIfRunning() {
+    const ctx = webAudioCtx;
+    if (!ctx || ctx.state !== 'running') return null;
+
+    try {
+        const p = ctx.suspend();
+        if (p && typeof p.catch === 'function') {
+            p.catch(() => {});
+            return p;
+        }
+    } catch {
+        // 無視
+    }
+
+    return null;
+}
+
+function handleAudioInteraction() {
+    // 最初の操作では unlock、復帰後の操作では resume に回す。
+    if (!audioUnlocked) {
+        return unlockAudioOnce();
+    }
+
+    return resumeWebAudioContextIfNeeded();
 }
 
 function playSoundViaWebAudio(name, { loop = false } = {}) {
@@ -1650,10 +1845,10 @@ function playSoundViaWebAudio(name, { loop = false } = {}) {
         source.loop = !!loop;
 
         const gain = ctx.createGain();
-        gain.gain.value = 1;
+        gain.gain.value = typeof cfg.volume === 'number' ? cfg.volume : 1;
 
         source.connect(gain);
-        gain.connect(webAudioMasterGain);
+        gain.connect(getWebAudioBusGain(name) || webAudioSfxGain || webAudioMasterGain);
 
         if (!webAudioActiveSources.has(name)) webAudioActiveSources.set(name, new Set());
         webAudioActiveSources.get(name).add(source);
@@ -1680,50 +1875,51 @@ function playSoundViaWebAudio(name, { loop = false } = {}) {
 }
 
 function unlockAudioOnce() {
-    if (audioUnlocked) return;
+    if (audioUnlocked) return Promise.resolve(true);
+    if (audioUnlockPromise) return audioUnlockPromise;
 
     // ユーザー操作のタイミングで初期化して、初回ロードの負荷を下げる
     initSounds();
     initTimerSound();
 
     // WebAudio を優先的に解放（HTMLAudio が詰まる端末向け）
-    const webAudioPrimed = primeWebAudioOnce();
+    audioUnlockPromise = Promise.resolve(primeWebAudioOnce())
+        .then(async (webAudioPrimed) => {
+            let anySucceeded = !!webAudioPrimed;
 
-    // 仕様：iOS（Safari/Chrome）はユーザー操作起点でない音声再生をブロックする
-    // 最初の操作時に全オーディオを空再生して解除し、タイマー駆動の音も鳴るようにする
-    const audiosToPrime = [];
-    for (const pool of soundPools.values()) {
-        for (const audio of pool) audiosToPrime.push(audio);
-    }
-    if (timerAudio) audiosToPrime.push(timerAudio);
+            // 実際の効果音プールを空再生すると、同じ操作内の select 音と競合して語尾だけになることがある。
+            // ここでは非同期起動される可能性が高いタイマー専用音だけを個別に解放する。
+            if (timerAudio) {
+                try {
+                    const originalVolume = timerAudio.volume;
+                    timerAudio.volume = 0;
+                    timerAudio.currentTime = 0;
+                    const p = timerAudio.play();
 
-    let anySucceeded = webAudioPrimed;
+                    // すぐ停止/リセットする。ここでは「ユーザー操作内で play() が成功する」ことだけが必要
+                    timerAudio.pause();
+                    timerAudio.currentTime = 0;
+                    timerAudio.volume = originalVolume;
 
-    for (const audio of audiosToPrime) {
-        try {
-            const originalVolume = audio.volume;
-            audio.volume = 0;
-            audio.currentTime = 0;
-            const p = audio.play();
-
-            // すぐ停止/リセットする。ここでは「ユーザー操作内で play() が成功する」ことだけが必要
-            audio.pause();
-            audio.currentTime = 0;
-            audio.volume = originalVolume;
-
-            if (p && typeof p.then === 'function') {
-                anySucceeded = true;
-                // 未処理の Promise rejection を避ける
-                p.catch(() => {});
-            } else {
-                anySucceeded = true;
+                    if (p && typeof p.then === 'function') {
+                        await p.catch(() => {});
+                        anySucceeded = true;
+                    } else {
+                        anySucceeded = true;
+                    }
+                } catch {
+                    // 無視
+                }
             }
-        } catch {
-            // 無視
-        }
-    }
 
-    if (anySucceeded) audioUnlocked = true;
+            if (anySucceeded) audioUnlocked = true;
+            return audioUnlocked;
+        })
+        .finally(() => {
+            audioUnlockPromise = null;
+        });
+
+    return audioUnlockPromise;
 }
 
 function initSounds() {
@@ -1758,7 +1954,27 @@ function ensureSoundPool(name) {
     extraSoundInstances.set(name, []);
 }
 
-function playSound(name) {
+function playSound(name, { allowDeferred = true } = {}) {
+    const activation = handleAudioInteraction();
+
+    const ctx = getWebAudioContext();
+    const shouldDeferUntilUnlocked =
+        allowDeferred &&
+        webAudioBuffers.has(name) &&
+        ctx &&
+        ctx.state !== 'running' &&
+        activation &&
+        typeof activation.then === 'function';
+
+    if (shouldDeferUntilUnlocked) {
+        activation.finally(() => {
+            playSound(name, { allowDeferred: false });
+        });
+        return;
+    }
+
+    maybeDuckTimerForSound(name);
+
     // WebAudio のバッファが使える場合はそちらを優先（多重再生・詰まり対策）
     if (playSoundViaWebAudio(name)) return;
 
@@ -1811,6 +2027,7 @@ function playSound(name) {
     try {
         // 再生中のインスタンスを強制的にリスタート（端末によってはこれをしないと詰まることがある）
         if (!audio.paused) audio.pause();
+        audio.volume = getHtmlAudioVolume(name);
         audio.currentTime = 0;
         const p = audio.play();
         if (p && typeof p.catch === 'function') p.catch(() => {});
@@ -1869,6 +2086,7 @@ function initTimerSound() {
     timerAudio = new Audio('assets/timer.mp3');
     timerAudio.preload = 'auto';
     timerAudio.loop = true;
+    timerAudio.volume = audioBusVolumes.master * audioBusVolumes.timer * timerDuckFactor;
     timerInitialized = true;
 }
 
@@ -1888,7 +2106,7 @@ function startTimerSound() {
             const gain = ctx.createGain();
             gain.gain.value = 1;
             source.connect(gain);
-            gain.connect(webAudioMasterGain);
+            gain.connect(getWebAudioBusGain('timer') || webAudioTimerGain || webAudioMasterGain);
 
             source.start(0);
             timerWebAudioSource = source;
@@ -1902,6 +2120,7 @@ function startTimerSound() {
     if (!timerAudio) return;
     if (!timerAudio.paused) return;
     try {
+        timerAudio.volume = audioBusVolumes.master * audioBusVolumes.timer * timerDuckFactor;
         const p = timerAudio.play();
         if (p && typeof p.catch === 'function') p.catch(() => {});
     } catch {
@@ -1923,17 +2142,24 @@ function stopTimerSound() {
         try { timerWebAudioSource.stop(); } catch {}
         timerWebAudioSource = null;
     }
-    if (!timerAudio) return;
-    timerAudio.pause();
-    timerAudio.currentTime = 0;
+    if (timerAudio) {
+        timerAudio.pause();
+        timerAudio.currentTime = 0;
+    }
+    applyTimerDuckFactor(1);
+}
+
+function updateTileImageElement(img, tileInfo) {
+    if (!img) return;
+    if (img.getAttribute('src') !== tileInfo.imgSrc) img.src = tileInfo.imgSrc;
+    img.alt = tileInfo.name;
 }
 
 function createTileImage(tileInfo) {
     const img = document.createElement('img');
-    img.src = tileInfo.imgSrc;
-    img.alt = tileInfo.name;
     img.draggable = false;
     img.className = 'tile-img';
+    updateTileImageElement(img, tileInfo);
     return img;
 }
 
@@ -1943,6 +2169,321 @@ function createInlineHandTile(tileInfo) {
     tile.title = tileInfo.name;
     tile.appendChild(createTileImage(tileInfo));
     return tile;
+}
+
+const tileRenderCache = {
+    handSlots: [],
+    possibleSlots: new Map()
+};
+
+const keyboardMenuState = {
+    context: '',
+    activeId: '',
+    row: 0,
+    col: 0
+};
+
+function isKeyboardEditableTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName?.toLowerCase();
+    return tagName === 'input' || tagName === 'textarea' || tagName === 'select' || !!target.isContentEditable;
+}
+
+function isKeyboardButtonUsable(button) {
+    if (!button || !button.isConnected) return false;
+    if (button.disabled) return false;
+    if (button.closest('.hidden')) return false;
+    if (button.closest('[aria-hidden="true"]')) return false;
+
+    const style = window.getComputedStyle(button);
+    return style.display !== 'none' && style.visibility !== 'hidden';
+}
+
+function getKeyboardMenuLayout() {
+    const tutorialScreen = getElementByIdCached('tutorial-screen');
+    if (tutorialScreen && !tutorialScreen.classList.contains('hidden')) {
+        return {
+            context: 'tutorial',
+            rows: [['tutorial-prev-btn', 'tutorial-next-btn', 'tutorial-close-btn']]
+        };
+    }
+
+    const resultSection = getElementByIdCached('result-section');
+    if (resultSection && !resultSection.classList.contains('hidden')) {
+        return {
+            context: 'result',
+            rows: [['next-btn', 'result-ok-btn', 'result-continue-btn', 'result-back-btn']]
+        };
+    }
+
+    const victoryScreen = getElementByIdCached('victory-screen');
+    if (victoryScreen && !victoryScreen.classList.contains('hidden')) {
+        return {
+            context: 'victory',
+            rows: [['play-again-victory', 'menu-victory']]
+        };
+    }
+
+    const gameoverScreen = getElementByIdCached('gameover-screen');
+    if (gameoverScreen && !gameoverScreen.classList.contains('hidden')) {
+        return {
+            context: 'gameover',
+            rows: [['play-again-gameover', 'menu-gameover']]
+        };
+    }
+
+    const languageScreen = getElementByIdCached('language-screen');
+    if (languageScreen && !languageScreen.classList.contains('hidden')) {
+        return {
+            context: 'language',
+            rows: [['lang-ja', 'lang-en', 'lang-zh']]
+        };
+    }
+
+    const difficultyScreen = getElementByIdCached('difficulty-screen');
+    if (difficultyScreen && !difficultyScreen.classList.contains('hidden')) {
+        return {
+            context: 'difficulty',
+            rows: [['difficulty-back-btn'], ['easy', 'medium', 'hard']]
+        };
+    }
+
+    const modeScreen = getElementByIdCached('mode-screen');
+    if (modeScreen && !modeScreen.classList.contains('hidden')) {
+        return {
+            context: 'mode',
+            rows: [['mode-back-btn', 'tutorial-btn'], ['casual-btn', 'story-btn', 'survival-btn']]
+        };
+    }
+
+    return null;
+}
+
+function getVisibleKeyboardRows(rowIds) {
+    return rowIds
+        .map((row) => row
+            .map((id) => getElementByIdCached(id))
+            .filter((button) => isKeyboardButtonUsable(button)))
+        .filter((row) => row.length > 0);
+}
+
+function clearKeyboardMenuHighlight() {
+    document.querySelectorAll('.keyboard-nav-active').forEach((button) => {
+        button.classList.remove('keyboard-nav-active');
+    });
+
+    keyboardMenuState.context = '';
+    keyboardMenuState.activeId = '';
+    keyboardMenuState.row = 0;
+    keyboardMenuState.col = 0;
+}
+
+function setKeyboardMenuButton(button, context, row, col) {
+    if (!button) return null;
+
+    document.querySelectorAll('.keyboard-nav-active').forEach((current) => {
+        if (current !== button) current.classList.remove('keyboard-nav-active');
+    });
+
+    button.classList.add('keyboard-nav-active');
+    if (typeof button.focus === 'function') {
+        try {
+            button.focus({ preventScroll: true });
+        } catch {
+            button.focus();
+        }
+    }
+
+    keyboardMenuState.context = context;
+    keyboardMenuState.activeId = button.id || '';
+    keyboardMenuState.row = row;
+    keyboardMenuState.col = col;
+    return button;
+}
+
+function syncKeyboardMenuHighlight() {
+    const layout = getKeyboardMenuLayout();
+    if (!layout) {
+        clearKeyboardMenuHighlight();
+        return null;
+    }
+
+    const rows = getVisibleKeyboardRows(layout.rows);
+    if (!rows.length) {
+        clearKeyboardMenuHighlight();
+        return null;
+    }
+
+    let rowIndex = 0;
+    let colIndex = 0;
+    let button = null;
+
+    if (keyboardMenuState.context === layout.context && keyboardMenuState.activeId) {
+        for (let row = 0; row < rows.length; row++) {
+            const col = rows[row].findIndex((candidate) => candidate.id === keyboardMenuState.activeId);
+            if (col >= 0) {
+                rowIndex = row;
+                colIndex = col;
+                button = rows[row][col];
+                break;
+            }
+        }
+    }
+
+    if (!button) button = rows[0][0];
+    setKeyboardMenuButton(button, layout.context, rowIndex, colIndex);
+    return { layout, rows, rowIndex, colIndex, button };
+}
+
+function moveKeyboardMenuSelection(direction) {
+    const state = syncKeyboardMenuHighlight();
+    if (!state) return null;
+
+    let nextRow = state.rowIndex;
+    let nextCol = state.colIndex;
+
+    if (direction === 'left') nextCol = Math.max(0, nextCol - 1);
+    if (direction === 'right') nextCol = Math.min(state.rows[nextRow].length - 1, nextCol + 1);
+    if (direction === 'up') nextRow = Math.max(0, nextRow - 1);
+    if (direction === 'down') nextRow = Math.min(state.rows.length - 1, nextRow + 1);
+
+    nextCol = Math.min(nextCol, state.rows[nextRow].length - 1);
+    return setKeyboardMenuButton(state.rows[nextRow][nextCol], state.layout.context, nextRow, nextCol);
+}
+
+function canHandleGameKeyboardInput() {
+    const gameScreen = getElementByIdCached('game-screen');
+    const tutorialScreen = getElementByIdCached('tutorial-screen');
+    const resultSection = getElementByIdCached('result-section');
+    const pauseOverlay = getElementByIdCached('pause-overlay');
+
+    return !!gameScreen &&
+        !gameScreen.classList.contains('hidden') &&
+        isActiveQuestion() &&
+        (!tutorialScreen || tutorialScreen.classList.contains('hidden')) &&
+        (!resultSection || resultSection.classList.contains('hidden')) &&
+        (!pauseOverlay || pauseOverlay.classList.contains('hidden'));
+}
+
+function handleGlobalKeyboardNavigation(event) {
+    if (event.defaultPrevented) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (isKeyboardEditableTarget(event.target)) return;
+
+    const key = event.key;
+    const menuState = syncKeyboardMenuHighlight();
+
+    if (/^[1-9]$/.test(key) && canHandleGameKeyboardInput()) {
+        const tile = Number(key);
+        const tileButton = tileRenderCache.possibleSlots.get(tile)?.wrapper || getElementByIdCached('possible-tiles')?.querySelector(`[data-tile="${tile}"]`);
+        if (tileButton) {
+            event.preventDefault();
+            toggleTileSelection(tile, tileButton);
+        }
+        return;
+    }
+
+    if (key === 'Enter') {
+        if (menuState?.button) {
+            event.preventDefault();
+            menuState.button.click();
+            return;
+        }
+
+        if (canHandleGameKeyboardInput()) {
+            const submitBtn = getElementByIdCached('submit-btn');
+            if (submitBtn && !submitBtn.disabled) {
+                event.preventDefault();
+                submitBtn.click();
+            }
+        }
+        return;
+    }
+
+    if (!menuState) return;
+
+    switch (key) {
+    case 'ArrowLeft':
+        event.preventDefault();
+        moveKeyboardMenuSelection('left');
+        break;
+    case 'ArrowRight':
+        event.preventDefault();
+        moveKeyboardMenuSelection('right');
+        break;
+    case 'ArrowUp':
+        event.preventDefault();
+        moveKeyboardMenuSelection('up');
+        break;
+    case 'ArrowDown':
+        event.preventDefault();
+        moveKeyboardMenuSelection('down');
+        break;
+    default:
+        break;
+    }
+}
+
+// 毎回 innerHTML を作り直さず、必要数までだけノードを増やして使い回す。
+function ensureHandTileSlots(count) {
+    const container = getElementByIdCached('hand-tiles');
+    if (!container) return [];
+
+    while (tileRenderCache.handSlots.length < count) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'hand-tile rounded-lg tile-shadow flex items-center justify-center';
+        wrapper.style.cssText = 'width: 48px; height: 68px; font-size: 36px;';
+
+        const img = createTileImage({ imgSrc: '', name: '' });
+        wrapper.appendChild(img);
+        container.appendChild(wrapper);
+
+        tileRenderCache.handSlots.push({ wrapper, img });
+    }
+
+    return tileRenderCache.handSlots;
+}
+
+function ensurePossibleTileSlots() {
+    const container = getElementByIdCached('possible-tiles');
+    if (!container) return tileRenderCache.possibleSlots;
+    if (tileRenderCache.possibleSlots.size === 9) return tileRenderCache.possibleSlots;
+
+    // 候補牌は 1〜9 で固定なので、最初に 9 個だけ作れば以後は状態更新で足りる。
+    container.innerHTML = '';
+    tileRenderCache.possibleSlots.clear();
+
+    for (let tile = 1; tile <= 9; tile++) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'selectable-tile rounded-xl tile-shadow tile-hover flex items-center justify-center cursor-pointer';
+        wrapper.style.cssText = 'width: 64px; height: 88px; font-size: 48px;';
+        wrapper.dataset.tile = tile;
+
+        const img = createTileImage({ imgSrc: '', name: '' });
+        wrapper.appendChild(img);
+        wrapper.addEventListener('click', () => toggleTileSelection(tile, wrapper));
+
+        container.appendChild(wrapper);
+        tileRenderCache.possibleSlots.set(tile, { wrapper, img });
+    }
+
+    return tileRenderCache.possibleSlots;
+}
+
+function syncPossibleTileNode(tile, slot) {
+    if (!slot) return;
+
+    const tileInfo = getTileInfo(gameState.tileType, tile);
+    const exhausted = !!(gameState.counts && gameState.counts[tile] >= 4);
+    const selected = gameState.selectedTiles.has(tile);
+
+    // 正誤表示のクラスは毎回リセットしてから、その時点の状態だけを反映する。
+    updateTileImageElement(slot.img, tileInfo);
+    slot.wrapper.title = tileInfo.name;
+    slot.wrapper.classList.remove('correct-selected', 'correct-missed', 'incorrect-selected');
+    slot.wrapper.classList.toggle('selected', selected && !gameState.isAnswered);
+    slot.wrapper.classList.toggle('tile-disabled', exhausted);
+    slot.wrapper.setAttribute('aria-disabled', exhausted ? 'true' : 'false');
 }
 
 const gameState = {
@@ -2214,7 +2755,16 @@ function resumeTimer() {
     hidePauseOverlay();
     document.body.classList.remove('effects-paused');
     if (gameState.timerCuePlayed && gameState.timeLeft <= 5 && !gameState.isAnswered) {
-        startTimerSound();
+        const resumed = resumeWebAudioContextIfNeeded();
+        if (resumed && typeof resumed.finally === 'function') {
+            resumed.finally(() => {
+                if (gameState.timerCuePlayed && gameState.timeLeft <= 5 && !gameState.isAnswered && !gameState.isPaused) {
+                    startTimerSound();
+                }
+            });
+        } else {
+            startTimerSound();
+        }
     }
     updateInteractionState();
 }
@@ -2246,6 +2796,7 @@ function updateInteractionState() {
     }
 
     updateTimeExtensionButton();
+    syncKeyboardMenuHighlight();
 }
 
 function updateTimerDisplay() {
@@ -2675,46 +3226,33 @@ function updateQuestionDisplay() {
 }
 
 function renderHand() {
-    const container = document.getElementById('hand-tiles');
-    container.innerHTML = '';
     const sorted = [...gameState.hand].sort((a, b) => a - b);
-    sorted.forEach(tile => {
+    const slots = ensureHandTileSlots(sorted.length);
+
+    sorted.forEach((tile, index) => {
         const tileInfo = getTileInfo(gameState.tileType, tile);
-        const div = document.createElement('div');
-        div.className = 'hand-tile rounded-lg tile-shadow flex items-center justify-center';
-        div.style.cssText = 'width: 48px; height: 68px; font-size: 36px;';
-        div.appendChild(createTileImage(tileInfo));
-        div.title = tileInfo.name;
-        container.appendChild(div);
+        const slot = slots[index];
+        if (!slot) return;
+        slot.wrapper.hidden = false;
+        slot.wrapper.title = tileInfo.name;
+        updateTileImageElement(slot.img, tileInfo);
     });
+
+    for (let index = sorted.length; index < slots.length; index++) {
+        slots[index].wrapper.hidden = true;
+    }
 }
 
 function renderPossibleTiles() {
-    const container = document.getElementById('possible-tiles');
-    container.innerHTML = '';
+    const slots = ensurePossibleTileSlots();
     for (let tile = 1; tile <= 9; tile++) {
-        const tileInfo = getTileInfo(gameState.tileType, tile);
-        const div = document.createElement('div');
-        div.className = 'selectable-tile rounded-xl tile-shadow tile-hover flex items-center justify-center cursor-pointer';
-        div.style.cssText = 'width: 64px; height: 88px; font-size: 48px;';
-        div.dataset.tile = tile;
-        div.appendChild(createTileImage(tileInfo));
-        div.title = tileInfo.name;
-
-        // 手牌内で同牌が4枚使われている場合、その牌は選択不可にする
-        const exhausted = (gameState.counts && gameState.counts[tile] >= 4);
-        if (exhausted) {
-            div.classList.add('tile-disabled');
-            div.setAttribute('aria-disabled', 'true');
-        } else {
-            div.addEventListener('click', () => toggleTileSelection(tile, div));
-        }
-        container.appendChild(div);
+        syncPossibleTileNode(tile, slots.get(tile));
     }
 }
 
 function toggleTileSelection(tile, element) {
     if (!isActiveQuestion()) return;
+    if (gameState.counts && gameState.counts[tile] >= 4) return;
 
     playSound('tap');
     if (gameState.selectedTiles.has(tile)) {
@@ -3584,6 +4122,7 @@ function selectLanguage(lang) {
         languageScreen.style.transform = 'scale(1)';
         modeScreen.classList.remove('hidden');
         modeScreen.classList.add('fade-in');
+        syncKeyboardMenuHighlight();
     }, 400);
 }
 
@@ -3613,6 +4152,7 @@ function backToLanguageSelection() {
     modeScreen.classList.add('hidden');
     languageScreen.classList.remove('hidden');
     languageScreen.classList.add('fade-in');
+    syncKeyboardMenuHighlight();
 }
 
 function backToModeSelection() {
@@ -3627,6 +4167,7 @@ function backToModeSelection() {
     difficultyScreen.classList.add('hidden');
     modeScreen.classList.remove('hidden');
     modeScreen.classList.add('fade-in');
+    syncKeyboardMenuHighlight();
 }
 
 function showPauseOverlay() {
@@ -3698,15 +4239,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 languageScreen.classList.remove('hidden');
                 languageScreen.classList.add('fade-in');
             }
+            syncKeyboardMenuHighlight();
         });
     });
 
     // Footer meta (year/version) should be correct even before language selection.
     updateFooterMeta();
 
-    // 最初のユーザー操作で音声を解放（iOS 対策）
-    document.addEventListener('pointerdown', unlockAudioOnce, { capture: true, once: true });
-    document.addEventListener('touchstart', unlockAudioOnce, { capture: true, once: true, passive: true });
+    // 先に pointer/touch で音声状態を整えておくと、その直後の click で効果音を鳴らしやすい。
+    document.addEventListener('pointerdown', handleAudioInteraction, { capture: true });
+    document.addEventListener('touchstart', handleAudioInteraction, { capture: true, passive: true });
 
     const langJaBtn = getElementByIdCached('lang-ja');
     if (langJaBtn) langJaBtn.addEventListener('click', () => { playSound('select'); selectLanguage('ja'); });
@@ -3822,8 +4364,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.hidden) {
             // フォーカス喪失/最小化
             pauseTimer();
+            // バックグラウンド中は WebAudio も止め、モバイルでの復帰不整合を減らす。
+            suspendWebAudioContextIfRunning();
         } else {
             // フォーカス復帰
+            resumeWebAudioContextIfNeeded();
             if (gameState.isPaused && gameState.timerInterval) {
                 // 自動再開しない（ユーザーのクリック待ち）
             }
@@ -3833,11 +4378,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // フォーカス喪失（別アプリへ切替）
     window.addEventListener('blur', () => {
         pauseTimer();
+        suspendWebAudioContextIfRunning();
     });
     
     // フォーカス復帰
     window.addEventListener('focus', () => {
+        resumeWebAudioContextIfNeeded();
         // 自動再開しない（一時停止オーバーレイのクリック待ち）
     });
+
+    window.addEventListener('pagehide', () => {
+        pauseTimer();
+        suspendWebAudioContextIfRunning();
+    });
+
+    window.addEventListener('pageshow', () => {
+        scheduleApplyUiScale();
+        resumeWebAudioContextIfNeeded();
+        syncKeyboardMenuHighlight();
+    });
+
+    document.addEventListener('keydown', handleGlobalKeyboardNavigation);
 });
  

@@ -1088,6 +1088,22 @@ body.in-game .time-extension-slot {
     height: 400px;
 }
 
+.mode-btn.keyboard-nav-active,
+.nav-back-btn.keyboard-nav-active,
+.tutorial-btn.keyboard-nav-active {
+    transform: translateY(-6px) scale(1.04);
+    border-color: rgba(242, 208, 138, 0.9);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.45),
+        0 0 48px rgba(217, 178, 111, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.mode-btn.keyboard-nav-active::before {
+    width: 400px;
+    height: 400px;
+}
+
 .mode-btn:active {
     transform: translateY(-4px) scale(1.02);
 }
@@ -1353,6 +1369,13 @@ body.low-power .selectable-tile {
 body.low-power .mode-btn:hover,
 body.low-power .selectable-tile:hover {
     transform: none !important;
+}
+
+body.low-power .mode-btn.keyboard-nav-active,
+body.low-power .nav-back-btn.keyboard-nav-active,
+body.low-power .tutorial-btn.keyboard-nav-active {
+    transform: none !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28) !important;
 }
 
 body.low-power .mode-btn::before,
