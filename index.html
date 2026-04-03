@@ -235,6 +235,8 @@
             </div>
         </div>
 
+        <button id="sound-toggle-btn" class="sound-toggle-btn" type="button" aria-label="Sound On" aria-pressed="false">🔊</button>
+
         <div id="game-screen" class="screen-container hidden">
             <div id="boss-indicator" class="boss-title text-center hidden">
                 <div class="text-6xl font-black animate-pulse">BOSS STAGE</div>
@@ -275,12 +277,16 @@
 
                 <div class="mb-6 wait-section">
                     <h4 id="select-waiting-title" class="text-2xl font-bold text-center mb-3">Select All Waiting Tiles</h4>
+                    <div class="selection-status-wrap" aria-live="polite">
+                        <p id="selection-status" class="selection-status">Select at least 1 waiting tile</p>
+                        <p id="selection-hint" class="selection-hint">Keyboard: press 1-9 to toggle tiles, Enter to submit</p>
+                    </div>
                     <div id="possible-tiles" class="grid grid-cols-9 gap-4 max-w-3xl mx-auto"></div>
                 </div>
             </div>
 
             <div class="action-bar">
-                <button id="submit-btn" class="mode-btn action-btn">
+                <button id="submit-btn" class="mode-btn action-btn" data-state="empty">
                     <span id="submit-text">Check Answer</span>
                 </button>
             </div>
@@ -288,7 +294,7 @@
             <!-- 結果モーダル（16:9 フレーム内でスクロール） -->
             <div id="result-section" class="hidden">
                 <div class="result-container">
-                    <div id="result-message" class="text-3xl font-bold text-green-300 mb-6">Correct!</div>
+                    <div id="result-message" class="text-3xl font-bold text-green-300 mb-6 hidden">Correct!</div>
                     <div id="correct-answer-display" class="mb-6"></div>
 
                     <div id="result-nav" class="mt-6 flex gap-6 justify-center flex-wrap">

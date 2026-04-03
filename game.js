@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v2.0.60312.0",
+        gameVersion: "v2.0.60404.0",
         scoreVersionLabel: "採点バージョン",
         scoreVersion: "1.1",
         selectMode: "モードを選択してください",
@@ -24,6 +24,21 @@ const translations = {
         handTitle: "🀄 手牌 🀄",
         selectWaiting: "🎯 待ち牌をすべて選んでください 🎯",
         submitAnswer: "✨ 回答する ✨",
+        selectionStatusIdle: "少なくとも1枚の待ち牌を選んでください",
+        selectionStatusSelected: "{count}枚選択中。Enterで回答できます",
+        selectionStatusLocked: "{count}枚選択済み。結果表示中は変更できません",
+        selectionHintActive: "キーボードは 1〜9 で選択、Enter で回答できます",
+        selectionHintLocked: "この画面ではキーボード操作は無効です",
+        resultCorrectSelected: "正しく選べた牌",
+        resultMissedTiles: "見逃した待ち牌",
+        resultIncorrectSelected: "誤って選んだ牌",
+        breakdownHowTitle: "待ち牌の並び替え（1雀頭 + 4面子）",
+        breakdownSortedHand: "理牌済みの和了形",
+        breakdownTarget: "牌型の並べ替え",
+        breakdownPrevWait: "前の待ち",
+        breakdownNextWait: "次の待ち",
+        breakdownCounter: "{current}/{total}",
+        breakdownAnimationHint: "理牌された14枚から、和了牌を含む形へ順番に組み替えます",
         correct: "🎉 素晴らしい！ 🎉",
         incorrect: "❌ 惜しい...",
         timeUp: "⏰ 時間切れ！",
@@ -76,6 +91,8 @@ const translations = {
         extensionsLeft: "あと",
         cooldown: "クールダウン",
         ok: "OK",
+        soundOn: "音あり",
+        soundOff: "消音",
 
         tutorial: "遊び方",
         tutorialTitle: "遊び方",
@@ -132,7 +149,7 @@ const translations = {
         tutorialRealHintStructure: "ヒント：{tiles} は必要な形を作れないため先に除外できます（例：9待ちは 7/8 または 9 が必要）。",
         tutorialRealHintFallback: "ヒント：この問題は明確な除外牌が少ない形です。中張（4/5/6）から順に仮追加して、4面子1雀頭になるかを確認しましょう。",
         tutorialRealAnswerText: "正解：待ちは {waits}。",
-        tutorialRealBreakdownTitle: "待ち牌ごとの分解（4面子1雀頭）",
+        tutorialRealBreakdownTitle: "待ち牌ごとの並び替え（1雀頭 + 4面子）",
         tutorialWaitTierLabel: "教學難易度：",
         tutorialWaitTierEasyDesc: "1〜3面待ち",
         tutorialWaitTierMediumDesc: "4〜6面待ち",
@@ -142,7 +159,7 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v2.0.60312.0",
+        gameVersion: "v2.0.60404.0",
         scoreVersionLabel: "Scoring Version",
         scoreVersion: "1.1",
         selectMode: "Select Mode",
@@ -162,6 +179,21 @@ const translations = {
         handTitle: "🀄 Your Hand 🀄",
         selectWaiting: "🎯 Select ALL Winning Tiles (Waits) 🎯",
         submitAnswer: "✨ Submit ✨",
+        selectionStatusIdle: "Select at least 1 waiting tile",
+        selectionStatusSelected: "{count} selected. Press Enter to submit",
+        selectionStatusLocked: "{count} selected. Selection is locked right now",
+        selectionHintActive: "Keyboard: press 1-9 to toggle tiles, Enter to submit",
+        selectionHintLocked: "Keyboard shortcuts are disabled on this screen",
+        resultCorrectSelected: "Correctly selected",
+        resultMissedTiles: "Missed waits",
+        resultIncorrectSelected: "Incorrect selections",
+        breakdownHowTitle: "Winning Shape Rearrangement (1 Pair + 4 Melds)",
+        breakdownSortedHand: "Sorted winning hand",
+        breakdownTarget: "Breakdown order",
+        breakdownPrevWait: "Previous Wait",
+        breakdownNextWait: "Next Wait",
+        breakdownCounter: "{current}/{total}",
+        breakdownAnimationHint: "Start from the sorted 14-tile hand, then rearrange it into the winning structure",
         correct: "🎉 Fantastic! 🎉",
         incorrect: "❌ So close...",
         timeUp: "⏰ Time's Up!",
@@ -214,6 +246,8 @@ const translations = {
         extensionsLeft: "Left:",
         cooldown: "Cooldown",
         ok: "OK",
+        soundOn: "Sound On",
+        soundOff: "Muted",
 
         tutorial: "Tutorial",
         tutorialTitle: "How to Play",
@@ -270,7 +304,7 @@ const translations = {
         tutorialRealHintStructure: "Hint: {tiles} cannot form required shapes, so eliminate them first (e.g. waiting on 9 needs 7/8 or an existing 9).",
         tutorialRealHintFallback: "Hint: This hand has few obvious eliminations. Start by testing middle tiles (4/5/6) and check whether the hand can become 4 melds + 1 pair.",
         tutorialRealAnswerText: "Answer: waits are {waits}.",
-        tutorialRealBreakdownTitle: "Breakdown per wait (4 melds + 1 pair)",
+        tutorialRealBreakdownTitle: "Rearrangement per wait (1 pair + 4 melds)",
         tutorialWaitTierLabel: "Tutorial Tier:",
         tutorialWaitTierEasyDesc: "1-3 waits",
         tutorialWaitTierMediumDesc: "4-6 waits",
@@ -280,7 +314,7 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v2.0.60312.0",
+        gameVersion: "v2.0.60404.0",
         scoreVersionLabel: "計分版本",
         scoreVersion: "1.1",
         selectMode: "請選擇遊戲模式",
@@ -300,6 +334,21 @@ const translations = {
         handTitle: "🀄 目前手牌 🀄",
         selectWaiting: "🎯 請選出所有聽的牌 🎯",
         submitAnswer: "✨ 確認答案 ✨",
+        selectionStatusIdle: "請至少選擇 1 張聽牌",
+        selectionStatusSelected: "已選擇 {count} 張，可按 Enter 送出",
+        selectionStatusLocked: "已選擇 {count} 張，目前不能再修改",
+        selectionHintActive: "鍵盤可用 1-9 選牌，Enter 送出答案",
+        selectionHintLocked: "此畫面已停用鍵盤快捷操作",
+        resultCorrectSelected: "正確選中的牌",
+        resultMissedTiles: "漏選的聽牌",
+        resultIncorrectSelected: "誤選的牌",
+        breakdownHowTitle: "胡牌排列（1 對子 + 4 面子）",
+        breakdownSortedHand: "理牌後的和牌形",
+        breakdownTarget: "拆分順序",
+        breakdownPrevWait: "上一張聽牌",
+        breakdownNextWait: "下一張聽牌",
+        breakdownCounter: "{current}/{total}",
+        breakdownAnimationHint: "先從排序後的 14 張牌開始，再依序重排成能胡的牌型",
         correct: "🎉 高手！ 🎉",
         incorrect: "❌ 可惜...",
         timeUp: "⏰ 時間到了！",
@@ -352,6 +401,8 @@ const translations = {
         extensionsLeft: "剩餘",
         cooldown: "冷卻",
         ok: "確認",
+        soundOn: "音效開啟",
+        soundOff: "靜音",
 
         tutorial: "教學",
         tutorialTitle: "遊戲玩法",
@@ -408,7 +459,7 @@ const translations = {
         tutorialRealHintStructure: "提示：{tiles} 無法形成必要形狀，可先淘汰（例如聽 9 至少要有 7/8 或已有 9）。",
         tutorialRealHintFallback: "提示：這題明顯可淘汰的牌較少，建議先從中張（4/5/6）開始逐張假設補入，再檢查是否能成 4 面子 + 1 雀頭。",
         tutorialRealAnswerText: "答案：聽 {waits}。",
-        tutorialRealBreakdownTitle: "各聽牌拆解（4面子+1雀頭）",
+        tutorialRealBreakdownTitle: "各聽牌排列（1 對子 + 4 面子）",
         tutorialWaitTierLabel: "教學難度：",
         tutorialWaitTierEasyDesc: "1-3 面聽",
         tutorialWaitTierMediumDesc: "4-6 面聽",
@@ -458,6 +509,7 @@ function getStoryDifficultyForStage(stageNumber) {
 
 let tutorialPageIndex = 0;
 let tutorialRealQuestionStep = 0;
+let tutorialBreakdownIndex = 0;
 let tutorialRealQuestionData = null;
 
 function getQueryParam(name) {
@@ -545,6 +597,11 @@ function getElementByIdCached(id) {
 document.getElementById = (id) => getElementByIdCached(id);
 
 let resultActionCache = {};
+const breakdownAnimationState = {
+    currentIndex: 0,
+    playToken: 0,
+    timerIds: []
+};
 
 function getResultActionElements() {
     if (resultActionCache.actions && resultActionCache.actions.isConnected) return resultActionCache;
@@ -645,6 +702,7 @@ function generateTutorialRealQuestion() {
         const waits = calculateWinningTiles(counts);
         return {
             difficulty,
+            tileType: 'pin',
             hand,
             counts,
             waits,
@@ -655,6 +713,7 @@ function generateTutorialRealQuestion() {
         const fallback = solveTutorialHand([1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9]);
         return {
             difficulty: 'easy',
+            tileType: 'pin',
             hand: fallback.hand.slice().sort((a, b) => a - b),
             counts: fallback.counts,
             waits: fallback.waits,
@@ -934,6 +993,7 @@ function renderTutorialVisual(page) {
         hintBtn.textContent = t('tutorialRealHintBtn');
         hintBtn.disabled = step >= 1 || !hasHint;
         hintBtn.addEventListener('click', () => {
+            playSound('select');
             tutorialRealQuestionStep = 1;
             renderTutorialVisual(page);
         });
@@ -945,7 +1005,9 @@ function renderTutorialVisual(page) {
         answerBtn.textContent = t('tutorialRealAnswerBtn');
         answerBtn.disabled = step >= 2;
         answerBtn.addEventListener('click', () => {
+            playSound('select');
             tutorialRealQuestionStep = 2;
+            tutorialBreakdownIndex = 0;
             renderTutorialVisual(page);
         });
         controls.appendChild(answerBtn);
@@ -955,7 +1017,9 @@ function renderTutorialVisual(page) {
         newBtn.className = 'tutorial-step-btn tutorial-step-btn--ghost';
         newBtn.textContent = t('tutorialRealNewBtn');
         newBtn.addEventListener('click', () => {
+            playSound('select');
             tutorialRealQuestionStep = 0;
+            tutorialBreakdownIndex = 0;
             getTutorialRealQuestionData({ forceNew: true });
             renderTutorialVisual(page);
         });
@@ -967,7 +1031,9 @@ function renderTutorialVisual(page) {
             resetBtn.className = 'tutorial-step-btn tutorial-step-btn--ghost';
             resetBtn.textContent = t('tutorialRealResetBtn');
             resetBtn.addEventListener('click', () => {
+                playSound('select');
                 tutorialRealQuestionStep = 0;
+                tutorialBreakdownIndex = 0;
                 renderTutorialVisual(page);
             });
             controls.appendChild(resetBtn);
@@ -984,30 +1050,76 @@ function renderTutorialVisual(page) {
             breakdownTitle.textContent = t('tutorialRealBreakdownTitle');
             breakdownWrap.appendChild(breakdownTitle);
 
-            for (const waitTile of question.waits || []) {
-                const item = document.createElement('div');
-                item.className = 'tutorial-breakdown-item';
+            const waits = question.waits || [];
+            tutorialBreakdownIndex = Math.min(Math.max(0, tutorialBreakdownIndex), Math.max(0, waits.length - 1));
 
-                const waitHeader = document.createElement('div');
-                waitHeader.className = 'tutorial-breakdown-wait';
-                waitHeader.textContent = `${t('winningTile')} `;
-                waitHeader.appendChild(createTutorialMiniTile(waitTile, { selected: true }));
-                item.appendChild(waitHeader);
+            if (waits.length > 1) {
+                const controlsRow = document.createElement('div');
+                controlsRow.className = 'breakdown-controls tutorial-breakdown-controls';
 
-                const breakdown = getWinningHandBreakdown([...(question.hand || []), waitTile]);
-                if (breakdown) {
-                    const groups = document.createElement('div');
-                    groups.className = 'tutorial-breakdown-groups';
-                    groups.appendChild(createTutorialBreakdownGroup(breakdown.head, { isHead: true }));
-                    for (const meld of breakdown.melds || []) {
-                        groups.appendChild(createTutorialBreakdownGroup(meld));
-                    }
-                    item.appendChild(groups);
-                }
+                const prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className = 'breakdown-switch-btn';
+                prevBtn.textContent = t('breakdownPrevWait');
+                prevBtn.disabled = tutorialBreakdownIndex <= 0;
+                prevBtn.addEventListener('click', () => {
+                    playSound('select');
+                    tutorialBreakdownIndex = Math.max(0, tutorialBreakdownIndex - 1);
+                    renderTutorialVisual(page);
+                });
 
-                breakdownWrap.appendChild(item);
+                const counter = document.createElement('div');
+                counter.className = 'breakdown-counter';
+                counter.textContent = t('breakdownCounter', { current: tutorialBreakdownIndex + 1, total: waits.length });
+
+                const nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className = 'breakdown-switch-btn';
+                nextBtn.textContent = t('breakdownNextWait');
+                nextBtn.disabled = tutorialBreakdownIndex >= waits.length - 1;
+                nextBtn.addEventListener('click', () => {
+                    playSound('select');
+                    tutorialBreakdownIndex = Math.min(waits.length - 1, tutorialBreakdownIndex + 1);
+                    renderTutorialVisual(page);
+                });
+
+                controlsRow.append(prevBtn, counter, nextBtn);
+                breakdownWrap.appendChild(controlsRow);
             }
 
+            const waitTile = waits[tutorialBreakdownIndex];
+            const item = document.createElement('div');
+            item.className = 'tutorial-breakdown-item';
+
+            const waitHeader = document.createElement('div');
+            waitHeader.className = 'tutorial-breakdown-wait';
+            waitHeader.textContent = `${t('winningTile')} `;
+            waitHeader.appendChild(createTutorialMiniTile(waitTile, { selected: true }));
+            item.appendChild(waitHeader);
+
+            const breakdown = getWinningHandBreakdown([...(question.hand || []), waitTile]);
+            if (breakdown) {
+                const displayData = buildBreakdownDisplayData(waitTile, breakdown, question.hand || []);
+                const stage = createBreakdownStageElement(displayData, {
+                    compact: true,
+                    tileType: question.tileType || 'pin'
+                });
+                item.appendChild(stage);
+                breakdownWrap.appendChild(item);
+                visualEl.appendChild(breakdownWrap);
+                playBreakdownTransition(stage, displayData, {
+                    autoReplay: true,
+                    replayHandler: () => {
+                        const tutorialScreen = getElementByIdCached('tutorial-screen');
+                        const visual = getElementByIdCached('tutorial-page-visual');
+                        if (!tutorialScreen || tutorialScreen.classList.contains('hidden') || !visual || !visual.isConnected) return;
+                        renderTutorialVisual(page);
+                    }
+                });
+                return;
+            }
+
+            breakdownWrap.appendChild(item);
             visualEl.appendChild(breakdownWrap);
         }
     }
@@ -1606,6 +1718,8 @@ const audioBusVolumes = {
     sfx: 1,
     timer: 0.78
 };
+const AUDIO_MUTE_STORAGE_KEY = 'tenpai-de-go-audio-muted';
+let audioMuted = false;
 
 let audioUnlocked = false;
 let soundsInitialized = false;
@@ -2078,6 +2192,73 @@ function stopSound(name) {
     if (extras.length) extraSoundInstances.set(name, []);
 }
 
+function syncAudioVolumes() {
+    const nextMaster = audioMuted ? 0 : 1;
+    audioBusVolumes.master = nextMaster;
+
+    const ctx = webAudioCtx;
+    if (ctx && webAudioMasterGain) {
+        const now = ctx.currentTime;
+        webAudioMasterGain.gain.cancelScheduledValues(now);
+        webAudioMasterGain.gain.setValueAtTime(webAudioMasterGain.gain.value, now);
+        webAudioMasterGain.gain.linearRampToValueAtTime(nextMaster, now + 0.05);
+    }
+
+    for (const [name, pool] of soundPools.entries()) {
+        for (const audio of pool) {
+            audio.volume = getHtmlAudioVolume(name);
+        }
+        const extras = extraSoundInstances.get(name) || [];
+        for (const audio of extras) {
+            audio.volume = getHtmlAudioVolume(name);
+        }
+    }
+
+    if (timerAudio) {
+        timerAudio.volume = Math.max(0, Math.min(1, audioBusVolumes.master * audioBusVolumes.timer * timerDuckFactor));
+    }
+}
+
+function updateSoundToggleButton() {
+    const button = getElementByIdCached('sound-toggle-btn');
+    if (!button) return;
+
+    button.textContent = audioMuted ? '🔇' : '🔊';
+    button.classList.toggle('is-muted', audioMuted);
+    button.setAttribute('aria-pressed', String(audioMuted));
+    const label = t(audioMuted ? 'soundOff' : 'soundOn');
+    button.setAttribute('aria-label', label);
+    button.title = label;
+}
+
+function persistAudioPreference() {
+    try {
+        window.localStorage?.setItem(AUDIO_MUTE_STORAGE_KEY, audioMuted ? '1' : '0');
+    } catch {
+        // ignore
+    }
+}
+
+function loadAudioPreference() {
+    try {
+        audioMuted = window.localStorage?.getItem(AUDIO_MUTE_STORAGE_KEY) === '1';
+    } catch {
+        audioMuted = false;
+    }
+    syncAudioVolumes();
+}
+
+function toggleAudioMute() {
+    audioMuted = !audioMuted;
+    syncAudioVolumes();
+    persistAudioPreference();
+    updateSoundToggleButton();
+
+    if (!audioMuted) {
+        playSound('select', { allowDeferred: false });
+    }
+}
+
 // カウントダウン音（assets/timer.mp3）は「残り 5 秒以内でループ再生」する専用音
 let timerAudio = null;
 
@@ -2176,179 +2357,16 @@ const tileRenderCache = {
     possibleSlots: new Map()
 };
 
-const keyboardMenuState = {
-    context: '',
-    activeId: '',
-    row: 0,
-    col: 0
-};
-
 function isKeyboardEditableTarget(target) {
     if (!target) return false;
     const tagName = target.tagName?.toLowerCase();
     return tagName === 'input' || tagName === 'textarea' || tagName === 'select' || !!target.isContentEditable;
 }
 
-function isKeyboardButtonUsable(button) {
-    if (!button || !button.isConnected) return false;
-    if (button.disabled) return false;
-    if (button.closest('.hidden')) return false;
-    if (button.closest('[aria-hidden="true"]')) return false;
-
-    const style = window.getComputedStyle(button);
-    return style.display !== 'none' && style.visibility !== 'hidden';
-}
-
-function getKeyboardMenuLayout() {
-    const tutorialScreen = getElementByIdCached('tutorial-screen');
-    if (tutorialScreen && !tutorialScreen.classList.contains('hidden')) {
-        return {
-            context: 'tutorial',
-            rows: [['tutorial-prev-btn', 'tutorial-next-btn', 'tutorial-close-btn']]
-        };
-    }
-
-    const resultSection = getElementByIdCached('result-section');
-    if (resultSection && !resultSection.classList.contains('hidden')) {
-        return {
-            context: 'result',
-            rows: [['next-btn', 'result-ok-btn', 'result-continue-btn', 'result-back-btn']]
-        };
-    }
-
-    const victoryScreen = getElementByIdCached('victory-screen');
-    if (victoryScreen && !victoryScreen.classList.contains('hidden')) {
-        return {
-            context: 'victory',
-            rows: [['play-again-victory', 'menu-victory']]
-        };
-    }
-
-    const gameoverScreen = getElementByIdCached('gameover-screen');
-    if (gameoverScreen && !gameoverScreen.classList.contains('hidden')) {
-        return {
-            context: 'gameover',
-            rows: [['play-again-gameover', 'menu-gameover']]
-        };
-    }
-
-    const languageScreen = getElementByIdCached('language-screen');
-    if (languageScreen && !languageScreen.classList.contains('hidden')) {
-        return {
-            context: 'language',
-            rows: [['lang-ja', 'lang-en', 'lang-zh']]
-        };
-    }
-
-    const difficultyScreen = getElementByIdCached('difficulty-screen');
-    if (difficultyScreen && !difficultyScreen.classList.contains('hidden')) {
-        return {
-            context: 'difficulty',
-            rows: [['difficulty-back-btn'], ['easy', 'medium', 'hard']]
-        };
-    }
-
-    const modeScreen = getElementByIdCached('mode-screen');
-    if (modeScreen && !modeScreen.classList.contains('hidden')) {
-        return {
-            context: 'mode',
-            rows: [['mode-back-btn', 'tutorial-btn'], ['casual-btn', 'story-btn', 'survival-btn']]
-        };
-    }
-
-    return null;
-}
-
-function getVisibleKeyboardRows(rowIds) {
-    return rowIds
-        .map((row) => row
-            .map((id) => getElementByIdCached(id))
-            .filter((button) => isKeyboardButtonUsable(button)))
-        .filter((row) => row.length > 0);
-}
-
 function clearKeyboardMenuHighlight() {
     document.querySelectorAll('.keyboard-nav-active').forEach((button) => {
         button.classList.remove('keyboard-nav-active');
     });
-
-    keyboardMenuState.context = '';
-    keyboardMenuState.activeId = '';
-    keyboardMenuState.row = 0;
-    keyboardMenuState.col = 0;
-}
-
-function setKeyboardMenuButton(button, context, row, col) {
-    if (!button) return null;
-
-    document.querySelectorAll('.keyboard-nav-active').forEach((current) => {
-        if (current !== button) current.classList.remove('keyboard-nav-active');
-    });
-
-    button.classList.add('keyboard-nav-active');
-    if (typeof button.focus === 'function') {
-        try {
-            button.focus({ preventScroll: true });
-        } catch {
-            button.focus();
-        }
-    }
-
-    keyboardMenuState.context = context;
-    keyboardMenuState.activeId = button.id || '';
-    keyboardMenuState.row = row;
-    keyboardMenuState.col = col;
-    return button;
-}
-
-function syncKeyboardMenuHighlight() {
-    const layout = getKeyboardMenuLayout();
-    if (!layout) {
-        clearKeyboardMenuHighlight();
-        return null;
-    }
-
-    const rows = getVisibleKeyboardRows(layout.rows);
-    if (!rows.length) {
-        clearKeyboardMenuHighlight();
-        return null;
-    }
-
-    let rowIndex = 0;
-    let colIndex = 0;
-    let button = null;
-
-    if (keyboardMenuState.context === layout.context && keyboardMenuState.activeId) {
-        for (let row = 0; row < rows.length; row++) {
-            const col = rows[row].findIndex((candidate) => candidate.id === keyboardMenuState.activeId);
-            if (col >= 0) {
-                rowIndex = row;
-                colIndex = col;
-                button = rows[row][col];
-                break;
-            }
-        }
-    }
-
-    if (!button) button = rows[0][0];
-    setKeyboardMenuButton(button, layout.context, rowIndex, colIndex);
-    return { layout, rows, rowIndex, colIndex, button };
-}
-
-function moveKeyboardMenuSelection(direction) {
-    const state = syncKeyboardMenuHighlight();
-    if (!state) return null;
-
-    let nextRow = state.rowIndex;
-    let nextCol = state.colIndex;
-
-    if (direction === 'left') nextCol = Math.max(0, nextCol - 1);
-    if (direction === 'right') nextCol = Math.min(state.rows[nextRow].length - 1, nextCol + 1);
-    if (direction === 'up') nextRow = Math.max(0, nextRow - 1);
-    if (direction === 'down') nextRow = Math.min(state.rows.length - 1, nextRow + 1);
-
-    nextCol = Math.min(nextCol, state.rows[nextRow].length - 1);
-    return setKeyboardMenuButton(state.rows[nextRow][nextCol], state.layout.context, nextRow, nextCol);
 }
 
 function canHandleGameKeyboardInput() {
@@ -2371,9 +2389,12 @@ function handleGlobalKeyboardNavigation(event) {
     if (isKeyboardEditableTarget(event.target)) return;
 
     const key = event.key;
-    const menuState = syncKeyboardMenuHighlight();
+    if (!canHandleGameKeyboardInput()) {
+        clearKeyboardMenuHighlight();
+        return;
+    }
 
-    if (/^[1-9]$/.test(key) && canHandleGameKeyboardInput()) {
+    if (/^[1-9]$/.test(key)) {
         const tile = Number(key);
         const tileButton = tileRenderCache.possibleSlots.get(tile)?.wrapper || getElementByIdCached('possible-tiles')?.querySelector(`[data-tile="${tile}"]`);
         if (tileButton) {
@@ -2384,43 +2405,11 @@ function handleGlobalKeyboardNavigation(event) {
     }
 
     if (key === 'Enter') {
-        if (menuState?.button) {
+        const submitBtn = getElementByIdCached('submit-btn');
+        if (submitBtn && !submitBtn.disabled) {
             event.preventDefault();
-            menuState.button.click();
-            return;
+            submitBtn.click();
         }
-
-        if (canHandleGameKeyboardInput()) {
-            const submitBtn = getElementByIdCached('submit-btn');
-            if (submitBtn && !submitBtn.disabled) {
-                event.preventDefault();
-                submitBtn.click();
-            }
-        }
-        return;
-    }
-
-    if (!menuState) return;
-
-    switch (key) {
-    case 'ArrowLeft':
-        event.preventDefault();
-        moveKeyboardMenuSelection('left');
-        break;
-    case 'ArrowRight':
-        event.preventDefault();
-        moveKeyboardMenuSelection('right');
-        break;
-    case 'ArrowUp':
-        event.preventDefault();
-        moveKeyboardMenuSelection('up');
-        break;
-    case 'ArrowDown':
-        event.preventDefault();
-        moveKeyboardMenuSelection('down');
-        break;
-    default:
-        break;
     }
 }
 
@@ -2784,6 +2773,7 @@ function updateInteractionState() {
 
     if (submitBtn) {
         submitBtn.disabled = !active || !hasSelection;
+        submitBtn.dataset.state = !active ? 'locked' : hasSelection ? 'ready' : 'empty';
     }
 
     if (nextBtn) {
@@ -2796,7 +2786,8 @@ function updateInteractionState() {
     }
 
     updateTimeExtensionButton();
-    syncKeyboardMenuHighlight();
+    updateSelectionStatus();
+    clearKeyboardMenuHighlight();
 }
 
 function updateTimerDisplay() {
@@ -3225,6 +3216,33 @@ function updateQuestionDisplay() {
     updateInteractionState();
 }
 
+function updateSelectionStatus() {
+    const status = getElementByIdCached('selection-status');
+    const hint = getElementByIdCached('selection-hint');
+    const count = gameState.selectedTiles?.size || 0;
+
+    if (status) {
+        if (!isActiveQuestion()) {
+            status.textContent = count > 0
+                ? t('selectionStatusLocked', { count })
+                : t('selectionStatusIdle');
+            status.dataset.state = 'locked';
+        } else if (count > 0) {
+            status.textContent = t('selectionStatusSelected', { count });
+            status.dataset.state = 'ready';
+        } else {
+            status.textContent = t('selectionStatusIdle');
+            status.dataset.state = 'empty';
+        }
+    }
+
+    if (hint) {
+        hint.textContent = isActiveQuestion()
+            ? t('selectionHintActive')
+            : t('selectionHintLocked');
+    }
+}
+
 function renderHand() {
     const sorted = [...gameState.hand].sort((a, b) => a - b);
     const slots = ensureHandTileSlots(sorted.length);
@@ -3382,25 +3400,65 @@ function highlightAnswers() {
         else if (missed.includes(tile)) element.classList.add('correct-missed');
         else if (wrong.includes(tile)) element.classList.add('incorrect-selected');
     });
+    breakdownAnimationState.currentIndex = 0;
     displayCorrectAnswer();
     displayHandBreakdown();
 }
 
 function displayCorrectAnswer() {
     const container = document.getElementById('correct-answer-display');
+    const selected = Array.from(gameState.selectedTiles);
+    const correct = gameState.waitingTiles;
+    const groups = [
+        {
+            title: t('resultCorrectSelected'),
+            className: 'result-group--correct',
+            tiles: selected.filter((tile) => correct.includes(tile))
+        },
+        {
+            title: t('resultMissedTiles'),
+            className: 'result-group--missed',
+            tiles: correct.filter((tile) => !selected.includes(tile))
+        },
+        {
+            title: t('resultIncorrectSelected'),
+            className: 'result-group--wrong',
+            tiles: selected.filter((tile) => !correct.includes(tile))
+        }
+    ].filter((group) => group.tiles.length > 0);
+
     container.innerHTML = `<p class="text-xl font-bold mb-4 text-center">${t('correctAnswer')}</p>`;
-    const tilesDiv = document.createElement('div');
-    tilesDiv.className = 'flex gap-3 flex-wrap justify-center';
-    gameState.waitingTiles.forEach(tile => {
-        const tileInfo = getTileInfo(gameState.tileType, tile);
-        const div = document.createElement('div');
-        div.className = 'hand-tile rounded-lg tile-shadow flex items-center justify-center';
-        div.style.cssText = 'width: 64px; height: 88px; font-size: 48px;';
-        div.appendChild(createTileImage(tileInfo));
-        div.title = tileInfo.name;
-        tilesDiv.appendChild(div);
+
+    const groupsWrap = document.createElement('div');
+    groupsWrap.className = 'result-groups';
+
+    groups.forEach((group) => {
+        const section = document.createElement('section');
+        section.className = `result-group ${group.className}`;
+
+        const title = document.createElement('h5');
+        title.className = 'result-group-title';
+        title.textContent = group.title;
+        section.appendChild(title);
+
+        const tilesDiv = document.createElement('div');
+        tilesDiv.className = 'result-group-tiles';
+
+        group.tiles.forEach((tile) => {
+            const tileInfo = getTileInfo(gameState.tileType, tile);
+            const div = document.createElement('div');
+            div.className = 'hand-tile rounded-lg tile-shadow flex items-center justify-center';
+            div.style.cssText = 'width: 64px; height: 88px; font-size: 48px;';
+            div.appendChild(createTileImage(tileInfo));
+            div.title = tileInfo.name;
+            tilesDiv.appendChild(div);
+        });
+
+        section.appendChild(tilesDiv);
+        groupsWrap.appendChild(section);
     });
-    container.appendChild(tilesDiv);
+
+    container.appendChild(groupsWrap);
 }
 
 // 和了牌型を理牌して返す
@@ -3472,58 +3530,49 @@ function findMeldBreakdown(counts, melds) {
 
 function displayHandBreakdown() {
     const container = document.getElementById('hand-breakdown');
+    if (!container) return;
+
+    clearBreakdownAnimationTimers();
     container.innerHTML = '';
-    const handTiles = [...gameState.hand];
-    
-    // タイトルを追加
+
     const mainTitle = document.createElement('p');
     mainTitle.className = 'font-bold text-2xl mb-6 text-center text-yellow-300';
-    mainTitle.innerHTML = t('allBreakdown');
+    mainTitle.innerHTML = t('breakdownHowTitle');
     container.appendChild(mainTitle);
-    
-    // 待ち牌を分類：未選択（優先表示）と選択済み
-    const selected = Array.from(gameState.selectedTiles);
-    const missedTiles = gameState.waitingTiles.filter(tile => !selected.includes(tile));
-    const selectedTiles = gameState.waitingTiles.filter(tile => selected.includes(tile));
-    
-    // 未選択の牌を優先表示（黄色）
-    const sortedWaitingTiles = [...missedTiles, ...selectedTiles];
-    
-    // すべての待ち牌について牌型を表示
-    for (const tile of sortedWaitingTiles) {
-        const tempHand = [...handTiles, tile];
-        const breakdown = getWinningHandBreakdown(tempHand);
-        if (breakdown) {
-            const tileInfo = getTileInfo(gameState.tileType, tile);
-            const isMissed = missedTiles.includes(tile);
-            
-            // 各待ち牌のセクション
-            const sectionDiv = document.createElement('div');
-            sectionDiv.className = `breakdown-section ${isMissed ? 'missed-tile' : 'selected-tile'}`;
-            
-            const breakdownTitle = document.createElement('h3');
-            breakdownTitle.style.color = isMissed ? '#fbbf24' : '#22c55e';
-            breakdownTitle.textContent = `${t('winningTile')}`;
-            breakdownTitle.appendChild(createInlineHandTile(tileInfo));
-            breakdownTitle.appendChild(document.createTextNode(` ${tileInfo.name}`));
-            sectionDiv.appendChild(breakdownTitle);
 
-            const breakdownFlex = document.createElement('div');
-            breakdownFlex.className = 'flex flex-wrap gap-4 justify-center';
-            
-            // 雀頭
-            const headContainer = createTileGroup(breakdown.head, t('head'));
-            breakdownFlex.appendChild(headContainer);
+    const sortedWaitingTiles = getSortedBreakdownWaitingTiles();
+    if (!sortedWaitingTiles.length) return;
 
-            // 面子
-            for (const meld of breakdown.melds) {
-                const meldContainer = createTileGroup(meld, t('meld'));
-                breakdownFlex.appendChild(meldContainer);
-            }
-            sectionDiv.appendChild(breakdownFlex);
-            container.appendChild(sectionDiv);
-        }
-    }
+    breakdownAnimationState.currentIndex = Math.min(
+        Math.max(0, breakdownAnimationState.currentIndex),
+        Math.max(0, sortedWaitingTiles.length - 1)
+    );
+
+    renderBreakdownControls(container, sortedWaitingTiles.length, breakdownAnimationState.currentIndex);
+
+    const waitTile = sortedWaitingTiles[breakdownAnimationState.currentIndex];
+    const breakdown = getWinningHandBreakdown([...gameState.hand, waitTile]);
+    if (!breakdown) return;
+
+    const tileInfo = getTileInfo(gameState.tileType, waitTile);
+    const isMissed = !gameState.selectedTiles.has(waitTile);
+    const displayData = buildBreakdownDisplayData(waitTile, breakdown);
+
+    const sectionDiv = document.createElement('div');
+    sectionDiv.className = `breakdown-section ${isMissed ? 'missed-tile' : 'selected-tile'}`;
+
+    const breakdownTitle = document.createElement('h3');
+    breakdownTitle.style.color = isMissed ? '#fbbf24' : '#22c55e';
+    breakdownTitle.textContent = `${t('winningTile')}`;
+    breakdownTitle.appendChild(createInlineHandTile(tileInfo));
+    breakdownTitle.appendChild(document.createTextNode(` ${tileInfo.name}`));
+    sectionDiv.appendChild(breakdownTitle);
+
+    const stage = createBreakdownStageElement(displayData, { tileType: gameState.tileType });
+    sectionDiv.appendChild(stage);
+    container.appendChild(sectionDiv);
+
+    playBreakdownTransition(stage, displayData);
 }
 
 function createTileGroup(tileNumbers, label) {
@@ -3907,17 +3956,388 @@ function createConfetti() {
     }
 }
 
+    function clearBreakdownAnimationTimers() {
+        breakdownAnimationState.playToken += 1;
+        breakdownAnimationState.timerIds.forEach((timerId) => clearTimeout(timerId));
+        breakdownAnimationState.timerIds = [];
+    }
+
+    function getSortedBreakdownWaitingTiles() {
+        const selected = Array.from(gameState.selectedTiles);
+        const missedTiles = gameState.waitingTiles.filter((tile) => !selected.includes(tile));
+        const selectedTiles = gameState.waitingTiles.filter((tile) => selected.includes(tile));
+        return [...missedTiles, ...selectedTiles];
+    }
+
+    function getTileGroupDetailText(tileNumbers) {
+        if (tileNumbers.length === 2) return t('pair');
+        if (tileNumbers.length === 3) {
+            if (tileNumbers[0] === tileNumbers[1] && tileNumbers[1] === tileNumbers[2]) return t('triplet');
+            return t('sequence');
+        }
+        return '';
+    }
+
+    function compareBreakdownNumberLists(left, right) {
+        const maxLength = Math.max(left.length, right.length);
+        for (let index = 0; index < maxLength; index++) {
+            const leftValue = left[index] ?? Number.MAX_SAFE_INTEGER;
+            const rightValue = right[index] ?? Number.MAX_SAFE_INTEGER;
+            if (leftValue !== rightValue) return leftValue - rightValue;
+        }
+        return 0;
+    }
+
+    function buildBreakdownDisplayData(waitTile, breakdown, baseHand = gameState.hand) {
+        const sortedBaseEntries = [...baseHand].sort((a, b) => a - b).map((tile, index) => ({
+                id: `hand-${index}`,
+                tile,
+                isWinning: false,
+                order: index
+            }));
+        const winningEntry = {
+            id: 'winning-tile',
+            tile: waitTile,
+            isWinning: true,
+            order: Number.MAX_SAFE_INTEGER
+        };
+        const sourceEntries = [...sortedBaseEntries, winningEntry];
+        const availableByTile = new Map();
+
+        sourceEntries.forEach((entry) => {
+            if (entry.isWinning) {
+                return;
+            }
+            const current = availableByTile.get(entry.tile) || [];
+            current.push(entry);
+            availableByTile.set(entry.tile, current);
+        });
+
+        const targetGroups = [breakdown.head, ...breakdown.melds];
+        const winningMeldIndex = breakdown.melds.findIndex((meld) => meld.includes(waitTile));
+        const preferredWinningGroupIndex = winningMeldIndex >= 0 ? winningMeldIndex + 1 : 0;
+        let winningPlaced = false;
+
+        const groups = targetGroups.map((groupTiles, groupIndex) => {
+            const tiles = groupTiles.map((tile) => {
+                let sourceEntry = null;
+
+                if (!winningPlaced && winningEntry && groupIndex === preferredWinningGroupIndex && tile === waitTile) {
+                    sourceEntry = winningEntry;
+                    winningPlaced = true;
+                } else {
+                    const pool = availableByTile.get(tile) || [];
+                    sourceEntry = pool.shift();
+                    availableByTile.set(tile, pool);
+                }
+
+                return {
+                    groupId: `group-${groupIndex}`,
+                    sourceId: sourceEntry?.id || `fallback-${groupIndex}-${tile}`,
+                    tile,
+                    isWinning: !!sourceEntry?.isWinning,
+                    sourceOrder: sourceEntry?.order ?? Number.MAX_SAFE_INTEGER
+                };
+            });
+
+            return {
+                id: `group-${groupIndex}`,
+                kind: groupIndex === 0 ? 'head' : 'meld',
+                label: getTileGroupDetailText(groupTiles),
+                tiles,
+                sourceOrders: tiles.map((tileEntry) => tileEntry.sourceOrder),
+                tileNumbers: [...groupTiles]
+            };
+        }).sort((left, right) => {
+            const orderDiff = compareBreakdownNumberLists(left.sourceOrders, right.sourceOrders);
+            if (orderDiff !== 0) return orderDiff;
+            return compareBreakdownNumberLists(left.tileNumbers, right.tileNumbers);
+        });
+
+        return {
+            sourceEntries,
+            groups,
+            animationOrder: groups.flatMap((group) => group.tiles)
+        };
+    }
+
+    function createBreakdownTileElement(tile, { sourceId = '', winning = false, className = '', width = 48, height = 68, fontSize = 36, tileType = gameState.tileType } = {}) {
+        const tileInfo = getTileInfo(tileType, tile);
+        const tileDiv = document.createElement('div');
+        tileDiv.className = `hand-tile rounded-lg tile-shadow flex items-center justify-center breakdown-tile ${className}`.trim();
+        tileDiv.style.cssText = `width: ${width}px; height: ${height}px; font-size: ${fontSize}px;`;
+        if (sourceId) tileDiv.dataset.sourceId = sourceId;
+        if (winning) tileDiv.classList.add('breakdown-winning-tile');
+        tileDiv.appendChild(createTileImage(tileInfo));
+        tileDiv.title = tileInfo.name;
+        return tileDiv;
+    }
+
+    function createBreakdownStageElement(displayData, { compact = false, tileType = gameState.tileType } = {}) {
+        const stage = document.createElement('div');
+        stage.className = `breakdown-stage ${compact ? 'tutorial-breakdown-stage' : ''}`.trim();
+
+        const bubble = document.createElement('div');
+        bubble.className = 'breakdown-bubble';
+
+        const tileSize = compact
+            ? { width: 40, height: 56, fontSize: 30 }
+            : { width: 48, height: 68, fontSize: 36 };
+
+        const sourceRow = document.createElement('div');
+        sourceRow.className = 'breakdown-source-row';
+        displayData.sourceEntries.forEach((entry) => {
+            if (entry.isWinning) {
+                const gap = document.createElement('div');
+                gap.className = 'breakdown-source-gap';
+                sourceRow.appendChild(gap);
+            }
+
+            sourceRow.appendChild(createBreakdownTileElement(entry.tile, {
+                sourceId: entry.id,
+                winning: entry.isWinning,
+                className: `breakdown-source-tile ${entry.isWinning ? 'breakdown-source-winning-tile' : ''}`,
+                tileType,
+                ...tileSize
+            }));
+        });
+
+        const targetGroups = document.createElement('div');
+        targetGroups.className = 'breakdown-target-groups';
+        displayData.groups.forEach((group) => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'breakdown-target-group';
+            groupDiv.dataset.groupId = group.id;
+
+            const groupLabel = document.createElement('div');
+            groupLabel.className = 'breakdown-target-group-label';
+            groupLabel.textContent = group.label;
+
+            const board = document.createElement('div');
+            board.className = 'breakdown-target-board';
+            group.tiles.forEach(() => {
+                const slot = document.createElement('div');
+                slot.className = 'breakdown-target-slot';
+                board.appendChild(slot);
+            });
+
+            const row = document.createElement('div');
+            row.className = 'breakdown-target-row';
+            group.tiles.forEach((tileEntry) => {
+                row.appendChild(createBreakdownTileElement(tileEntry.tile, {
+                    sourceId: tileEntry.sourceId,
+                    winning: tileEntry.isWinning,
+                    className: 'breakdown-target-tile',
+                    tileType,
+                    ...tileSize
+                }));
+            });
+
+            groupDiv.append(groupLabel, board, row);
+            targetGroups.appendChild(groupDiv);
+        });
+
+        const animationLayer = document.createElement('div');
+        animationLayer.className = 'breakdown-animation-layer';
+        bubble.append(sourceRow, targetGroups);
+        stage.append(bubble, animationLayer);
+        return stage;
+    }
+
+    function applyBreakdownCentering(stage, { animated = true, vertical = false } = {}) {
+        const bubble = stage?.querySelector('.breakdown-bubble');
+        const targetGroups = stage?.querySelector('.breakdown-target-groups');
+        if (!bubble || !targetGroups) return;
+
+        const groupNodes = Array.from(targetGroups.children).filter((node) => node.classList?.contains('breakdown-target-group'));
+        if (!groupNodes.length) return;
+
+        const trackRect = targetGroups.getBoundingClientRect();
+        const bubbleRect = bubble.getBoundingClientRect();
+        if (!trackRect.width) return;
+
+        const firstRect = groupNodes[0].getBoundingClientRect();
+        const lastRect = groupNodes[groupNodes.length - 1].getBoundingClientRect();
+        const contentLeft = firstRect.left - trackRect.left;
+        const contentRight = lastRect.right - trackRect.left;
+        const contentWidth = Math.max(0, contentRight - contentLeft);
+        const shiftX = contentWidth < trackRect.width
+            ? Math.max(0, ((trackRect.width - contentWidth) / 2) - contentLeft)
+            : 0;
+
+        const groupsRect = targetGroups.getBoundingClientRect();
+        const currentCenterY = (groupsRect.top - bubbleRect.top) + (groupsRect.height / 2);
+        const desiredCenterY = bubbleRect.height / 2;
+        const shiftY = vertical ? desiredCenterY - currentCenterY : 0;
+
+        stage.classList.toggle('breakdown-stage-centering', animated && (Math.abs(shiftX) > 0.5 || Math.abs(shiftY) > 0.5));
+        targetGroups.style.setProperty('--breakdown-center-shift-x', `${shiftX.toFixed(2)}px`);
+        targetGroups.style.setProperty('--breakdown-center-shift-y', `${shiftY.toFixed(2)}px`);
+    }
+
+    function renderBreakdownControls(container, total, activeIndex) {
+        if (total <= 1) return null;
+
+        const controls = document.createElement('div');
+        controls.className = 'breakdown-controls';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'breakdown-switch-btn';
+        prevBtn.textContent = t('breakdownPrevWait');
+        prevBtn.disabled = activeIndex <= 0;
+        prevBtn.addEventListener('click', () => {
+            playSound('select');
+            breakdownAnimationState.currentIndex = Math.max(0, breakdownAnimationState.currentIndex - 1);
+            displayHandBreakdown();
+        });
+
+        const counter = document.createElement('div');
+        counter.className = 'breakdown-counter';
+        counter.textContent = t('breakdownCounter', { current: activeIndex + 1, total });
+
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'breakdown-switch-btn';
+        nextBtn.textContent = t('breakdownNextWait');
+        nextBtn.disabled = activeIndex >= total - 1;
+        nextBtn.addEventListener('click', () => {
+            playSound('select');
+            breakdownAnimationState.currentIndex = Math.min(total - 1, breakdownAnimationState.currentIndex + 1);
+            displayHandBreakdown();
+        });
+
+        controls.append(prevBtn, counter, nextBtn);
+        container.appendChild(controls);
+        return controls;
+    }
+
+    function playBreakdownTransition(stage, displayData, { autoReplay = true, replayHandler = null } = {}) {
+        clearBreakdownAnimationTimers();
+        const playToken = breakdownAnimationState.playToken;
+
+        const sourceTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-source-tile')).map((node) => [node.dataset.sourceId, node]));
+        const targetGroups = new Map(Array.from(stage.querySelectorAll('.breakdown-target-group')).map((node) => [node.dataset.groupId, node]));
+        const targetTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-target-tile')).map((node) => [node.dataset.sourceId, node]));
+        const animationLayer = stage.querySelector('.breakdown-animation-layer');
+        if (animationLayer) animationLayer.innerHTML = '';
+        stage.classList.remove('breakdown-stage-complete', 'breakdown-stage-centering');
+        const targetGroupsTrack = stage.querySelector('.breakdown-target-groups');
+        if (targetGroupsTrack) {
+            targetGroupsTrack.style.setProperty('--breakdown-center-shift-x', '0px');
+            targetGroupsTrack.style.setProperty('--breakdown-center-shift-y', '0px');
+        }
+        sourceTiles.forEach((node) => node.classList.remove('is-dealt'));
+        targetTiles.forEach((node) => node.classList.remove('is-arrived'));
+        targetGroups.forEach((groupNode) => {
+            groupNode.classList.remove('is-complete');
+            groupNode.querySelectorAll('.breakdown-target-slot').forEach((slot) => slot.classList.remove('is-filled'));
+        });
+        requestAnimationFrame(() => {
+            if (playToken !== breakdownAnimationState.playToken) return;
+            applyBreakdownCentering(stage, { animated: false, vertical: false });
+        });
+
+        const shouldSkipAnimation = document.body.classList.contains('low-power') || prefersReducedMotion();
+        if (shouldSkipAnimation) {
+            sourceTiles.forEach((node) => node.classList.add('is-dealt'));
+            targetTiles.forEach((node) => node.classList.add('is-arrived'));
+            targetGroups.forEach((groupNode) => {
+                groupNode.classList.add('is-complete');
+                groupNode.querySelectorAll('.breakdown-target-slot').forEach((slot) => slot.classList.add('is-filled'));
+            });
+            stage.classList.add('breakdown-stage-complete');
+            requestAnimationFrame(() => applyBreakdownCentering(stage, { animated: false, vertical: true }));
+            return;
+        }
+
+        const animationOrder = displayData.animationOrder;
+        const sourceFadeMs = 40;
+        const targetRevealMs = 70;
+        const gapMs = 20;
+        const tileCycleMs = sourceFadeMs + targetRevealMs + gapMs;
+        const replayDelayMs = 900;
+        const arrivedCounts = new Map(displayData.groups.map((group) => [group.id, 0]));
+        const groupSizes = new Map(displayData.groups.map((group) => [group.id, group.tiles.length]));
+
+        animationOrder.forEach((item, index) => {
+            const sourceNode = sourceTiles.get(item.sourceId);
+            const groupNode = targetGroups.get(item.groupId);
+            const targetNode = targetTiles.get(item.sourceId);
+            const targetSlots = groupNode ? Array.from(groupNode.querySelectorAll('.breakdown-target-slot')) : [];
+            const slotIndex = displayData.groups.find((group) => group.id === item.groupId)?.tiles.findIndex((tile) => tile.sourceId === item.sourceId) ?? -1;
+            const targetSlot = slotIndex >= 0 ? targetSlots[slotIndex] : null;
+            if (!sourceNode || !targetNode) return;
+
+            const startDelay = index * tileCycleMs;
+
+            const startTimer = setTimeout(() => {
+                if (playToken !== breakdownAnimationState.playToken) return;
+                sourceNode.classList.add('is-dealt');
+                if (targetSlot) targetSlot.classList.add('is-filled');
+            }, startDelay);
+
+            const revealTimer = setTimeout(() => {
+                if (playToken !== breakdownAnimationState.playToken) return;
+                targetNode.classList.add('is-arrived');
+            }, startDelay + sourceFadeMs);
+
+            const endTimer = setTimeout(() => {
+                if (playToken !== breakdownAnimationState.playToken) return;
+
+                const nextCount = (arrivedCounts.get(item.groupId) || 0) + 1;
+                arrivedCounts.set(item.groupId, nextCount);
+                if (nextCount >= (groupSizes.get(item.groupId) || 0) && groupNode) {
+                    groupNode.classList.add('is-complete');
+                }
+            }, startDelay + sourceFadeMs + targetRevealMs);
+
+            breakdownAnimationState.timerIds.push(startTimer, revealTimer, endTimer);
+        });
+
+        const finishTimer = setTimeout(() => {
+            if (playToken !== breakdownAnimationState.playToken) return;
+            stage.classList.add('breakdown-stage-complete');
+            animationLayer.innerHTML = '';
+            requestAnimationFrame(() => {
+                if (playToken !== breakdownAnimationState.playToken) return;
+                applyBreakdownCentering(stage, { animated: true, vertical: true });
+            });
+        }, animationOrder.length * tileCycleMs);
+
+        breakdownAnimationState.timerIds.push(finishTimer);
+
+        if (autoReplay) {
+            const replayTimer = setTimeout(() => {
+                if (playToken !== breakdownAnimationState.playToken) return;
+                if (!stage.isConnected) return;
+
+                if (typeof replayHandler === 'function') {
+                    replayHandler();
+                    return;
+                }
+
+                const resultSection = document.getElementById('result-section');
+                if (!resultSection || resultSection.classList.contains('hidden')) return;
+
+                displayHandBreakdown();
+            }, animationOrder.length * tileCycleMs + replayDelayMs);
+
+            breakdownAnimationState.timerIds.push(replayTimer);
+        }
+    }
+
 function updateUILanguage() {
+    clearBreakdownAnimationTimers();
+
     document.getElementById('header-title').textContent = t('gameTitle');
     document.getElementById('header-subtitle').textContent = t('gameSubtitle');
-    
-    // 言語選択画面
+
     document.getElementById('language-title').textContent = t('selectLanguage');
     document.getElementById('lang-ja-text').textContent = t('japanese');
     document.getElementById('lang-en-text').textContent = t('english');
     document.getElementById('lang-zh-text').textContent = t('chinese');
-    
-    // モード選択
+
     document.getElementById('mode-title').textContent = t('selectMode');
     document.getElementById('casual-title').textContent = t('casualMode');
     document.getElementById('casual-desc').textContent = t('casualDesc');
@@ -3931,8 +4351,7 @@ function updateUILanguage() {
 
     const modeBackText = document.getElementById('mode-back-text');
     if (modeBackText) modeBackText.textContent = t('back');
-    
-    // 難易度選択
+
     document.getElementById('difficulty-title').textContent = t('selectDifficulty');
     document.getElementById('easy-title').textContent = t('easy');
     document.getElementById('easy-desc').textContent = t('easyDesc');
@@ -3943,12 +4362,12 @@ function updateUILanguage() {
 
     const difficultyBackText = document.getElementById('difficulty-back-text');
     if (difficultyBackText) difficultyBackText.textContent = t('back');
-    
-    // ゲーム画面
+
     document.getElementById('hand-title').textContent = t('handTitle');
     document.getElementById('select-waiting-title').textContent = t('selectWaiting');
     document.getElementById('submit-text').textContent = t('submitAnswer');
     document.getElementById('next-text').textContent = t('nextQuestion');
+
     const resultMenuText = document.getElementById('result-menu-text');
     if (resultMenuText) resultMenuText.textContent = t('backToMenu');
 
@@ -3958,9 +4377,17 @@ function updateUILanguage() {
     if (resultContinueText) resultContinueText.textContent = t('continue');
     if (resultBackText) resultBackText.textContent = t('giveUp');
     if (resultOkText) resultOkText.textContent = t('ok');
-    
-    
-    // 勝利/敗北画面
+
+    const tutorialPrevText = document.getElementById('tutorial-prev-text');
+    const tutorialNextText = document.getElementById('tutorial-next-text');
+    const tutorialCloseText = document.getElementById('tutorial-close-text');
+    if (tutorialPrevText) tutorialPrevText.textContent = t('tutorialPrev');
+    if (tutorialNextText) tutorialNextText.textContent = t('tutorialNext');
+    if (tutorialCloseText) tutorialCloseText.textContent = t('tutorialClose');
+    updateSoundToggleButton();
+
+    updateSelectionStatus();
+
     const resultOpen = !!document.getElementById('result-section') && !document.getElementById('result-section').classList.contains('hidden');
     document.getElementById('gameover-title').textContent = t('gameOver');
     const timeLeftLabel = document.getElementById('final-time-left-label');
@@ -4002,6 +4429,11 @@ function updateUILanguage() {
     const tutorialTitle = document.getElementById('tutorial-title');
     if (tutorialTitle) tutorialTitle.textContent = t('tutorialTitle');
     renderTutorialPage();
+
+    if (resultOpen) {
+        displayCorrectAnswer();
+        displayHandBreakdown();
+    }
 }
 
 function updateFooterMeta() {
@@ -4122,7 +4554,7 @@ function selectLanguage(lang) {
         languageScreen.style.transform = 'scale(1)';
         modeScreen.classList.remove('hidden');
         modeScreen.classList.add('fade-in');
-        syncKeyboardMenuHighlight();
+        clearKeyboardMenuHighlight();
     }, 400);
 }
 
@@ -4152,7 +4584,7 @@ function backToLanguageSelection() {
     modeScreen.classList.add('hidden');
     languageScreen.classList.remove('hidden');
     languageScreen.classList.add('fade-in');
-    syncKeyboardMenuHighlight();
+    clearKeyboardMenuHighlight();
 }
 
 function backToModeSelection() {
@@ -4167,7 +4599,7 @@ function backToModeSelection() {
     difficultyScreen.classList.add('hidden');
     modeScreen.classList.remove('hidden');
     modeScreen.classList.add('fade-in');
-    syncKeyboardMenuHighlight();
+    clearKeyboardMenuHighlight();
 }
 
 function showPauseOverlay() {
@@ -4239,12 +4671,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 languageScreen.classList.remove('hidden');
                 languageScreen.classList.add('fade-in');
             }
-            syncKeyboardMenuHighlight();
+            clearKeyboardMenuHighlight();
         });
     });
 
     // Footer meta (year/version) should be correct even before language selection.
     updateFooterMeta();
+    loadAudioPreference();
+    updateSoundToggleButton();
 
     // 先に pointer/touch で音声状態を整えておくと、その直後の click で効果音を鳴らしやすい。
     document.addEventListener('pointerdown', handleAudioInteraction, { capture: true });
@@ -4279,12 +4713,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const tutorialPrevBtn = getElementByIdCached('tutorial-prev-btn');
     const tutorialNextBtn = getElementByIdCached('tutorial-next-btn');
     const tutorialCloseBtn = getElementByIdCached('tutorial-close-btn');
+    const soundToggleBtn = getElementByIdCached('sound-toggle-btn');
 
     function openTutorial() {
         if (!tutorialScreen) return;
         playSound('select');
         tutorialPageIndex = 0;
         tutorialRealQuestionStep = 0;
+        tutorialBreakdownIndex = 0;
         tutorialRealQuestionData = null;
         tutorialScreen.classList.remove('hidden');
         tutorialScreen.classList.add('fade-in');
@@ -4334,6 +4770,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', closeTutorial);
+    if (soundToggleBtn) soundToggleBtn.addEventListener('click', toggleAudioMute);
     const easyBtn = getElementByIdCached('easy');
     if (easyBtn) easyBtn.addEventListener('click', () => { playSound('select'); startGameWithDifficulty('easy'); });
 
@@ -4395,7 +4832,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('pageshow', () => {
         scheduleApplyUiScale();
         resumeWebAudioContextIfNeeded();
-        syncKeyboardMenuHighlight();
+        clearKeyboardMenuHighlight();
     });
 
     document.addEventListener('keydown', handleGlobalKeyboardNavigation);
