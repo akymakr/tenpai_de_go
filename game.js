@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v2.0.60404.0",
+        gameVersion: "v2.0.60406.0",
         scoreVersionLabel: "採点バージョン",
         scoreVersion: "1.1",
         selectMode: "モードを選択してください",
@@ -159,7 +159,7 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v2.0.60404.0",
+        gameVersion: "v2.0.60406.0",
         scoreVersionLabel: "Scoring Version",
         scoreVersion: "1.1",
         selectMode: "Select Mode",
@@ -314,7 +314,7 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v2.0.60404.0",
+        gameVersion: "v2.0.60406.0",
         scoreVersionLabel: "計分版本",
         scoreVersion: "1.1",
         selectMode: "請選擇遊戲模式",
@@ -1164,6 +1164,40 @@ function renderTutorialPage() {
 }
 
 let currentLang = 'ja';
+const primaryScreenIds = ['preload-screen', 'language-screen', 'mode-screen', 'difficulty-screen', 'game-screen'];
+const overlayScreenIds = ['victory-screen', 'gameover-screen'];
+const menuNavigationState = {
+    lockUntil: 0
+};
+
+function showExclusiveScreen(activeId, { fadeIn = false } = {}) {
+    [...primaryScreenIds, ...overlayScreenIds].forEach((screenId) => {
+        const screen = getElementByIdCached(screenId);
+        if (!screen) return;
+        screen.classList.add('hidden');
+        screen.classList.remove('fade-in');
+    });
+
+    if (!activeId) return null;
+
+    const activeScreen = getElementByIdCached(activeId);
+    if (!activeScreen) return null;
+
+    activeScreen.classList.remove('hidden');
+    if (fadeIn) {
+        void activeScreen.offsetWidth;
+        activeScreen.classList.add('fade-in');
+    }
+    return activeScreen;
+}
+
+function isMenuNavigationLocked() {
+    return Date.now() < menuNavigationState.lockUntil;
+}
+
+function lockMenuNavigation(durationMs = 220) {
+    menuNavigationState.lockUntil = Date.now() + Math.max(0, durationMs);
+}
 
 function formatTemplateString(str, vars) {
     if (typeof str !== 'string') return str;
@@ -2698,9 +2732,9 @@ function startTimer() {
 
     // 画面を見ていない（タブ非表示/別アプリ/最小化など）状態で開始した場合は、即時に一時停止へ
     // ※ ステージ演出中に離脱 → 演出後にタイマー開始、というケースでも残り時間が減らないようにする
-    const isVisible = !document.hidden && document.visibilityState === 'visible';
-    const hasFocus = typeof document.hasFocus === 'function' ? document.hasFocus() : true;
-    if (!isVisible || !hasFocus) {
+    const visibilityState = document.visibilityState;
+    const isVisible = !document.hidden && (!visibilityState || visibilityState === 'visible');
+    if (!isVisible) {
         pauseTimer();
     }
 
@@ -3003,9 +3037,11 @@ function restartCurrentRun() {
 }
 
 function startGameMode(mode) {
+    if (isMenuNavigationLocked()) return;
+    lockMenuNavigation(mode === 'story' ? 420 : 240);
+
     gameState.mode = mode;
     gameState.lives = gameConfig.lives; // ライフをリセット
-    document.getElementById('mode-screen').classList.add('hidden');
     if (mode === 'story') {
         gameState.difficulty = 'easy';
         gameState.currentQuestion = 0;
@@ -3016,17 +3052,19 @@ function startGameMode(mode) {
         gameState.lastExtensionStageGranted = 0;
         gameState.extendedTime = 0;
         clearTimeExtensionCooldown();
-        document.getElementById('difficulty-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
+        showExclusiveScreen('game-screen');
         document.body.classList.add('in-game');
         updateLivesDisplay();
         startNewQuestion();
     } else {
-        document.getElementById('difficulty-screen').classList.remove('hidden');
+        showExclusiveScreen('difficulty-screen', { fadeIn: true });
     }
 }
 
 function startGameWithDifficulty(difficulty) {
+    if (isMenuNavigationLocked()) return;
+    lockMenuNavigation(420);
+
     gameState.difficulty = difficulty;
     gameState.currentQuestion = 0;
     gameState.currentStage = 0;
@@ -3037,8 +3075,7 @@ function startGameWithDifficulty(difficulty) {
     gameState.lastExtensionStageGranted = 0;
     gameState.extendedTime = 0;
     clearTimeExtensionCooldown();
-    document.getElementById('difficulty-screen').classList.add('hidden');
-    document.getElementById('game-screen').classList.remove('hidden');
+    showExclusiveScreen('game-screen');
     document.body.classList.add('in-game');
     if (gameState.mode === 'survival') gameState.timeLeft = getMaxTime(); // サバイバルの初期時間
     updateLivesDisplay();
@@ -3427,10 +3464,13 @@ function displayCorrectAnswer() {
         }
     ].filter((group) => group.tiles.length > 0);
 
-    container.innerHTML = `<p class="text-xl font-bold mb-4 text-center">${t('correctAnswer')}</p>`;
+    const totalTiles = groups.reduce((sum, group) => sum + group.tiles.length, 0);
+    const useCompactTiles = totalTiles >= 8 || groups.some((group) => group.tiles.length >= 5);
+
+    container.innerHTML = '';
 
     const groupsWrap = document.createElement('div');
-    groupsWrap.className = 'result-groups';
+    groupsWrap.className = `result-groups ${useCompactTiles ? 'result-groups--compact' : ''}`.trim();
 
     groups.forEach((group) => {
         const section = document.createElement('section');
@@ -3447,8 +3487,7 @@ function displayCorrectAnswer() {
         group.tiles.forEach((tile) => {
             const tileInfo = getTileInfo(gameState.tileType, tile);
             const div = document.createElement('div');
-            div.className = 'hand-tile rounded-lg tile-shadow flex items-center justify-center';
-            div.style.cssText = 'width: 64px; height: 88px; font-size: 48px;';
+            div.className = 'hand-tile rounded-lg tile-shadow flex items-center justify-center result-answer-tile';
             div.appendChild(createTileImage(tileInfo));
             div.title = tileInfo.name;
             tilesDiv.appendChild(div);
@@ -3548,8 +3587,6 @@ function displayHandBreakdown() {
         Math.max(0, sortedWaitingTiles.length - 1)
     );
 
-    renderBreakdownControls(container, sortedWaitingTiles.length, breakdownAnimationState.currentIndex);
-
     const waitTile = sortedWaitingTiles[breakdownAnimationState.currentIndex];
     const breakdown = getWinningHandBreakdown([...gameState.hand, waitTile]);
     if (!breakdown) return;
@@ -3570,6 +3607,7 @@ function displayHandBreakdown() {
 
     const stage = createBreakdownStageElement(displayData, { tileType: gameState.tileType });
     sectionDiv.appendChild(stage);
+    renderBreakdownControls(sectionDiv, sortedWaitingTiles.length, breakdownAnimationState.currentIndex);
     container.appendChild(sectionDiv);
 
     playBreakdownTransition(stage, displayData);
@@ -3995,11 +4033,17 @@ function createConfetti() {
                 isWinning: false,
                 order: index
             }));
+        const lastSameTileEntry = [...sortedBaseEntries].reverse().find((entry) => entry.tile === waitTile) || null;
+        const lastLessOrEqualTileEntry = [...sortedBaseEntries].reverse().find((entry) => entry.tile <= waitTile) || null;
         const winningEntry = {
             id: 'winning-tile',
             tile: waitTile,
             isWinning: true,
-            order: Number.MAX_SAFE_INTEGER
+            order: lastSameTileEntry
+                ? lastSameTileEntry.order + 0.5
+                : lastLessOrEqualTileEntry
+                    ? lastLessOrEqualTileEntry.order + 0.5
+                    : -0.5
         };
         const sourceEntries = [...sortedBaseEntries, winningEntry];
         const availableByTile = new Map();
@@ -4014,15 +4058,63 @@ function createConfetti() {
         });
 
         const targetGroups = [breakdown.head, ...breakdown.melds];
-        const winningMeldIndex = breakdown.melds.findIndex((meld) => meld.includes(waitTile));
-        const preferredWinningGroupIndex = winningMeldIndex >= 0 ? winningMeldIndex + 1 : 0;
-        let winningPlaced = false;
+        const previewAvailableByTile = new Map(
+            Array.from(availableByTile.entries()).map(([tile, entries]) => [tile, [...entries]])
+        );
 
         const groups = targetGroups.map((groupTiles, groupIndex) => {
-            const tiles = groupTiles.map((tile) => {
+            const previewOrders = groupTiles.map((tile) => {
+                const pool = previewAvailableByTile.get(tile) || [];
+                const sourceEntry = pool.shift();
+                previewAvailableByTile.set(tile, pool);
+                return sourceEntry?.order ?? Number.MAX_SAFE_INTEGER;
+            });
+
+            return {
+                id: `group-${groupIndex}`,
+                kind: groupIndex === 0 ? 'head' : 'meld',
+                label: getTileGroupDetailText(groupTiles),
+                tileNumbers: [...groupTiles],
+                sourceOrders: previewOrders,
+                normalizedSourceOrders: [...previewOrders].sort((a, b) => a - b)
+            };
+        });
+
+        const [headGroup, ...meldGroups] = groups;
+        if (!headGroup) {
+            return {
+                sourceEntries,
+                groups,
+                animationOrder: groups.flatMap((group) => group.tiles)
+            };
+        }
+
+        const headMinOrder = headGroup.normalizedSourceOrders[0] ?? Number.MAX_SAFE_INTEGER;
+        const headInsertIndex = meldGroups.findIndex((group) => {
+            const groupMinOrder = group.normalizedSourceOrders[0] ?? Number.MAX_SAFE_INTEGER;
+            return headMinOrder < groupMinOrder;
+        });
+
+        const orderedGroups = [...meldGroups];
+        if (headInsertIndex >= 0) {
+            orderedGroups.splice(headInsertIndex, 0, headGroup);
+        } else {
+            orderedGroups.push(headGroup);
+        }
+
+        const preferredWinningGroupId = (() => {
+            for (let groupIndex = orderedGroups.length - 1; groupIndex >= 0; groupIndex--) {
+                if (orderedGroups[groupIndex]?.tileNumbers.includes(waitTile)) return orderedGroups[groupIndex].id;
+            }
+            return orderedGroups[orderedGroups.length - 1]?.id || null;
+        })();
+
+        let winningPlaced = false;
+        const assignedGroups = orderedGroups.map((group) => {
+            const tiles = group.tileNumbers.map((tile) => {
                 let sourceEntry = null;
 
-                if (!winningPlaced && winningEntry && groupIndex === preferredWinningGroupIndex && tile === waitTile) {
+                if (!winningPlaced && preferredWinningGroupId === group.id && tile === waitTile) {
                     sourceEntry = winningEntry;
                     winningPlaced = true;
                 } else {
@@ -4032,8 +4124,8 @@ function createConfetti() {
                 }
 
                 return {
-                    groupId: `group-${groupIndex}`,
-                    sourceId: sourceEntry?.id || `fallback-${groupIndex}-${tile}`,
+                    groupId: group.id,
+                    sourceId: sourceEntry?.id || `fallback-${group.id}-${tile}`,
                     tile,
                     isWinning: !!sourceEntry?.isWinning,
                     sourceOrder: sourceEntry?.order ?? Number.MAX_SAFE_INTEGER
@@ -4041,23 +4133,15 @@ function createConfetti() {
             });
 
             return {
-                id: `group-${groupIndex}`,
-                kind: groupIndex === 0 ? 'head' : 'meld',
-                label: getTileGroupDetailText(groupTiles),
-                tiles,
-                sourceOrders: tiles.map((tileEntry) => tileEntry.sourceOrder),
-                tileNumbers: [...groupTiles]
+                ...group,
+                tiles
             };
-        }).sort((left, right) => {
-            const orderDiff = compareBreakdownNumberLists(left.sourceOrders, right.sourceOrders);
-            if (orderDiff !== 0) return orderDiff;
-            return compareBreakdownNumberLists(left.tileNumbers, right.tileNumbers);
         });
 
         return {
             sourceEntries,
-            groups,
-            animationOrder: groups.flatMap((group) => group.tiles)
+            groups: assignedGroups,
+            animationOrder: assignedGroups.flatMap((group) => group.tiles)
         };
     }
 
@@ -4071,6 +4155,69 @@ function createConfetti() {
         tileDiv.appendChild(createTileImage(tileInfo));
         tileDiv.title = tileInfo.name;
         return tileDiv;
+    }
+
+    function animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { duration = 1000 } = {}) {
+        // アニメーション用レイヤー・移動元・移動先のいずれかが欠けている場合は、
+        // 演出を諦めて状態だけを即時反映する。
+        if (!animationLayer || !sourceNode || !targetNode) {
+            if (sourceNode) sourceNode.classList.add('is-dealt');
+            if (targetNode) targetNode.classList.add('is-arrived');
+            return null;
+        }
+
+        // 画面上の実座標を取得し、
+        // 「どこからどこへ飛ばすか」をピクセル単位で計算できるようにする。
+        const layerRect = animationLayer.getBoundingClientRect();
+        const sourceRect = sourceNode.getBoundingClientRect();
+        const targetRect = targetNode.getBoundingClientRect();
+
+        // 座標やサイズが正しく取得できない場合は、
+        // 中途半端なアニメーションを避けて即時反映にフォールバックする。
+        if (!layerRect.width || !layerRect.height || !sourceRect.width || !targetRect.width) {
+            sourceNode.classList.add('is-dealt');
+            targetNode.classList.add('is-arrived');
+            return null;
+        }
+
+        // 元の牌 DOM を複製し、
+        // 実際に飛んで見える専用の「飛行牌」要素を作る。
+        const flyTile = sourceNode.cloneNode(true);
+
+        // 元牌や到着済み牌の状態クラスは飛行牌には不要なので外し、
+        // 飛行専用クラスだけを付与する。
+        flyTile.classList.remove('is-dealt', 'is-arrived');
+        flyTile.classList.add('breakdown-fly-tile');
+
+        // 飛行牌の初期サイズと初期位置を、移動元牌と完全に一致させる。
+        flyTile.style.width = `${sourceRect.width}px`;
+        flyTile.style.height = `${sourceRect.height}px`;
+        flyTile.style.left = `${sourceRect.left - layerRect.left}px`;
+        flyTile.style.top = `${sourceRect.top - layerRect.top}px`;
+
+        // 最初は「まだ動いていない状態」にしておき、
+        // 次のフレームで transform を更新して移動を発火させる。
+        flyTile.style.transform = 'translate(0px, 0px) scale(1)';
+        flyTile.style.transition = `transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 600ms ease`;
+
+        // 飛行牌をアニメーションレイヤーへ載せ、
+        // 元の牌はその瞬間に「配り済み」として画面から消す。
+        animationLayer.appendChild(flyTile);
+        sourceNode.classList.add('is-dealt');
+
+        // レイアウト確定後の次フレームで透明度と移動先 transform を与え、
+        // ブラウザに「今ここからあそこへ飛ぶ」アニメーションを実行させる。
+        requestAnimationFrame(() => {
+            flyTile.style.opacity = '1';
+
+            // 移動量は「移動先座標 - 移動元座標」で求め、
+            // 必要なら移動先サイズに合わせて scale も同時に調整する。
+            flyTile.style.transform = `translate(${(targetRect.left - sourceRect.left).toFixed(2)}px, ${(targetRect.top - sourceRect.top).toFixed(2)}px) scale(${(targetRect.width / Math.max(sourceRect.width, 1)).toFixed(4)})`;
+        });
+
+        // 呼び出し元で完了後に remove() できるよう、
+        // 生成した飛行牌要素を返す。
+        return flyTile;
     }
 
     function createBreakdownStageElement(displayData, { compact = false, tileType = gameState.tileType } = {}) {
@@ -4144,7 +4291,7 @@ function createConfetti() {
         return stage;
     }
 
-    function applyBreakdownCentering(stage, { animated = true, vertical = false } = {}) {
+    function applyBreakdownCentering(stage, { animated = true } = {}) {
         const bubble = stage?.querySelector('.breakdown-bubble');
         const targetGroups = stage?.querySelector('.breakdown-target-groups');
         if (!bubble || !targetGroups) return;
@@ -4165,14 +4312,9 @@ function createConfetti() {
             ? Math.max(0, ((trackRect.width - contentWidth) / 2) - contentLeft)
             : 0;
 
-        const groupsRect = targetGroups.getBoundingClientRect();
-        const currentCenterY = (groupsRect.top - bubbleRect.top) + (groupsRect.height / 2);
-        const desiredCenterY = bubbleRect.height / 2;
-        const shiftY = vertical ? desiredCenterY - currentCenterY : 0;
-
-        stage.classList.toggle('breakdown-stage-centering', animated && (Math.abs(shiftX) > 0.5 || Math.abs(shiftY) > 0.5));
+        stage.classList.toggle('breakdown-stage-centering', animated && Math.abs(shiftX) > 0.5);
         targetGroups.style.setProperty('--breakdown-center-shift-x', `${shiftX.toFixed(2)}px`);
-        targetGroups.style.setProperty('--breakdown-center-shift-y', `${shiftY.toFixed(2)}px`);
+        targetGroups.style.setProperty('--breakdown-center-shift-y', '0px');
     }
 
     function renderBreakdownControls(container, total, activeIndex) {
@@ -4216,98 +4358,99 @@ function createConfetti() {
         clearBreakdownAnimationTimers();
         const playToken = breakdownAnimationState.playToken;
 
-        const sourceTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-source-tile')).map((node) => [node.dataset.sourceId, node]));
+        const bubble = stage.querySelector('.breakdown-bubble');
         const targetGroups = new Map(Array.from(stage.querySelectorAll('.breakdown-target-group')).map((node) => [node.dataset.groupId, node]));
-        const targetTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-target-tile')).map((node) => [node.dataset.sourceId, node]));
         const animationLayer = stage.querySelector('.breakdown-animation-layer');
+        const sourceTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-source-tile[data-source-id]')).map((node) => [node.dataset.sourceId, node]));
+        const targetTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-target-tile[data-source-id]')).map((node) => [node.dataset.sourceId, node]));
         if (animationLayer) animationLayer.innerHTML = '';
-        stage.classList.remove('breakdown-stage-complete', 'breakdown-stage-centering');
+        stage.classList.remove('breakdown-stage-complete', 'breakdown-stage-centering', 'breakdown-stage-replay-fadeout');
+        if (bubble) bubble.style.minHeight = `${bubble.offsetHeight}px`;
         const targetGroupsTrack = stage.querySelector('.breakdown-target-groups');
         if (targetGroupsTrack) {
             targetGroupsTrack.style.setProperty('--breakdown-center-shift-x', '0px');
             targetGroupsTrack.style.setProperty('--breakdown-center-shift-y', '0px');
         }
-        sourceTiles.forEach((node) => node.classList.remove('is-dealt'));
-        targetTiles.forEach((node) => node.classList.remove('is-arrived'));
+        stage.querySelectorAll('.breakdown-source-tile').forEach((node) => node.classList.remove('is-dealt'));
+        stage.querySelectorAll('.breakdown-target-tile').forEach((node) => node.classList.remove('is-arrived'));
         targetGroups.forEach((groupNode) => {
-            groupNode.classList.remove('is-complete');
+            groupNode.classList.remove('is-complete', 'is-revealed');
             groupNode.querySelectorAll('.breakdown-target-slot').forEach((slot) => slot.classList.remove('is-filled'));
         });
         requestAnimationFrame(() => {
             if (playToken !== breakdownAnimationState.playToken) return;
-            applyBreakdownCentering(stage, { animated: false, vertical: false });
+            applyBreakdownCentering(stage, { animated: false });
         });
 
-        const shouldSkipAnimation = document.body.classList.contains('low-power') || prefersReducedMotion();
+        const shouldSkipAnimation = prefersReducedMotion();
         if (shouldSkipAnimation) {
-            sourceTiles.forEach((node) => node.classList.add('is-dealt'));
-            targetTiles.forEach((node) => node.classList.add('is-arrived'));
+            stage.querySelectorAll('.breakdown-source-tile').forEach((node) => node.classList.add('is-dealt'));
+            stage.querySelectorAll('.breakdown-target-tile').forEach((node) => node.classList.add('is-arrived'));
             targetGroups.forEach((groupNode) => {
-                groupNode.classList.add('is-complete');
+                groupNode.classList.add('is-revealed', 'is-complete');
                 groupNode.querySelectorAll('.breakdown-target-slot').forEach((slot) => slot.classList.add('is-filled'));
             });
             stage.classList.add('breakdown-stage-complete');
-            requestAnimationFrame(() => applyBreakdownCentering(stage, { animated: false, vertical: true }));
             return;
         }
 
-        const animationOrder = displayData.animationOrder;
-        const sourceFadeMs = 40;
-        const targetRevealMs = 70;
-        const gapMs = 20;
-        const tileCycleMs = sourceFadeMs + targetRevealMs + gapMs;
-        const replayDelayMs = 900;
-        const arrivedCounts = new Map(displayData.groups.map((group) => [group.id, 0]));
-        const groupSizes = new Map(displayData.groups.map((group) => [group.id, group.tiles.length]));
+        const prepDelayMs = 1800;
+        const groupRevealMs = 400;
+        const groupGapMs = 150;
+        const groupCycleMs = groupRevealMs + groupGapMs;
+        const settleDelayMs = 250;
+        const replayFadeOutMs = 320;
+        const replayDelayMs = 2000;
+        displayData.groups.forEach((group, index) => {
+            const groupNode = targetGroups.get(group.id);
+            if (!groupNode) return;
 
-        animationOrder.forEach((item, index) => {
-            const sourceNode = sourceTiles.get(item.sourceId);
-            const groupNode = targetGroups.get(item.groupId);
-            const targetNode = targetTiles.get(item.sourceId);
-            const targetSlots = groupNode ? Array.from(groupNode.querySelectorAll('.breakdown-target-slot')) : [];
-            const slotIndex = displayData.groups.find((group) => group.id === item.groupId)?.tiles.findIndex((tile) => tile.sourceId === item.sourceId) ?? -1;
-            const targetSlot = slotIndex >= 0 ? targetSlots[slotIndex] : null;
-            if (!sourceNode || !targetNode) return;
-
-            const startDelay = index * tileCycleMs;
-
-            const startTimer = setTimeout(() => {
+            const delay = prepDelayMs + (index * groupCycleMs);
+            const timerId = setTimeout(() => {
                 if (playToken !== breakdownAnimationState.playToken) return;
-                sourceNode.classList.add('is-dealt');
-                if (targetSlot) targetSlot.classList.add('is-filled');
-            }, startDelay);
+                groupNode.classList.add('is-revealed');
+                const targetSlots = Array.from(groupNode.querySelectorAll('.breakdown-target-slot'));
+                const flyTiles = group.tiles.map((tileEntry, tileIndex) => {
+                    const sourceNode = sourceTiles.get(tileEntry.sourceId);
+                    const targetNode = targetTiles.get(tileEntry.sourceId);
+                    const slotNode = targetSlots[tileIndex];
+                    if (slotNode) slotNode.classList.add('is-filled');
+                    return animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { duration: groupRevealMs });
+                }).filter(Boolean);
 
-            const revealTimer = setTimeout(() => {
-                if (playToken !== breakdownAnimationState.playToken) return;
-                targetNode.classList.add('is-arrived');
-            }, startDelay + sourceFadeMs);
-
-            const endTimer = setTimeout(() => {
-                if (playToken !== breakdownAnimationState.playToken) return;
-
-                const nextCount = (arrivedCounts.get(item.groupId) || 0) + 1;
-                arrivedCounts.set(item.groupId, nextCount);
-                if (nextCount >= (groupSizes.get(item.groupId) || 0) && groupNode) {
+                const completeTimer = setTimeout(() => {
+                    if (playToken !== breakdownAnimationState.playToken) return;
+                    group.tiles.forEach((tileEntry) => {
+                        const targetNode = targetTiles.get(tileEntry.sourceId);
+                        if (targetNode) targetNode.classList.add('is-arrived');
+                    });
+                    flyTiles.forEach((node) => node.remove());
                     groupNode.classList.add('is-complete');
-                }
-            }, startDelay + sourceFadeMs + targetRevealMs);
+                }, groupRevealMs);
 
-            breakdownAnimationState.timerIds.push(startTimer, revealTimer, endTimer);
+                breakdownAnimationState.timerIds.push(completeTimer);
+            }, delay);
+
+            breakdownAnimationState.timerIds.push(timerId);
         });
 
         const finishTimer = setTimeout(() => {
             if (playToken !== breakdownAnimationState.playToken) return;
             stage.classList.add('breakdown-stage-complete');
             animationLayer.innerHTML = '';
-            requestAnimationFrame(() => {
-                if (playToken !== breakdownAnimationState.playToken) return;
-                applyBreakdownCentering(stage, { animated: true, vertical: true });
-            });
-        }, animationOrder.length * tileCycleMs);
+        }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs));
 
         breakdownAnimationState.timerIds.push(finishTimer);
 
         if (autoReplay) {
+            const fadeOutTimer = setTimeout(() => {
+                if (playToken !== breakdownAnimationState.playToken) return;
+                if (!stage.isConnected) return;
+                stage.classList.add('breakdown-stage-replay-fadeout');
+            }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs + replayDelayMs - replayFadeOutMs));
+
+            breakdownAnimationState.timerIds.push(fadeOutTimer);
+
             const replayTimer = setTimeout(() => {
                 if (playToken !== breakdownAnimationState.playToken) return;
                 if (!stage.isConnected) return;
@@ -4321,7 +4464,7 @@ function createConfetti() {
                 if (!resultSection || resultSection.classList.contains('hidden')) return;
 
                 displayHandBreakdown();
-            }, animationOrder.length * tileCycleMs + replayDelayMs);
+            }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs) + replayDelayMs);
 
             breakdownAnimationState.timerIds.push(replayTimer);
         }
@@ -4518,6 +4661,9 @@ function resetGame() {
 }
 
 function selectLanguage(lang) {
+    if (isMenuNavigationLocked()) return;
+    lockMenuNavigation(320);
+
     currentLang = lang;
     document.documentElement.lang = lang;
     document.title = t('gameTitle').replace(/🀄/g, '').trim();
@@ -4544,18 +4690,8 @@ function selectLanguage(lang) {
         }
     }
 
-    const languageScreen = document.getElementById('language-screen');
-    const modeScreen = document.getElementById('mode-screen');
-    languageScreen.style.opacity = '0';
-    languageScreen.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-        languageScreen.classList.add('hidden');
-        languageScreen.style.opacity = '1';
-        languageScreen.style.transform = 'scale(1)';
-        modeScreen.classList.remove('hidden');
-        modeScreen.classList.add('fade-in');
-        clearKeyboardMenuHighlight();
-    }, 400);
+    showExclusiveScreen('mode-screen', { fadeIn: true });
+    clearKeyboardMenuHighlight();
 }
 
 function ensureGoogleFontsTcLoaded() {
@@ -4577,34 +4713,29 @@ function ensureGoogleFontsTcLoaded() {
 }
 
 function backToLanguageSelection() {
-    const languageScreen = document.getElementById('language-screen');
-    const modeScreen = document.getElementById('mode-screen');
-    if (!languageScreen || !modeScreen) return;
+    if (isMenuNavigationLocked()) return;
+    lockMenuNavigation(220);
 
-    modeScreen.classList.add('hidden');
-    languageScreen.classList.remove('hidden');
-    languageScreen.classList.add('fade-in');
+    showExclusiveScreen('language-screen', { fadeIn: true });
     clearKeyboardMenuHighlight();
 }
 
 function backToModeSelection() {
-    const difficultyScreen = document.getElementById('difficulty-screen');
-    const modeScreen = document.getElementById('mode-screen');
-    if (!difficultyScreen || !modeScreen) return;
+    if (isMenuNavigationLocked()) return;
+    lockMenuNavigation(220);
 
     // 途中まで選んだ状態を破棄する
     gameState.mode = null;
     gameState.difficulty = null;
 
-    difficultyScreen.classList.add('hidden');
-    modeScreen.classList.remove('hidden');
-    modeScreen.classList.add('fade-in');
+    showExclusiveScreen('mode-screen', { fadeIn: true });
     clearKeyboardMenuHighlight();
 }
 
 function showPauseOverlay() {
     let overlay = getElementByIdCached('pause-overlay');
     if (!overlay) {
+        const overlayHost = getElementByIdCached('game-screen') || document.body;
         overlay = document.createElement('div');
         overlay.id = 'pause-overlay';
         overlay.className = 'pause-overlay';
@@ -4615,9 +4746,7 @@ function showPauseOverlay() {
             </div>
         `;
         overlay.addEventListener('click', resumeTimer);
-
-        const root = getElementByIdCached('design-root');
-        (root || document.body).appendChild(overlay);
+        overlayHost.appendChild(overlay);
     }
     overlay.classList.remove('hidden');
     overlay.classList.add('fade-in');
@@ -4632,10 +4761,8 @@ function hidePauseOverlay() {
 
 document.addEventListener('DOMContentLoaded', () => {
     // 初期表示はプリロード画面のみにする
-    const preloadScreen = getElementByIdCached('preload-screen');
+    const preloadScreen = showExclusiveScreen('preload-screen', { fadeIn: true });
     const languageScreen = getElementByIdCached('language-screen');
-    if (preloadScreen) preloadScreen.classList.remove('hidden');
-    if (languageScreen) languageScreen.classList.add('hidden');
 
     applyLowPowerClass();
     applyIosTextureCompatibilityClass();
@@ -4666,11 +4793,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (progressText) progressText.textContent = `${pct}% (${loaded}/${total})`;
             }
         }).then(() => {
-            if (preloadScreen) preloadScreen.classList.add('hidden');
-            if (languageScreen) {
-                languageScreen.classList.remove('hidden');
-                languageScreen.classList.add('fade-in');
-            }
+            if (languageScreen) showExclusiveScreen('language-screen', { fadeIn: true });
             clearKeyboardMenuHighlight();
         });
     });
