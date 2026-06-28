@@ -1,6 +1,6 @@
-![](https://repository-images.githubusercontent.com/1122175543/44e23fd5-5e22-4ce0-bab1-148843f58eed)
+# 聴牌でGO! - Mahjong Tenpai Training Game
 
-# Tenpai de GO! / 聴牌でGO! / 聽牌GO!
+![](https://repository-images.githubusercontent.com/1122175543/44e23fd5-5e22-4ce0-bab1-148843f58eed)
 
 Mahjong tenpai training game.
 
