@@ -2576,80 +2576,74 @@ function grantTimeExtensionForStage(stageNumber) {
 }
 
 // 正確な和了判定（4面子1雀頭）
+function _countsToArr(counts) {
+    const arr = new Int8Array(10);
+    for (let i = 1; i <= 9; i++) arr[i] = counts[i] | 0;
+    return arr;
+}
+
+function _canFormMentsuArr(arr, total) {
+    if (total === 0) return true;
+    if (total % 3 !== 0) return false;
+    let first = 0;
+    for (let i = 1; i <= 9; i++) {
+        if (arr[i] > 0) { first = i; break; }
+    }
+    if (first === 0) return true;
+    if (arr[first] >= 3) {
+        arr[first] -= 3;
+        if (_canFormMentsuArr(arr, total - 3)) { arr[first] += 3; return true; }
+        arr[first] += 3;
+    }
+    if (first <= 7 && arr[first] > 0 && arr[first + 1] > 0 && arr[first + 2] > 0) {
+        arr[first]--; arr[first + 1]--; arr[first + 2]--;
+        if (_canFormMentsuArr(arr, total - 3)) {
+            arr[first]++; arr[first + 1]++; arr[first + 2]++;
+            return true;
+        }
+        arr[first]++; arr[first + 1]++; arr[first + 2]++;
+    }
+    return false;
+}
+
 function isWinningHand(counts) {
+    const arr = _countsToArr(counts);
     for (let head = 1; head <= 9; head++) {
-        if (counts[head] >= 2) {
-            const newCounts = {...counts};
-            newCounts[head] -= 2;
-            if (canFormMentsu(newCounts)) {
-                return true;
+        if (arr[head] >= 2) {
+            arr[head] -= 2;
+            if (_canFormMentsuArr(arr, 12)) { arr[head] += 2; return true; }
+            arr[head] += 2;
+        }
+    }
+    return false;
+}
+
+function canFormMentsu(counts) {
+    const arr = _countsToArr(counts);
+    let total = 0;
+    for (let i = 1; i <= 9; i++) total += arr[i];
+    return _canFormMentsuArr(arr, total);
+}
+
+function calculateWinningTiles(counts) {
+    const arr = _countsToArr(counts);
+    const winningTiles = [];
+    for (let tile = 1; tile <= 9; tile++) {
+        if (arr[tile] >= 4) continue;
+        arr[tile]++;
+        const a2 = arr.slice();
+        for (let head = 1; head <= 9; head++) {
+            if (a2[head] >= 2) {
+                a2[head] -= 2;
+                if (_canFormMentsuArr(a2, 12)) { winningTiles.push(tile); a2[head] += 2; break; }
+                a2[head] += 2;
             }
         }
-    }
-    return false;
-}
-
-// 面子（刻子/順子）を組めるか判定
-function canFormMentsu(counts) {
-    let totalTiles = 0;
-    for (let i = 1; i <= 9; i++) {
-        totalTiles += counts[i];
-    }
-    
-    if (totalTiles === 0) return true;
-    if (totalTiles % 3 !== 0) return false;
-    
-    let firstTile = 0;
-    for (let i = 1; i <= 9; i++) {
-        if (counts[i] > 0) {
-            firstTile = i;
-            break;
-        }
-    }
-    
-    if (firstTile === 0) return true;
-    
-    const newCounts = { ...counts };
-    
-    // まず刻子（同牌3枚）を試す
-    if (newCounts[firstTile] >= 3) {
-        newCounts[firstTile] -= 3;
-        if (canFormMentsu(newCounts)) {
-            return true;
-        }
-        newCounts[firstTile] += 3;
-    }
-    
-    // 次に順子（連続3枚）を試す
-    if (firstTile <= 7 && newCounts[firstTile] > 0 && newCounts[firstTile + 1] > 0 && newCounts[firstTile + 2] > 0) {
-        newCounts[firstTile]--;
-        newCounts[firstTile + 1]--;
-        newCounts[firstTile + 2]--;
-        if (canFormMentsu(newCounts)) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-// 聴牌（待ち牌）を計算
-function calculateWinningTiles(counts) {
-    const winningTiles = [];
-    
-    for (let tile = 1; tile <= 9; tile++) {
-        if (counts[tile] >= 4) continue;
-        const newCounts = {...counts};
-        newCounts[tile]++;
-        
-        if (isWinningHand(newCounts)) {
-            winningTiles.push(tile);
-        }
+        arr[tile]--;
     }
     return winningTiles;
 }
 
-// 難易度に応じて待ちの数が条件を満たすか判定
 function isValidWinningTilesCount(count, difficulty, attempts) {
     if (difficulty === 'easy') {
         return count >= 1 && count <= 3;
@@ -2660,75 +2654,73 @@ function isValidWinningTilesCount(count, difficulty, attempts) {
         if (attempts <= 72) return count >= 3 && count <= 6;
         if (attempts <= 96) return count >= 2 && count <= 6;
         return count >= 1 && count <= 6;
-    } else { // 上級
-        if (attempts <= 60) return count === 9;
-        if (attempts <= 120) return count >= 8 && count <= 9;
-        if (attempts <= 240) return count >= 7 && count <= 9;
-        if (attempts <= 480) return count >= 6 && count <= 9;
-        if (attempts <= 720) return count >= 5 && count <= 9;
-        if (attempts <= 960) return count >= 4 && count <= 9;
-        if (attempts <= 1200) return count >= 3 && count <= 9;
-        if (attempts <= 1440) return count >= 2 && count <= 9;
+    } else {
+        if (attempts <= 30) return count === 9;
+        if (attempts <= 80) return count >= 8 && count <= 9;
+        if (attempts <= 160) return count >= 7 && count <= 9;
+        if (attempts <= 300) return count >= 6 && count <= 9;
+        if (attempts <= 500) return count >= 5 && count <= 9;
+        if (attempts <= 700) return count >= 4 && count <= 9;
+        if (attempts <= 900) return count >= 3 && count <= 9;
+        if (attempts <= 1100) return count >= 2 && count <= 9;
         return count >= 1 && count <= 9;
     }
 }
 
-// 聴牌手牌を生成
 function generateTenpaiHand(difficulty) {
     let attempts = 0;
-    
+    const counts = {};
+    const hand = [];
+
     do {
         attempts++;
-        
-        // 牌カウントをリセット
-        gameState.counts = {};
-        for (let i = 1; i <= 9; i++) {
-            gameState.counts[i] = 0;
-        }
-        gameState.hand = [];
-        
-        // 13枚を生成（各牌は最大4枚）
-        while (gameState.hand.length < 13) {
+
+        for (let i = 1; i <= 9; i++) counts[i] = 0;
+        hand.length = 0;
+
+        while (hand.length < 13) {
             const tile = Math.floor(Math.random() * 9) + 1;
-            if (gameState.counts[tile] < 4) {
-                gameState.hand.push(tile);
-                gameState.counts[tile]++;
+            if (counts[tile] < 4) {
+                hand.push(tile);
+                counts[tile]++;
             }
         }
-        
-        // 聴牌を計算
-        const winningTiles = calculateWinningTiles(gameState.counts);
-        
-        // 難易度条件を満たすか確認
+
+        const winningTiles = calculateWinningTiles(counts);
+
         if (isValidWinningTilesCount(winningTiles.length, difficulty, attempts)) {
-            return { hand: gameState.hand, waiting: winningTiles, counts: gameState.counts };
+            return { hand: hand.slice(), waiting: winningTiles, counts: Object.assign({}, counts) };
         }
-        
-        // 無限ループ防止
-        if (attempts > 1000000) {
+
+        if (attempts > 200000) {
             console.warn('条件に合う手牌を生成できませんでした。現在の結果を使用します。');
-            return { hand: gameState.hand, waiting: winningTiles, counts: gameState.counts };
+            return { hand: hand.slice(), waiting: winningTiles, counts: Object.assign({}, counts) };
         }
-        
+
     } while (true);
 }
 
 function startTimer() {
     stopTimer();
-    // 現在ステージの最大時間を保存
     gameState.maxTime = gameState.isBossStage ? Math.max(0, gameState.timeLeft) : getMaxTime();
     gameState.isPaused = false;
+    gameState._timerStartMs = Date.now();
+    gameState._timerBaseLeft = gameState.timeLeft;
     updateTimerDisplay();
     gameState.timerInterval = setInterval(() => {
         if (!gameState.isPaused) {
-            gameState.timeLeft--;
-            updateTimerDisplay();
+            const elapsed = Math.floor((Date.now() - gameState._timerStartMs) / 1000);
+            const newTimeLeft = Math.max(0, gameState._timerBaseLeft - elapsed);
+            if (newTimeLeft !== gameState.timeLeft) {
+                gameState.timeLeft = newTimeLeft;
+                updateTimerDisplay();
+            }
             if (gameState.timeLeft <= 0) {
                 stopTimer();
                 handleTimeUp();
             }
         }
-    }, 1000);
+    }, 250);
 
     // 画面を見ていない（タブ非表示/別アプリ/最小化など）状態で開始した場合は、即時に一時停止へ
     // ※ ステージ演出中に離脱 → 演出後にタイマー開始、というケースでも残り時間が減らないようにする
@@ -2766,6 +2758,7 @@ function stopTimer() {
 function pauseTimer() {
     if (!gameState.timerInterval || gameState.isAnswered) return;
     gameState.isPaused = true;
+    gameState._timerPausedAt = Date.now();
     pauseTimerSound();
     document.body.classList.add('effects-paused');
     showPauseOverlay();
@@ -2774,6 +2767,11 @@ function pauseTimer() {
 
 function resumeTimer() {
     if (!gameState.timerInterval) return;
+    if (gameState._timerPausedAt) {
+        const pausedMs = Date.now() - gameState._timerPausedAt;
+        gameState._timerStartMs += pausedMs;
+        gameState._timerPausedAt = null;
+    }
     gameState.isPaused = false;
     hidePauseOverlay();
     document.body.classList.remove('effects-paused');
@@ -2887,10 +2885,26 @@ function getMaxTime() {
     return Math.max(0, gameConfig.modeStartSeconds?.[gameState.mode] || 0);
 }
 
+function _showTimeUpResult(onAfter) {
+    highlightAnswers();
+    const section = document.getElementById('result-section');
+    const message = document.getElementById('result-message');
+    const nextBtn = document.getElementById('next-btn');
+    if (section) {
+        section.classList.remove('hidden');
+        section.classList.add('slide-down');
+    }
+    if (message) {
+        message.textContent = t('timeUp');
+        message.className = 'text-3xl font-bold text-red-300 mb-6';
+    }
+    if (nextBtn) nextBtn.classList.add('hidden');
+    if (onAfter) onAfter();
+}
+
 function handleTimeUp() {
     if (gameState.isAnswered) return;
 
-    // 1枚でも選んでいれば「自動提出」として扱う（select 音は鳴らさない）
     if (gameState.selectedTiles && gameState.selectedTiles.size > 0) {
         checkAnswer({ force: true });
         return;
@@ -2898,66 +2912,30 @@ function handleTimeUp() {
 
     gameState.isAnswered = true;
     updateInteractionState();
-
-    // 時間切れ確定：カウントダウン音は停止
     stopTimerSound();
-
-    // 未提出の時間切れ：incorrect ではなく timeup を鳴らす
     playSound('timeup');
-    
-    // サバイバルは時間切れで即終了
+
     if (gameState.mode === 'survival') {
-        highlightAnswers();
-        const section = document.getElementById('result-section');
-        const message = document.getElementById('result-message');
-        const nextBtn = document.getElementById('next-btn');
-        if (section) {
-            section.classList.remove('hidden');
-            section.classList.add('slide-down');
-        }
-        if (message) {
-            message.textContent = t('timeUp');
-            message.className = 'text-3xl font-bold text-red-300 mb-6';
-        }
-        if (nextBtn) nextBtn.classList.add('hidden');
-        hideResultActions();
-        showGameOver(true);
+        _showTimeUpResult(() => {
+            hideResultActions();
+            showGameOver(true);
+        });
         return;
     }
-    
-    // カジュアル/ストーリーはライフ制
+
     if (gameState.mode === 'casual' || gameState.mode === 'story') {
         gameState.lives--;
         updateLivesDisplay();
-        
+
         if (gameState.lives <= 0) {
-            highlightAnswers();
-            const section = document.getElementById('result-section');
-            const message = document.getElementById('result-message');
-            const nextBtn = document.getElementById('next-btn');
-            if (section) {
-                section.classList.remove('hidden');
-                section.classList.add('slide-down');
-            }
-            if (message) {
-                message.textContent = t('timeUp');
-                message.className = 'text-3xl font-bold text-red-300 mb-6';
-            }
-            if (nextBtn) nextBtn.classList.add('hidden');
-            hideResultActions();
-            showGameOver(true);
+            _showTimeUpResult(() => {
+                hideResultActions();
+                showGameOver(true);
+            });
         } else {
-            // 正解表示後に Continue を出す
-            highlightAnswers();
-            const section = document.getElementById('result-section');
-            const message = document.getElementById('result-message');
-            const nextBtn = document.getElementById('next-btn');
-            section.classList.remove('hidden');
-            section.classList.add('slide-down');
-            message.textContent = t('timeUp');
-            message.className = 'text-3xl font-bold text-red-300 mb-6';
-            if (nextBtn) nextBtn.classList.add('hidden');
-            showContinueOption();
+            _showTimeUpResult(() => {
+                showContinueOption();
+            });
         }
     }
 }
@@ -3141,7 +3119,7 @@ function generateAndShowQuestion() {
 
     const result = generateTenpaiHand(gameState.difficulty);
     if (!result) { 
-        alert('問題を生成できません。もう一度お試しください。');
+        console.error('Failed to generate question');
         resetGame();
         return; 
     }
@@ -3188,7 +3166,8 @@ function generateAndShowBossQuestion({ resetTime = false } = {}) {
     // ボスは現在の難易度を引き継ぐ（カジュアルは選択値、ストーリーは7-9でハードの想定）
     const result = generateTenpaiHand(gameState.difficulty);
     if (!result) {
-        alert('BOSS問題を生成できません');
+        console.error('Failed to generate BOSS question');
+        resetGame();
         return;
     }
 
@@ -3351,6 +3330,10 @@ function handleCorrectAnswer() {
     if (gameState.mode === 'survival') {
         const recovery = Math.max(0, gameConfig.survivalRecoverySeconds?.[gameState.difficulty] || 0);
         gameState.timeLeft += recovery;
+        if (gameState._timerStartMs != null) {
+            gameState._timerBaseLeft = gameState.timeLeft;
+            gameState._timerStartMs = Date.now();
+        }
     }
     showResult(true);
     highlightAnswers();
@@ -3657,14 +3640,11 @@ function updateLivesDisplay() {
     
     if (gameState.mode === 'casual' || gameState.mode === 'story') {
         livesContainer.classList.remove('hidden');
-        livesContainer.innerHTML = `<span class="font-bold">${t('lives')}</span> `;
+        let livesHtml = `<span class="font-bold">${t('lives')}</span> `;
         for (let i = 0; i < gameState.maxLives; i++) {
-            if (i < gameState.lives) {
-                livesContainer.innerHTML += '❤️';
-            } else {
-                livesContainer.innerHTML += '🖤';
-            }
+            livesHtml += i < gameState.lives ? '❤️' : '🖤';
         }
+        livesContainer.innerHTML = livesHtml;
     } else {
         livesContainer.classList.add('hidden');
     }
@@ -3802,6 +3782,10 @@ function useTimeExtension() {
     
     gameState.timeExtensions--;
     gameState.timeLeft += gameConfig.timeExtensionSeconds;
+    if (gameState._timerStartMs != null) {
+        gameState._timerBaseLeft = gameState.timeLeft;
+        gameState._timerStartMs = Date.now();
+    }
     gameState.extendedTime += gameConfig.timeExtensionSeconds; // このステージで使った延長時間を記録
 
     // 連打防止：5 秒クールダウン
@@ -3994,660 +3978,660 @@ function createConfetti() {
     }
 }
 
-    function clearBreakdownAnimationTimers() {
-        breakdownAnimationState.playToken += 1;
-        breakdownAnimationState.timerIds.forEach((timerId) => clearTimeout(timerId));
-        breakdownAnimationState.timerIds = [];
-    }
+function clearBreakdownAnimationTimers() {
+    breakdownAnimationState.playToken += 1;
+    breakdownAnimationState.timerIds.forEach((timerId) => clearTimeout(timerId));
+    breakdownAnimationState.timerIds = [];
+}
 
-    function getSortedBreakdownWaitingTiles() {
-        const selected = Array.from(gameState.selectedTiles);
-        const missedTiles = gameState.waitingTiles.filter((tile) => !selected.includes(tile));
-        const selectedTiles = gameState.waitingTiles.filter((tile) => selected.includes(tile));
-        return [...missedTiles, ...selectedTiles];
-    }
+function getSortedBreakdownWaitingTiles() {
+    const selected = Array.from(gameState.selectedTiles);
+    const missedTiles = gameState.waitingTiles.filter((tile) => !selected.includes(tile));
+    const selectedTiles = gameState.waitingTiles.filter((tile) => selected.includes(tile));
+    return [...missedTiles, ...selectedTiles];
+}
 
-    function getTileGroupDetailText(tileNumbers) {
-        if (tileNumbers.length === 2) return t('pair');
-        if (tileNumbers.length === 3) {
-            if (tileNumbers[0] === tileNumbers[1] && tileNumbers[1] === tileNumbers[2]) return t('triplet');
-            return t('sequence');
+function getTileGroupDetailText(tileNumbers) {
+    if (tileNumbers.length === 2) return t('pair');
+    if (tileNumbers.length === 3) {
+        if (tileNumbers[0] === tileNumbers[1] && tileNumbers[1] === tileNumbers[2]) return t('triplet');
+        return t('sequence');
+    }
+    return '';
+}
+
+function compareBreakdownNumberLists(left, right) {
+    const maxLength = Math.max(left.length, right.length);
+    for (let index = 0; index < maxLength; index++) {
+        const leftValue = left[index] ?? Number.MAX_SAFE_INTEGER;
+        const rightValue = right[index] ?? Number.MAX_SAFE_INTEGER;
+        if (leftValue !== rightValue) return leftValue - rightValue;
+    }
+    return 0;
+}
+
+function buildBreakdownDisplayData(waitTile, breakdown, baseHand = gameState.hand) {
+    const sortedBaseEntries = [...baseHand].sort((a, b) => a - b).map((tile, index) => ({
+            id: `hand-${index}`,
+            tile,
+            isWinning: false,
+            order: index
+        }));
+    const lastSameTileEntry = [...sortedBaseEntries].reverse().find((entry) => entry.tile === waitTile) || null;
+    const lastLessOrEqualTileEntry = [...sortedBaseEntries].reverse().find((entry) => entry.tile <= waitTile) || null;
+    const winningEntry = {
+        id: 'winning-tile',
+        tile: waitTile,
+        isWinning: true,
+        order: lastSameTileEntry
+            ? lastSameTileEntry.order + 0.5
+            : lastLessOrEqualTileEntry
+                ? lastLessOrEqualTileEntry.order + 0.5
+                : -0.5
+    };
+    const sourceEntries = [...sortedBaseEntries, winningEntry];
+    const availableByTile = new Map();
+
+    sourceEntries.forEach((entry) => {
+        if (entry.isWinning) {
+            return;
         }
-        return '';
-    }
+        const current = availableByTile.get(entry.tile) || [];
+        current.push(entry);
+        availableByTile.set(entry.tile, current);
+    });
 
-    function compareBreakdownNumberLists(left, right) {
-        const maxLength = Math.max(left.length, right.length);
-        for (let index = 0; index < maxLength; index++) {
-            const leftValue = left[index] ?? Number.MAX_SAFE_INTEGER;
-            const rightValue = right[index] ?? Number.MAX_SAFE_INTEGER;
-            if (leftValue !== rightValue) return leftValue - rightValue;
-        }
-        return 0;
-    }
+    const targetGroups = [breakdown.head, ...breakdown.melds];
+    const previewAvailableByTile = new Map(
+        Array.from(availableByTile.entries()).map(([tile, entries]) => [tile, [...entries]])
+    );
 
-    function buildBreakdownDisplayData(waitTile, breakdown, baseHand = gameState.hand) {
-        const sortedBaseEntries = [...baseHand].sort((a, b) => a - b).map((tile, index) => ({
-                id: `hand-${index}`,
-                tile,
-                isWinning: false,
-                order: index
-            }));
-        const lastSameTileEntry = [...sortedBaseEntries].reverse().find((entry) => entry.tile === waitTile) || null;
-        const lastLessOrEqualTileEntry = [...sortedBaseEntries].reverse().find((entry) => entry.tile <= waitTile) || null;
-        const winningEntry = {
-            id: 'winning-tile',
-            tile: waitTile,
-            isWinning: true,
-            order: lastSameTileEntry
-                ? lastSameTileEntry.order + 0.5
-                : lastLessOrEqualTileEntry
-                    ? lastLessOrEqualTileEntry.order + 0.5
-                    : -0.5
+    const groups = targetGroups.map((groupTiles, groupIndex) => {
+        const previewOrders = groupTiles.map((tile) => {
+            const pool = previewAvailableByTile.get(tile) || [];
+            const sourceEntry = pool.shift();
+            previewAvailableByTile.set(tile, pool);
+            return sourceEntry?.order ?? Number.MAX_SAFE_INTEGER;
+        });
+
+        return {
+            id: `group-${groupIndex}`,
+            kind: groupIndex === 0 ? 'head' : 'meld',
+            label: getTileGroupDetailText(groupTiles),
+            tileNumbers: [...groupTiles],
+            sourceOrders: previewOrders,
+            normalizedSourceOrders: [...previewOrders].sort((a, b) => a - b)
         };
-        const sourceEntries = [...sortedBaseEntries, winningEntry];
-        const availableByTile = new Map();
+    });
 
-        sourceEntries.forEach((entry) => {
-            if (entry.isWinning) {
-                return;
-            }
-            const current = availableByTile.get(entry.tile) || [];
-            current.push(entry);
-            availableByTile.set(entry.tile, current);
-        });
+    const [headGroup, ...meldGroups] = groups;
+    if (!headGroup) {
+        return {
+            sourceEntries,
+            groups,
+            animationOrder: groups.flatMap((group) => group.tiles)
+        };
+    }
 
-        const targetGroups = [breakdown.head, ...breakdown.melds];
-        const previewAvailableByTile = new Map(
-            Array.from(availableByTile.entries()).map(([tile, entries]) => [tile, [...entries]])
-        );
+    const headMinOrder = headGroup.normalizedSourceOrders[0] ?? Number.MAX_SAFE_INTEGER;
+    const headInsertIndex = meldGroups.findIndex((group) => {
+        const groupMinOrder = group.normalizedSourceOrders[0] ?? Number.MAX_SAFE_INTEGER;
+        return headMinOrder < groupMinOrder;
+    });
 
-        const groups = targetGroups.map((groupTiles, groupIndex) => {
-            const previewOrders = groupTiles.map((tile) => {
-                const pool = previewAvailableByTile.get(tile) || [];
-                const sourceEntry = pool.shift();
-                previewAvailableByTile.set(tile, pool);
-                return sourceEntry?.order ?? Number.MAX_SAFE_INTEGER;
-            });
+    const orderedGroups = [...meldGroups];
+    if (headInsertIndex >= 0) {
+        orderedGroups.splice(headInsertIndex, 0, headGroup);
+    } else {
+        orderedGroups.push(headGroup);
+    }
 
-            return {
-                id: `group-${groupIndex}`,
-                kind: groupIndex === 0 ? 'head' : 'meld',
-                label: getTileGroupDetailText(groupTiles),
-                tileNumbers: [...groupTiles],
-                sourceOrders: previewOrders,
-                normalizedSourceOrders: [...previewOrders].sort((a, b) => a - b)
-            };
-        });
-
-        const [headGroup, ...meldGroups] = groups;
-        if (!headGroup) {
-            return {
-                sourceEntries,
-                groups,
-                animationOrder: groups.flatMap((group) => group.tiles)
-            };
+    const preferredWinningGroupId = (() => {
+        for (let groupIndex = orderedGroups.length - 1; groupIndex >= 0; groupIndex--) {
+            if (orderedGroups[groupIndex]?.tileNumbers.includes(waitTile)) return orderedGroups[groupIndex].id;
         }
+        return orderedGroups[orderedGroups.length - 1]?.id || null;
+    })();
 
-        const headMinOrder = headGroup.normalizedSourceOrders[0] ?? Number.MAX_SAFE_INTEGER;
-        const headInsertIndex = meldGroups.findIndex((group) => {
-            const groupMinOrder = group.normalizedSourceOrders[0] ?? Number.MAX_SAFE_INTEGER;
-            return headMinOrder < groupMinOrder;
-        });
+    let winningPlaced = false;
+    const assignedGroups = orderedGroups.map((group) => {
+        const tiles = group.tileNumbers.map((tile) => {
+            let sourceEntry = null;
 
-        const orderedGroups = [...meldGroups];
-        if (headInsertIndex >= 0) {
-            orderedGroups.splice(headInsertIndex, 0, headGroup);
-        } else {
-            orderedGroups.push(headGroup);
-        }
-
-        const preferredWinningGroupId = (() => {
-            for (let groupIndex = orderedGroups.length - 1; groupIndex >= 0; groupIndex--) {
-                if (orderedGroups[groupIndex]?.tileNumbers.includes(waitTile)) return orderedGroups[groupIndex].id;
+            if (!winningPlaced && preferredWinningGroupId === group.id && tile === waitTile) {
+                sourceEntry = winningEntry;
+                winningPlaced = true;
+            } else {
+                const pool = availableByTile.get(tile) || [];
+                sourceEntry = pool.shift();
+                availableByTile.set(tile, pool);
             }
-            return orderedGroups[orderedGroups.length - 1]?.id || null;
-        })();
-
-        let winningPlaced = false;
-        const assignedGroups = orderedGroups.map((group) => {
-            const tiles = group.tileNumbers.map((tile) => {
-                let sourceEntry = null;
-
-                if (!winningPlaced && preferredWinningGroupId === group.id && tile === waitTile) {
-                    sourceEntry = winningEntry;
-                    winningPlaced = true;
-                } else {
-                    const pool = availableByTile.get(tile) || [];
-                    sourceEntry = pool.shift();
-                    availableByTile.set(tile, pool);
-                }
-
-                return {
-                    groupId: group.id,
-                    sourceId: sourceEntry?.id || `fallback-${group.id}-${tile}`,
-                    tile,
-                    isWinning: !!sourceEntry?.isWinning,
-                    sourceOrder: sourceEntry?.order ?? Number.MAX_SAFE_INTEGER
-                };
-            });
 
             return {
-                ...group,
-                tiles
+                groupId: group.id,
+                sourceId: sourceEntry?.id || `fallback-${group.id}-${tile}`,
+                tile,
+                isWinning: !!sourceEntry?.isWinning,
+                sourceOrder: sourceEntry?.order ?? Number.MAX_SAFE_INTEGER
             };
         });
 
         return {
-            sourceEntries,
-            groups: assignedGroups,
-            animationOrder: assignedGroups.flatMap((group) => group.tiles)
+            ...group,
+            tiles
         };
+    });
+
+    return {
+        sourceEntries,
+        groups: assignedGroups,
+        animationOrder: assignedGroups.flatMap((group) => group.tiles)
+    };
+}
+
+function createBreakdownTileElement(tile, { sourceId = '', winning = false, className = '', width = 48, height = 68, fontSize = 36, tileType = gameState.tileType } = {}) {
+    const tileInfo = getTileInfo(tileType, tile);
+    const tileDiv = document.createElement('div');
+    tileDiv.className = `hand-tile rounded-lg tile-shadow flex items-center justify-center breakdown-tile ${className}`.trim();
+    tileDiv.style.cssText = `width: ${width}px; height: ${height}px; font-size: ${fontSize}px;`;
+    if (sourceId) tileDiv.dataset.sourceId = sourceId;
+    if (winning) tileDiv.classList.add('breakdown-winning-tile');
+    tileDiv.appendChild(createTileImage(tileInfo));
+    tileDiv.title = tileInfo.name;
+    return tileDiv;
+}
+
+function animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { duration = 1000 } = {}) {
+    // アニメーション用レイヤー・移動元・移動先のいずれかが欠けている場合は、
+    // 演出を諦めて状態だけを即時反映する。
+    if (!animationLayer || !sourceNode || !targetNode) {
+        if (sourceNode) sourceNode.classList.add('is-dealt');
+        if (targetNode) targetNode.classList.add('is-arrived');
+        return null;
     }
 
-    function createBreakdownTileElement(tile, { sourceId = '', winning = false, className = '', width = 48, height = 68, fontSize = 36, tileType = gameState.tileType } = {}) {
-        const tileInfo = getTileInfo(tileType, tile);
-        const tileDiv = document.createElement('div');
-        tileDiv.className = `hand-tile rounded-lg tile-shadow flex items-center justify-center breakdown-tile ${className}`.trim();
-        tileDiv.style.cssText = `width: ${width}px; height: ${height}px; font-size: ${fontSize}px;`;
-        if (sourceId) tileDiv.dataset.sourceId = sourceId;
-        if (winning) tileDiv.classList.add('breakdown-winning-tile');
-        tileDiv.appendChild(createTileImage(tileInfo));
-        tileDiv.title = tileInfo.name;
-        return tileDiv;
-    }
+    // 画面上の実座標を取得し、
+    // 「どこからどこへ飛ばすか」をピクセル単位で計算できるようにする。
+    const layerRect = animationLayer.getBoundingClientRect();
+    const sourceRect = sourceNode.getBoundingClientRect();
+    const targetRect = targetNode.getBoundingClientRect();
 
-    function animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { duration = 1000 } = {}) {
-        // アニメーション用レイヤー・移動元・移動先のいずれかが欠けている場合は、
-        // 演出を諦めて状態だけを即時反映する。
-        if (!animationLayer || !sourceNode || !targetNode) {
-            if (sourceNode) sourceNode.classList.add('is-dealt');
-            if (targetNode) targetNode.classList.add('is-arrived');
-            return null;
+    // 座標やサイズが正しく取得できない場合は、
+// 中途半端なアニメーションを避けて即時反映にフォールバックする。
+if (!layerRect.width || !layerRect.height || !sourceRect.width || !targetRect.width) {
+    sourceNode.classList.add('is-dealt');
+    targetNode.classList.add('is-arrived');
+    return null;
+}
+
+// 元の牌 DOM を複製し、
+// 実際に飛んで見える専用の「飛行牌」要素を作る。
+const flyTile = sourceNode.cloneNode(true);
+
+// 元牌や到着済み牌の状態クラスは飛行牌には不要なので外し、
+// 飛行専用クラスだけを付与する。
+flyTile.classList.remove('is-dealt', 'is-arrived');
+flyTile.classList.add('breakdown-fly-tile');
+
+// 飛行牌の初期サイズと初期位置を、移動元牌と完全に一致させる。
+flyTile.style.width = `${sourceRect.width}px`;
+flyTile.style.height = `${sourceRect.height}px`;
+flyTile.style.left = `${sourceRect.left - layerRect.left}px`;
+flyTile.style.top = `${sourceRect.top - layerRect.top}px`;
+
+// 最初は「まだ動いていない状態」にしておき、
+// 次のフレームで transform を更新して移動を発火させる。
+flyTile.style.transform = 'translate(0px, 0px) scale(1)';
+flyTile.style.transition = `transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 600ms ease`;
+
+// 飛行牌をアニメーションレイヤーへ載せ、
+// 元の牌はその瞬間に「配り済み」として画面から消す。
+animationLayer.appendChild(flyTile);
+sourceNode.classList.add('is-dealt');
+
+// レイアウト確定後の次フレームで透明度と移動先 transform を与え、
+// ブラウザに「今ここからあそこへ飛ぶ」アニメーションを実行させる。
+requestAnimationFrame(() => {
+    flyTile.style.opacity = '1';
+
+    // 移動量は「移動先座標 - 移動元座標」で求め、
+    // 必要なら移動先サイズに合わせて scale も同時に調整する。
+    flyTile.style.transform = `translate(${(targetRect.left - sourceRect.left).toFixed(2)}px, ${(targetRect.top - sourceRect.top).toFixed(2)}px) scale(${(targetRect.width / Math.max(sourceRect.width, 1)).toFixed(4)})`;
+});
+
+// 呼び出し元で完了後に remove() できるよう、
+// 生成した飛行牌要素を返す。
+return flyTile;
+}
+
+function createBreakdownStageElement(displayData, { compact = false, tileType = gameState.tileType } = {}) {
+    const stage = document.createElement('div');
+    stage.className = `breakdown-stage ${compact ? 'tutorial-breakdown-stage' : ''}`.trim();
+
+    const bubble = document.createElement('div');
+    bubble.className = 'breakdown-bubble';
+
+    const tileSize = compact
+        ? { width: 40, height: 56, fontSize: 30 }
+        : { width: 48, height: 68, fontSize: 36 };
+
+    const sourceRow = document.createElement('div');
+    sourceRow.className = 'breakdown-source-row';
+    displayData.sourceEntries.forEach((entry) => {
+        if (entry.isWinning) {
+            const gap = document.createElement('div');
+            gap.className = 'breakdown-source-gap';
+            sourceRow.appendChild(gap);
         }
 
-        // 画面上の実座標を取得し、
-        // 「どこからどこへ飛ばすか」をピクセル単位で計算できるようにする。
-        const layerRect = animationLayer.getBoundingClientRect();
-        const sourceRect = sourceNode.getBoundingClientRect();
-        const targetRect = targetNode.getBoundingClientRect();
+        sourceRow.appendChild(createBreakdownTileElement(entry.tile, {
+            sourceId: entry.id,
+            winning: entry.isWinning,
+            className: `breakdown-source-tile ${entry.isWinning ? 'breakdown-source-winning-tile' : ''}`,
+            tileType,
+            ...tileSize
+        }));
+    });
 
-        // 座標やサイズが正しく取得できない場合は、
-        // 中途半端なアニメーションを避けて即時反映にフォールバックする。
-        if (!layerRect.width || !layerRect.height || !sourceRect.width || !targetRect.width) {
-            sourceNode.classList.add('is-dealt');
-            targetNode.classList.add('is-arrived');
-            return null;
-        }
+    const targetGroups = document.createElement('div');
+    targetGroups.className = 'breakdown-target-groups';
+    displayData.groups.forEach((group) => {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'breakdown-target-group';
+        groupDiv.dataset.groupId = group.id;
 
-        // 元の牌 DOM を複製し、
-        // 実際に飛んで見える専用の「飛行牌」要素を作る。
-        const flyTile = sourceNode.cloneNode(true);
+        const groupLabel = document.createElement('div');
+        groupLabel.className = 'breakdown-target-group-label';
+        groupLabel.textContent = group.label;
 
-        // 元牌や到着済み牌の状態クラスは飛行牌には不要なので外し、
-        // 飛行専用クラスだけを付与する。
-        flyTile.classList.remove('is-dealt', 'is-arrived');
-        flyTile.classList.add('breakdown-fly-tile');
-
-        // 飛行牌の初期サイズと初期位置を、移動元牌と完全に一致させる。
-        flyTile.style.width = `${sourceRect.width}px`;
-        flyTile.style.height = `${sourceRect.height}px`;
-        flyTile.style.left = `${sourceRect.left - layerRect.left}px`;
-        flyTile.style.top = `${sourceRect.top - layerRect.top}px`;
-
-        // 最初は「まだ動いていない状態」にしておき、
-        // 次のフレームで transform を更新して移動を発火させる。
-        flyTile.style.transform = 'translate(0px, 0px) scale(1)';
-        flyTile.style.transition = `transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 600ms ease`;
-
-        // 飛行牌をアニメーションレイヤーへ載せ、
-        // 元の牌はその瞬間に「配り済み」として画面から消す。
-        animationLayer.appendChild(flyTile);
-        sourceNode.classList.add('is-dealt');
-
-        // レイアウト確定後の次フレームで透明度と移動先 transform を与え、
-        // ブラウザに「今ここからあそこへ飛ぶ」アニメーションを実行させる。
-        requestAnimationFrame(() => {
-            flyTile.style.opacity = '1';
-
-            // 移動量は「移動先座標 - 移動元座標」で求め、
-            // 必要なら移動先サイズに合わせて scale も同時に調整する。
-            flyTile.style.transform = `translate(${(targetRect.left - sourceRect.left).toFixed(2)}px, ${(targetRect.top - sourceRect.top).toFixed(2)}px) scale(${(targetRect.width / Math.max(sourceRect.width, 1)).toFixed(4)})`;
+        const board = document.createElement('div');
+        board.className = 'breakdown-target-board';
+        group.tiles.forEach(() => {
+            const slot = document.createElement('div');
+            slot.className = 'breakdown-target-slot';
+            board.appendChild(slot);
         });
 
-        // 呼び出し元で完了後に remove() できるよう、
-        // 生成した飛行牌要素を返す。
-        return flyTile;
-    }
-
-    function createBreakdownStageElement(displayData, { compact = false, tileType = gameState.tileType } = {}) {
-        const stage = document.createElement('div');
-        stage.className = `breakdown-stage ${compact ? 'tutorial-breakdown-stage' : ''}`.trim();
-
-        const bubble = document.createElement('div');
-        bubble.className = 'breakdown-bubble';
-
-        const tileSize = compact
-            ? { width: 40, height: 56, fontSize: 30 }
-            : { width: 48, height: 68, fontSize: 36 };
-
-        const sourceRow = document.createElement('div');
-        sourceRow.className = 'breakdown-source-row';
-        displayData.sourceEntries.forEach((entry) => {
-            if (entry.isWinning) {
-                const gap = document.createElement('div');
-                gap.className = 'breakdown-source-gap';
-                sourceRow.appendChild(gap);
-            }
-
-            sourceRow.appendChild(createBreakdownTileElement(entry.tile, {
-                sourceId: entry.id,
-                winning: entry.isWinning,
-                className: `breakdown-source-tile ${entry.isWinning ? 'breakdown-source-winning-tile' : ''}`,
+        const row = document.createElement('div');
+        row.className = 'breakdown-target-row';
+        group.tiles.forEach((tileEntry) => {
+            row.appendChild(createBreakdownTileElement(tileEntry.tile, {
+                sourceId: tileEntry.sourceId,
+                winning: tileEntry.isWinning,
+                className: 'breakdown-target-tile',
                 tileType,
                 ...tileSize
             }));
         });
 
-        const targetGroups = document.createElement('div');
-        targetGroups.className = 'breakdown-target-groups';
-        displayData.groups.forEach((group) => {
-            const groupDiv = document.createElement('div');
-            groupDiv.className = 'breakdown-target-group';
-            groupDiv.dataset.groupId = group.id;
+        groupDiv.append(groupLabel, board, row);
+        targetGroups.appendChild(groupDiv);
+    });
 
-            const groupLabel = document.createElement('div');
-            groupLabel.className = 'breakdown-target-group-label';
-            groupLabel.textContent = group.label;
+    const animationLayer = document.createElement('div');
+    animationLayer.className = 'breakdown-animation-layer';
+    bubble.append(sourceRow, targetGroups);
+    stage.append(bubble, animationLayer);
+    return stage;
+}
 
-            const board = document.createElement('div');
-            board.className = 'breakdown-target-board';
-            group.tiles.forEach(() => {
-                const slot = document.createElement('div');
-                slot.className = 'breakdown-target-slot';
-                board.appendChild(slot);
-            });
+function applyBreakdownCentering(stage, { animated = true } = {}) {
+    const bubble = stage?.querySelector('.breakdown-bubble');
+    const targetGroups = stage?.querySelector('.breakdown-target-groups');
+    if (!bubble || !targetGroups) return;
 
-            const row = document.createElement('div');
-            row.className = 'breakdown-target-row';
-            group.tiles.forEach((tileEntry) => {
-                row.appendChild(createBreakdownTileElement(tileEntry.tile, {
-                    sourceId: tileEntry.sourceId,
-                    winning: tileEntry.isWinning,
-                    className: 'breakdown-target-tile',
-                    tileType,
-                    ...tileSize
-                }));
-            });
+    const groupNodes = Array.from(targetGroups.children).filter((node) => node.classList?.contains('breakdown-target-group'));
+    if (!groupNodes.length) return;
 
-            groupDiv.append(groupLabel, board, row);
-            targetGroups.appendChild(groupDiv);
-        });
+    const trackRect = targetGroups.getBoundingClientRect();
+    const bubbleRect = bubble.getBoundingClientRect();
+    if (!trackRect.width) return;
 
-        const animationLayer = document.createElement('div');
-        animationLayer.className = 'breakdown-animation-layer';
-        bubble.append(sourceRow, targetGroups);
-        stage.append(bubble, animationLayer);
-        return stage;
+    const firstRect = groupNodes[0].getBoundingClientRect();
+    const lastRect = groupNodes[groupNodes.length - 1].getBoundingClientRect();
+    const contentLeft = firstRect.left - trackRect.left;
+    const contentRight = lastRect.right - trackRect.left;
+    const contentWidth = Math.max(0, contentRight - contentLeft);
+    const shiftX = contentWidth < trackRect.width
+        ? Math.max(0, ((trackRect.width - contentWidth) / 2) - contentLeft)
+        : 0;
+
+    stage.classList.toggle('breakdown-stage-centering', animated && Math.abs(shiftX) > 0.5);
+    targetGroups.style.setProperty('--breakdown-center-shift-x', `${shiftX.toFixed(2)}px`);
+    targetGroups.style.setProperty('--breakdown-center-shift-y', '0px');
+}
+
+function renderBreakdownControls(container, total, activeIndex) {
+    if (total <= 1) return null;
+
+    const controls = document.createElement('div');
+    controls.className = 'breakdown-controls';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.className = 'breakdown-switch-btn';
+    prevBtn.textContent = t('breakdownPrevWait');
+    prevBtn.disabled = activeIndex <= 0;
+    prevBtn.addEventListener('click', () => {
+        playSound('select');
+        breakdownAnimationState.currentIndex = Math.max(0, breakdownAnimationState.currentIndex - 1);
+        displayHandBreakdown();
+    });
+
+    const counter = document.createElement('div');
+    counter.className = 'breakdown-counter';
+    counter.textContent = t('breakdownCounter', { current: activeIndex + 1, total });
+
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'breakdown-switch-btn';
+    nextBtn.textContent = t('breakdownNextWait');
+    nextBtn.disabled = activeIndex >= total - 1;
+    nextBtn.addEventListener('click', () => {
+        playSound('select');
+        breakdownAnimationState.currentIndex = Math.min(total - 1, breakdownAnimationState.currentIndex + 1);
+        displayHandBreakdown();
+    });
+
+    controls.append(prevBtn, counter, nextBtn);
+    container.appendChild(controls);
+    return controls;
+}
+
+function playBreakdownTransition(stage, displayData, { autoReplay = true, replayHandler = null } = {}) {
+    clearBreakdownAnimationTimers();
+    const playToken = breakdownAnimationState.playToken;
+
+    const bubble = stage.querySelector('.breakdown-bubble');
+    const targetGroups = new Map(Array.from(stage.querySelectorAll('.breakdown-target-group')).map((node) => [node.dataset.groupId, node]));
+    const animationLayer = stage.querySelector('.breakdown-animation-layer');
+    const sourceTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-source-tile[data-source-id]')).map((node) => [node.dataset.sourceId, node]));
+    const targetTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-target-tile[data-source-id]')).map((node) => [node.dataset.sourceId, node]));
+    if (animationLayer) animationLayer.innerHTML = '';
+    stage.classList.remove('breakdown-stage-complete', 'breakdown-stage-centering', 'breakdown-stage-replay-fadeout');
+    if (bubble) bubble.style.minHeight = `${bubble.offsetHeight}px`;
+    const targetGroupsTrack = stage.querySelector('.breakdown-target-groups');
+    if (targetGroupsTrack) {
+        targetGroupsTrack.style.setProperty('--breakdown-center-shift-x', '0px');
+        targetGroupsTrack.style.setProperty('--breakdown-center-shift-y', '0px');
     }
+    stage.querySelectorAll('.breakdown-source-tile').forEach((node) => node.classList.remove('is-dealt'));
+    stage.querySelectorAll('.breakdown-target-tile').forEach((node) => node.classList.remove('is-arrived'));
+    targetGroups.forEach((groupNode) => {
+        groupNode.classList.remove('is-complete', 'is-revealed');
+        groupNode.querySelectorAll('.breakdown-target-slot').forEach((slot) => slot.classList.remove('is-filled'));
+    });
+    requestAnimationFrame(() => {
+        if (playToken !== breakdownAnimationState.playToken) return;
+        applyBreakdownCentering(stage, { animated: false });
+    });
 
-    function applyBreakdownCentering(stage, { animated = true } = {}) {
-        const bubble = stage?.querySelector('.breakdown-bubble');
-        const targetGroups = stage?.querySelector('.breakdown-target-groups');
-        if (!bubble || !targetGroups) return;
-
-        const groupNodes = Array.from(targetGroups.children).filter((node) => node.classList?.contains('breakdown-target-group'));
-        if (!groupNodes.length) return;
-
-        const trackRect = targetGroups.getBoundingClientRect();
-        const bubbleRect = bubble.getBoundingClientRect();
-        if (!trackRect.width) return;
-
-        const firstRect = groupNodes[0].getBoundingClientRect();
-        const lastRect = groupNodes[groupNodes.length - 1].getBoundingClientRect();
-        const contentLeft = firstRect.left - trackRect.left;
-        const contentRight = lastRect.right - trackRect.left;
-        const contentWidth = Math.max(0, contentRight - contentLeft);
-        const shiftX = contentWidth < trackRect.width
-            ? Math.max(0, ((trackRect.width - contentWidth) / 2) - contentLeft)
-            : 0;
-
-        stage.classList.toggle('breakdown-stage-centering', animated && Math.abs(shiftX) > 0.5);
-        targetGroups.style.setProperty('--breakdown-center-shift-x', `${shiftX.toFixed(2)}px`);
-        targetGroups.style.setProperty('--breakdown-center-shift-y', '0px');
-    }
-
-    function renderBreakdownControls(container, total, activeIndex) {
-        if (total <= 1) return null;
-
-        const controls = document.createElement('div');
-        controls.className = 'breakdown-controls';
-
-        const prevBtn = document.createElement('button');
-        prevBtn.type = 'button';
-        prevBtn.className = 'breakdown-switch-btn';
-        prevBtn.textContent = t('breakdownPrevWait');
-        prevBtn.disabled = activeIndex <= 0;
-        prevBtn.addEventListener('click', () => {
-            playSound('select');
-            breakdownAnimationState.currentIndex = Math.max(0, breakdownAnimationState.currentIndex - 1);
-            displayHandBreakdown();
-        });
-
-        const counter = document.createElement('div');
-        counter.className = 'breakdown-counter';
-        counter.textContent = t('breakdownCounter', { current: activeIndex + 1, total });
-
-        const nextBtn = document.createElement('button');
-        nextBtn.type = 'button';
-        nextBtn.className = 'breakdown-switch-btn';
-        nextBtn.textContent = t('breakdownNextWait');
-        nextBtn.disabled = activeIndex >= total - 1;
-        nextBtn.addEventListener('click', () => {
-            playSound('select');
-            breakdownAnimationState.currentIndex = Math.min(total - 1, breakdownAnimationState.currentIndex + 1);
-            displayHandBreakdown();
-        });
-
-        controls.append(prevBtn, counter, nextBtn);
-        container.appendChild(controls);
-        return controls;
-    }
-
-    function playBreakdownTransition(stage, displayData, { autoReplay = true, replayHandler = null } = {}) {
-        clearBreakdownAnimationTimers();
-        const playToken = breakdownAnimationState.playToken;
-
-        const bubble = stage.querySelector('.breakdown-bubble');
-        const targetGroups = new Map(Array.from(stage.querySelectorAll('.breakdown-target-group')).map((node) => [node.dataset.groupId, node]));
-        const animationLayer = stage.querySelector('.breakdown-animation-layer');
-        const sourceTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-source-tile[data-source-id]')).map((node) => [node.dataset.sourceId, node]));
-        const targetTiles = new Map(Array.from(stage.querySelectorAll('.breakdown-target-tile[data-source-id]')).map((node) => [node.dataset.sourceId, node]));
-        if (animationLayer) animationLayer.innerHTML = '';
-        stage.classList.remove('breakdown-stage-complete', 'breakdown-stage-centering', 'breakdown-stage-replay-fadeout');
-        if (bubble) bubble.style.minHeight = `${bubble.offsetHeight}px`;
-        const targetGroupsTrack = stage.querySelector('.breakdown-target-groups');
-        if (targetGroupsTrack) {
-            targetGroupsTrack.style.setProperty('--breakdown-center-shift-x', '0px');
-            targetGroupsTrack.style.setProperty('--breakdown-center-shift-y', '0px');
-        }
-        stage.querySelectorAll('.breakdown-source-tile').forEach((node) => node.classList.remove('is-dealt'));
-        stage.querySelectorAll('.breakdown-target-tile').forEach((node) => node.classList.remove('is-arrived'));
+    const shouldSkipAnimation = prefersReducedMotion();
+    if (shouldSkipAnimation) {
+        stage.querySelectorAll('.breakdown-source-tile').forEach((node) => node.classList.add('is-dealt'));
+        stage.querySelectorAll('.breakdown-target-tile').forEach((node) => node.classList.add('is-arrived'));
         targetGroups.forEach((groupNode) => {
-            groupNode.classList.remove('is-complete', 'is-revealed');
-            groupNode.querySelectorAll('.breakdown-target-slot').forEach((slot) => slot.classList.remove('is-filled'));
+            groupNode.classList.add('is-revealed', 'is-complete');
+            groupNode.querySelectorAll('.breakdown-target-slot').forEach((slot) => slot.classList.add('is-filled'));
         });
-        requestAnimationFrame(() => {
-            if (playToken !== breakdownAnimationState.playToken) return;
-            applyBreakdownCentering(stage, { animated: false });
-        });
-
-        const shouldSkipAnimation = prefersReducedMotion();
-        if (shouldSkipAnimation) {
-            stage.querySelectorAll('.breakdown-source-tile').forEach((node) => node.classList.add('is-dealt'));
-            stage.querySelectorAll('.breakdown-target-tile').forEach((node) => node.classList.add('is-arrived'));
-            targetGroups.forEach((groupNode) => {
-                groupNode.classList.add('is-revealed', 'is-complete');
-                groupNode.querySelectorAll('.breakdown-target-slot').forEach((slot) => slot.classList.add('is-filled'));
-            });
-            stage.classList.add('breakdown-stage-complete');
-            return;
-        }
-
-        const prepDelayMs = 1800;
-        const groupRevealMs = 400;
-        const groupGapMs = 150;
-        const groupCycleMs = groupRevealMs + groupGapMs;
-        const settleDelayMs = 250;
-        const replayFadeOutMs = 320;
-        const replayDelayMs = 2000;
-        displayData.groups.forEach((group, index) => {
-            const groupNode = targetGroups.get(group.id);
-            if (!groupNode) return;
-
-            const delay = prepDelayMs + (index * groupCycleMs);
-            const timerId = setTimeout(() => {
-                if (playToken !== breakdownAnimationState.playToken) return;
-                groupNode.classList.add('is-revealed');
-                const targetSlots = Array.from(groupNode.querySelectorAll('.breakdown-target-slot'));
-                const flyTiles = group.tiles.map((tileEntry, tileIndex) => {
-                    const sourceNode = sourceTiles.get(tileEntry.sourceId);
-                    const targetNode = targetTiles.get(tileEntry.sourceId);
-                    const slotNode = targetSlots[tileIndex];
-                    if (slotNode) slotNode.classList.add('is-filled');
-                    return animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { duration: groupRevealMs });
-                }).filter(Boolean);
-
-                const completeTimer = setTimeout(() => {
-                    if (playToken !== breakdownAnimationState.playToken) return;
-                    group.tiles.forEach((tileEntry) => {
-                        const targetNode = targetTiles.get(tileEntry.sourceId);
-                        if (targetNode) targetNode.classList.add('is-arrived');
-                    });
-                    flyTiles.forEach((node) => node.remove());
-                    groupNode.classList.add('is-complete');
-                }, groupRevealMs);
-
-                breakdownAnimationState.timerIds.push(completeTimer);
-            }, delay);
-
-            breakdownAnimationState.timerIds.push(timerId);
-        });
-
-        const finishTimer = setTimeout(() => {
-            if (playToken !== breakdownAnimationState.playToken) return;
-            stage.classList.add('breakdown-stage-complete');
-            animationLayer.innerHTML = '';
-        }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs));
-
-        breakdownAnimationState.timerIds.push(finishTimer);
-
-        if (autoReplay) {
-            const fadeOutTimer = setTimeout(() => {
-                if (playToken !== breakdownAnimationState.playToken) return;
-                if (!stage.isConnected) return;
-                stage.classList.add('breakdown-stage-replay-fadeout');
-            }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs + replayDelayMs - replayFadeOutMs));
-
-            breakdownAnimationState.timerIds.push(fadeOutTimer);
-
-            const replayTimer = setTimeout(() => {
-                if (playToken !== breakdownAnimationState.playToken) return;
-                if (!stage.isConnected) return;
-
-                if (typeof replayHandler === 'function') {
-                    replayHandler();
-                    return;
-                }
-
-                const resultSection = document.getElementById('result-section');
-                if (!resultSection || resultSection.classList.contains('hidden')) return;
-
-                displayHandBreakdown();
-            }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs) + replayDelayMs);
-
-            breakdownAnimationState.timerIds.push(replayTimer);
-        }
+        stage.classList.add('breakdown-stage-complete');
+        return;
     }
+
+    const prepDelayMs = 1800;
+    const groupRevealMs = 400;
+    const groupGapMs = 150;
+    const groupCycleMs = groupRevealMs + groupGapMs;
+    const settleDelayMs = 250;
+    const replayFadeOutMs = 320;
+    const replayDelayMs = 2000;
+    displayData.groups.forEach((group, index) => {
+        const groupNode = targetGroups.get(group.id);
+        if (!groupNode) return;
+
+        const delay = prepDelayMs + (index * groupCycleMs);
+        const timerId = setTimeout(() => {
+            if (playToken !== breakdownAnimationState.playToken) return;
+            groupNode.classList.add('is-revealed');
+            const targetSlots = Array.from(groupNode.querySelectorAll('.breakdown-target-slot'));
+            const flyTiles = group.tiles.map((tileEntry, tileIndex) => {
+                const sourceNode = sourceTiles.get(tileEntry.sourceId);
+                const targetNode = targetTiles.get(tileEntry.sourceId);
+                const slotNode = targetSlots[tileIndex];
+                if (slotNode) slotNode.classList.add('is-filled');
+                return animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { duration: groupRevealMs });
+            }).filter(Boolean);
+
+            const completeTimer = setTimeout(() => {
+                if (playToken !== breakdownAnimationState.playToken) return;
+                group.tiles.forEach((tileEntry) => {
+                    const targetNode = targetTiles.get(tileEntry.sourceId);
+                    if (targetNode) targetNode.classList.add('is-arrived');
+                });
+                flyTiles.forEach((node) => node.remove());
+                groupNode.classList.add('is-complete');
+            }, groupRevealMs);
+
+            breakdownAnimationState.timerIds.push(completeTimer);
+        }, delay);
+
+        breakdownAnimationState.timerIds.push(timerId);
+    });
+
+    const finishTimer = setTimeout(() => {
+        if (playToken !== breakdownAnimationState.playToken) return;
+        stage.classList.add('breakdown-stage-complete');
+        animationLayer.innerHTML = '';
+    }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs));
+
+    breakdownAnimationState.timerIds.push(finishTimer);
+
+    if (autoReplay) {
+        const fadeOutTimer = setTimeout(() => {
+            if (playToken !== breakdownAnimationState.playToken) return;
+            if (!stage.isConnected) return;
+            stage.classList.add('breakdown-stage-replay-fadeout');
+        }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs + replayDelayMs - replayFadeOutMs));
+
+        breakdownAnimationState.timerIds.push(fadeOutTimer);
+
+        const replayTimer = setTimeout(() => {
+            if (playToken !== breakdownAnimationState.playToken) return;
+            if (!stage.isConnected) return;
+
+            if (typeof replayHandler === 'function') {
+                replayHandler();
+                return;
+            }
+
+            const resultSection = document.getElementById('result-section');
+            if (!resultSection || resultSection.classList.contains('hidden')) return;
+
+            displayHandBreakdown();
+        }, Math.max(0, prepDelayMs + (displayData.groups.length * groupCycleMs) - groupGapMs + settleDelayMs) + replayDelayMs);
+
+        breakdownAnimationState.timerIds.push(replayTimer);
+    }
+}
 
 function updateUILanguage() {
-    clearBreakdownAnimationTimers();
+clearBreakdownAnimationTimers();
 
-    document.getElementById('header-title').textContent = t('gameTitle');
-    document.getElementById('header-subtitle').textContent = t('gameSubtitle');
+document.getElementById('header-title').textContent = t('gameTitle');
+document.getElementById('header-subtitle').textContent = t('gameSubtitle');
 
-    document.getElementById('language-title').textContent = t('selectLanguage');
-    document.getElementById('lang-ja-text').textContent = t('japanese');
-    document.getElementById('lang-en-text').textContent = t('english');
-    document.getElementById('lang-zh-text').textContent = t('chinese');
+document.getElementById('language-title').textContent = t('selectLanguage');
+document.getElementById('lang-ja-text').textContent = t('japanese');
+document.getElementById('lang-en-text').textContent = t('english');
+document.getElementById('lang-zh-text').textContent = t('chinese');
 
-    document.getElementById('mode-title').textContent = t('selectMode');
-    document.getElementById('casual-title').textContent = t('casualMode');
-    document.getElementById('casual-desc').textContent = t('casualDesc');
-    document.getElementById('story-title').textContent = t('storyMode');
-    document.getElementById('story-desc').textContent = t('storyDesc');
-    document.getElementById('survival-title').textContent = t('survivalMode');
-    document.getElementById('survival-desc').textContent = t('survivalDesc');
+document.getElementById('mode-title').textContent = t('selectMode');
+document.getElementById('casual-title').textContent = t('casualMode');
+document.getElementById('casual-desc').textContent = t('casualDesc');
+document.getElementById('story-title').textContent = t('storyMode');
+document.getElementById('story-desc').textContent = t('storyDesc');
+document.getElementById('survival-title').textContent = t('survivalMode');
+document.getElementById('survival-desc').textContent = t('survivalDesc');
 
-    const tutorialBtnText = document.getElementById('tutorial-btn-text');
-    if (tutorialBtnText) tutorialBtnText.textContent = t('tutorial');
+const tutorialBtnText = document.getElementById('tutorial-btn-text');
+if (tutorialBtnText) tutorialBtnText.textContent = t('tutorial');
 
-    const modeBackText = document.getElementById('mode-back-text');
-    if (modeBackText) modeBackText.textContent = t('back');
+const modeBackText = document.getElementById('mode-back-text');
+if (modeBackText) modeBackText.textContent = t('back');
 
-    document.getElementById('difficulty-title').textContent = t('selectDifficulty');
-    document.getElementById('easy-title').textContent = t('easy');
-    document.getElementById('easy-desc').textContent = t('easyDesc');
-    document.getElementById('medium-title').textContent = t('medium');
-    document.getElementById('medium-desc').textContent = t('mediumDesc');
-    document.getElementById('hard-title').textContent = t('hard');
-    document.getElementById('hard-desc').textContent = t('hardDesc');
+document.getElementById('difficulty-title').textContent = t('selectDifficulty');
+document.getElementById('easy-title').textContent = t('easy');
+document.getElementById('easy-desc').textContent = t('easyDesc');
+document.getElementById('medium-title').textContent = t('medium');
+document.getElementById('medium-desc').textContent = t('mediumDesc');
+document.getElementById('hard-title').textContent = t('hard');
+document.getElementById('hard-desc').textContent = t('hardDesc');
 
-    const difficultyBackText = document.getElementById('difficulty-back-text');
-    if (difficultyBackText) difficultyBackText.textContent = t('back');
+const difficultyBackText = document.getElementById('difficulty-back-text');
+if (difficultyBackText) difficultyBackText.textContent = t('back');
 
-    document.getElementById('hand-title').textContent = t('handTitle');
-    document.getElementById('select-waiting-title').textContent = t('selectWaiting');
-    document.getElementById('submit-text').textContent = t('submitAnswer');
-    document.getElementById('next-text').textContent = t('nextQuestion');
+document.getElementById('hand-title').textContent = t('handTitle');
+document.getElementById('select-waiting-title').textContent = t('selectWaiting');
+document.getElementById('submit-text').textContent = t('submitAnswer');
+document.getElementById('next-text').textContent = t('nextQuestion');
 
-    const resultMenuText = document.getElementById('result-menu-text');
-    if (resultMenuText) resultMenuText.textContent = t('backToMenu');
+const resultMenuText = document.getElementById('result-menu-text');
+if (resultMenuText) resultMenuText.textContent = t('backToMenu');
 
-    const resultContinueText = document.getElementById('result-continue-text');
-    const resultBackText = document.getElementById('result-back-text');
-    const resultOkText = document.getElementById('result-ok-text');
-    if (resultContinueText) resultContinueText.textContent = t('continue');
-    if (resultBackText) resultBackText.textContent = t('giveUp');
-    if (resultOkText) resultOkText.textContent = t('ok');
+const resultContinueText = document.getElementById('result-continue-text');
+const resultBackText = document.getElementById('result-back-text');
+const resultOkText = document.getElementById('result-ok-text');
+if (resultContinueText) resultContinueText.textContent = t('continue');
+if (resultBackText) resultBackText.textContent = t('giveUp');
+if (resultOkText) resultOkText.textContent = t('ok');
 
-    const tutorialPrevText = document.getElementById('tutorial-prev-text');
-    const tutorialNextText = document.getElementById('tutorial-next-text');
-    const tutorialCloseText = document.getElementById('tutorial-close-text');
-    if (tutorialPrevText) tutorialPrevText.textContent = t('tutorialPrev');
-    if (tutorialNextText) tutorialNextText.textContent = t('tutorialNext');
-    if (tutorialCloseText) tutorialCloseText.textContent = t('tutorialClose');
-    updateSoundToggleButton();
+const tutorialPrevText = document.getElementById('tutorial-prev-text');
+const tutorialNextText = document.getElementById('tutorial-next-text');
+const tutorialCloseText = document.getElementById('tutorial-close-text');
+if (tutorialPrevText) tutorialPrevText.textContent = t('tutorialPrev');
+if (tutorialNextText) tutorialNextText.textContent = t('tutorialNext');
+if (tutorialCloseText) tutorialCloseText.textContent = t('tutorialClose');
+updateSoundToggleButton();
 
-    updateSelectionStatus();
+updateSelectionStatus();
 
-    const resultOpen = !!document.getElementById('result-section') && !document.getElementById('result-section').classList.contains('hidden');
-    document.getElementById('gameover-title').textContent = t('gameOver');
-    const timeLeftLabel = document.getElementById('final-time-left-label');
-    const livesLeftLabel = document.getElementById('final-lives-left-label');
-    const modeLabel = document.getElementById('mode-label');
-    if (modeLabel) modeLabel.textContent = t('modeLabel');
-    const modeEl = document.getElementById('mode');
-    if (modeEl) modeEl.textContent = getModeDisplayText(gameState.mode);
+const resultOpen = !!document.getElementById('result-section') && !document.getElementById('result-section').classList.contains('hidden');
+document.getElementById('gameover-title').textContent = t('gameOver');
+const timeLeftLabel = document.getElementById('final-time-left-label');
+const livesLeftLabel = document.getElementById('final-lives-left-label');
+const modeLabel = document.getElementById('mode-label');
+if (modeLabel) modeLabel.textContent = t('modeLabel');
+const modeEl = document.getElementById('mode');
+if (modeEl) modeEl.textContent = getModeDisplayText(gameState.mode);
 
-    const modeLabelGameOver = document.getElementById('mode-label-gameover');
-    if (modeLabelGameOver) modeLabelGameOver.textContent = t('modeLabel');
-    const modeElGameOver = document.getElementById('mode-gameover');
-    if (modeElGameOver) modeElGameOver.textContent = getModeDisplayText(gameState.mode);
+const modeLabelGameOver = document.getElementById('mode-label-gameover');
+if (modeLabelGameOver) modeLabelGameOver.textContent = t('modeLabel');
+const modeElGameOver = document.getElementById('mode-gameover');
+if (modeElGameOver) modeElGameOver.textContent = getModeDisplayText(gameState.mode);
 
-    const diffLabelVictory = document.getElementById('final-difficulty-label');
-    if (diffLabelVictory) diffLabelVictory.textContent = `${t('difficulty')}:`;
-    const diffLabelGameOver = document.getElementById('final-difficulty-label-gameover');
-    if (diffLabelGameOver) diffLabelGameOver.textContent = `${t('difficulty')}:`;
-    if (timeLeftLabel) timeLeftLabel.textContent = t('timeLeftLabel');
-    if (livesLeftLabel) livesLeftLabel.textContent = t('livesLeftLabel');
-    document.getElementById('final-score-label').textContent = t('finalScore');
-    const scoreVersionLabel = document.getElementById('score-version-label');
-    const scoreVersionValue = document.getElementById('score-version');
-    if (scoreVersionLabel) scoreVersionLabel.textContent = `${t('scoreVersionLabel')}:`;
-    if (scoreVersionValue) scoreVersionValue.textContent = t('scoreVersion');
-    const scoreVersionLabelGameOver = document.getElementById('score-version-label-gameover');
-    const scoreVersionValueGameOver = document.getElementById('score-version-gameover');
-    if (scoreVersionLabelGameOver) scoreVersionLabelGameOver.textContent = `${t('scoreVersionLabel')}:`;
-    if (scoreVersionValueGameOver) scoreVersionValueGameOver.textContent = t('scoreVersion');
-    document.getElementById('play-again-victory').textContent = t('playAgain');
-    document.getElementById('play-again-gameover').textContent = t('playAgain');
-    document.getElementById('menu-victory').textContent = t('backToMenu');
-    document.getElementById('menu-gameover').textContent = t('backToMenu');
-    
-    // フッター
-    updateFooterMeta();
+const diffLabelVictory = document.getElementById('final-difficulty-label');
+if (diffLabelVictory) diffLabelVictory.textContent = `${t('difficulty')}:`;
+const diffLabelGameOver = document.getElementById('final-difficulty-label-gameover');
+if (diffLabelGameOver) diffLabelGameOver.textContent = `${t('difficulty')}:`;
+if (timeLeftLabel) timeLeftLabel.textContent = t('timeLeftLabel');
+if (livesLeftLabel) livesLeftLabel.textContent = t('livesLeftLabel');
+document.getElementById('final-score-label').textContent = t('finalScore');
+const scoreVersionLabel = document.getElementById('score-version-label');
+const scoreVersionValue = document.getElementById('score-version');
+if (scoreVersionLabel) scoreVersionLabel.textContent = `${t('scoreVersionLabel')}:`;
+if (scoreVersionValue) scoreVersionValue.textContent = t('scoreVersion');
+const scoreVersionLabelGameOver = document.getElementById('score-version-label-gameover');
+const scoreVersionValueGameOver = document.getElementById('score-version-gameover');
+if (scoreVersionLabelGameOver) scoreVersionLabelGameOver.textContent = `${t('scoreVersionLabel')}:`;
+if (scoreVersionValueGameOver) scoreVersionValueGameOver.textContent = t('scoreVersion');
+document.getElementById('play-again-victory').textContent = t('playAgain');
+document.getElementById('play-again-gameover').textContent = t('playAgain');
+document.getElementById('menu-victory').textContent = t('backToMenu');
+document.getElementById('menu-gameover').textContent = t('backToMenu');
 
-    // チュートリアル
-    const tutorialTitle = document.getElementById('tutorial-title');
-    if (tutorialTitle) tutorialTitle.textContent = t('tutorialTitle');
-    renderTutorialPage();
+// フッター
+updateFooterMeta();
 
-    if (resultOpen) {
-        displayCorrectAnswer();
-        displayHandBreakdown();
-    }
+// チュートリアル
+const tutorialTitle = document.getElementById('tutorial-title');
+if (tutorialTitle) tutorialTitle.textContent = t('tutorialTitle');
+renderTutorialPage();
+
+if (resultOpen) {
+    displayCorrectAnswer();
+    displayHandBreakdown();
+}
 }
 
 function updateFooterMeta() {
-    try {
-        const footerText = document.getElementById('footer-text');
-        if (!footerText) return;
+try {
+    const footerText = document.getElementById('footer-text');
+    if (!footerText) return;
 
-        const versionEl = document.getElementById('game-version');
-        if (versionEl) {
-            // Keep it optional: translations may omit this key in some forks.
-            const version = t?.('gameVersion');
-            versionEl.textContent = typeof version === 'string' ? version : '';
-        }
-
-        const yearEl = document.getElementById('current-year');
-        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-
-        // Update only the leading label text node (before #game-version) without clobbering spans.
-        const label = t?.('footer');
-        const leading = `${typeof label === 'string' ? label : ''} `;
-
-        let leadingTextNode = null;
-        for (const node of footerText.childNodes) {
-            if (node && node.nodeType === 3) {
-                leadingTextNode = node;
-                break;
-            }
-        }
-
-        if (leadingTextNode) {
-            leadingTextNode.textContent = leading;
-        } else {
-            footerText.insertBefore(document.createTextNode(leading), footerText.firstChild);
-        }
-    } catch {
-        // Footer meta update failure is non-fatal.
+    const versionEl = document.getElementById('game-version');
+    if (versionEl) {
+        // Keep it optional: translations may omit this key in some forks.
+        const version = t?.('gameVersion');
+        versionEl.textContent = typeof version === 'string' ? version : '';
     }
+
+    const yearEl = document.getElementById('current-year');
+    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+    // Update only the leading label text node (before #game-version) without clobbering spans.
+    const label = t?.('footer');
+    const leading = `${typeof label === 'string' ? label : ''} `;
+
+    let leadingTextNode = null;
+    for (const node of footerText.childNodes) {
+        if (node && node.nodeType === 3) {
+            leadingTextNode = node;
+            break;
+        }
+    }
+
+    if (leadingTextNode) {
+        leadingTextNode.textContent = leading;
+    } else {
+        footerText.insertBefore(document.createTextNode(leading), footerText.firstChild);
+    }
+} catch {
+    // Footer meta update failure is non-fatal.
+}
 }
 
 function resetGame() {
-    // メニューへ戻る遷移では、勝利/敗北系の音が残らないように止める
-    stopSound('victory');
-    stopSound('gameover');
-    stopSound('timeup');
-    stopTimer();
-    stopTimerSound();
-    gameState.mode = null;
-    gameState.difficulty = null;
-    gameState.currentQuestion = 0;
-    gameState.currentStage = 0;
-    gameState.correctCount = 0;
-    gameState.timeBonus = 0;
-    gameState.hand = [];
-    gameState.counts = {};
-    gameState.waitingTiles = [];
-    gameState.selectedTiles.clear();
-    gameState.isBossStage = false;
-    gameState.isAnswered = false;
-    gameState.isPaused = false;
-    gameState.lives = gameConfig.lives;
-    gameState.timeExtensions = 0;
-    gameState.lastExtensionStageGranted = 0;
-    gameState.extendedTime = 0;
-    clearTimeExtensionCooldown();
-    gameState.timeLeft = 0;
-    gameState.maxTime = 0;
-    gameState.timerCuePlayed = false;
-    document.body.classList.remove('boss-stage');
-    document.body.classList.remove('in-game');
-    document.getElementById('game-screen').classList.add('hidden');
-    document.getElementById('victory-screen').classList.add('hidden');
+// メニューへ戻る遷移では、勝利/敗北系の音が残らないように止める
+stopSound('victory');
+stopSound('gameover');
+stopSound('timeup');
+stopTimer();
+stopTimerSound();
+gameState.mode = null;
+gameState.difficulty = null;
+gameState.currentQuestion = 0;
+gameState.currentStage = 0;
+gameState.correctCount = 0;
+gameState.timeBonus = 0;
+gameState.hand = [];
+gameState.counts = {};
+gameState.waitingTiles = [];
+gameState.selectedTiles.clear();
+gameState.isBossStage = false;
+gameState.isAnswered = false;
+gameState.isPaused = false;
+gameState.lives = gameConfig.lives;
+gameState.timeExtensions = 0;
+gameState.lastExtensionStageGranted = 0;
+gameState.extendedTime = 0;
+clearTimeExtensionCooldown();
+gameState.timeLeft = 0;
+gameState.maxTime = 0;
+gameState.timerCuePlayed = false;
+document.body.classList.remove('boss-stage');
+document.body.classList.remove('in-game');
+document.getElementById('game-screen').classList.add('hidden');
+document.getElementById('victory-screen').classList.add('hidden');
     document.getElementById('gameover-screen').classList.add('hidden');
 
     // モーダル状態をクリーンアップ
@@ -4838,26 +4822,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const tutorialCloseBtn = getElementByIdCached('tutorial-close-btn');
     const soundToggleBtn = getElementByIdCached('sound-toggle-btn');
 
-    function openTutorial() {
-        if (!tutorialScreen) return;
-        playSound('select');
-        tutorialPageIndex = 0;
-        tutorialRealQuestionStep = 0;
-        tutorialBreakdownIndex = 0;
-        tutorialRealQuestionData = null;
-        tutorialScreen.classList.remove('hidden');
-        tutorialScreen.classList.add('fade-in');
-        tutorialScreen.setAttribute('aria-hidden', 'false');
-        updateUILanguage();
-        renderTutorialPage();
-    }
+function openTutorial() {
+    if (!tutorialScreen) return;
+    playSound('select');
+    tutorialPageIndex = 0;
+    tutorialRealQuestionStep = 0;
+    tutorialBreakdownIndex = 0;
+    tutorialRealQuestionData = null;
+    tutorialScreen.classList.remove('hidden');
+    tutorialScreen.classList.add('fade-in');
+    tutorialScreen.setAttribute('aria-hidden', 'false');
+    updateUILanguage();
+    renderTutorialPage();
+}
 
-    function closeTutorial() {
-        if (!tutorialScreen) return;
-        playSound('select');
-        tutorialScreen.classList.add('hidden');
-        tutorialScreen.setAttribute('aria-hidden', 'true');
-    }
+function closeTutorial() {
+    if (!tutorialScreen) return;
+    playSound('select');
+    tutorialScreen.classList.add('hidden');
+    tutorialScreen.setAttribute('aria-hidden', 'true');
+}
 
     if (tutorialBtn) tutorialBtn.addEventListener('click', openTutorial);
 
