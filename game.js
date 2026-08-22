@@ -2037,26 +2037,38 @@ function unlockAudioOnce() {
 
             // 実際の効果音プールを空再生すると、同じ操作内の select 音と競合して語尾だけになることがある。
             // ここでは非同期起動される可能性が高いタイマー専用音だけを個別に解放する。
-            if (timerAudio) {
+            const unlockHtmlAudio = async (audio) => {
+                if (!audio) return false;
                 try {
-                    const originalVolume = timerAudio.volume;
-                    timerAudio.volume = 0;
-                    timerAudio.currentTime = 0;
-                    const p = timerAudio.play();
+                    const originalVolume = audio.volume;
+                    audio.volume = 0;
+                    audio.currentTime = 0;
+                    const p = audio.play();
 
                     // すぐ停止/リセットする。ここでは「ユーザー操作内で play() が成功する」ことだけが必要
-                    timerAudio.pause();
-                    timerAudio.currentTime = 0;
-                    timerAudio.volume = originalVolume;
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.volume = originalVolume;
 
                     if (p && typeof p.then === 'function') {
-                        await p.catch(() => {});
-                        anySucceeded = true;
-                    } else {
+                        await p;
+                        return true;
+                    }
+                    return true;
+                } catch {
+                    return false;
+                }
+            };
+
+            if (await unlockHtmlAudio(timerAudio)) {
+                anySucceeded = true;
+            } else {
+                // timerAudio の解放に失敗した場合、フォールバックとして select 音を試す
+                const selectSoundPool = soundPools.get('select');
+                if (selectSoundPool && selectSoundPool.length > 0) {
+                    if (await unlockHtmlAudio(selectSoundPool[0])) {
                         anySucceeded = true;
                     }
-                } catch {
-                    // 無視
                 }
             }
 
@@ -2484,7 +2496,16 @@ function ensurePossibleTileSlots() {
 
         const img = createTileImage({ imgSrc: '', name: '' });
         wrapper.appendChild(img);
-        wrapper.addEventListener('click', () => toggleTileSelection(tile, wrapper));
+        wrapper.addEventListener('click', (e) => toggleTileSelection(tile, wrapper, e));
+        wrapper.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent ghost clicks
+            // Immediate feedback on touch
+            wrapper.classList.add('touch-active');
+        });
+        wrapper.addEventListener('touchend', (e) => {
+            wrapper.classList.remove('touch-active');
+            toggleTileSelection(tile, wrapper, e);
+        });
 
         container.appendChild(wrapper);
         tileRenderCache.possibleSlots.set(tile, { wrapper, img });
@@ -3284,7 +3305,13 @@ function renderPossibleTiles() {
     }
 }
 
-function toggleTileSelection(tile, element) {
+const isTouchDevice = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+
+function toggleTileSelection(tile, element, event) {
+    // For hybrid devices, if a touch event was handled, ignore the subsequent click event.
+    if (event.type === 'click' && isTouchDevice) {
+        return;
+    }
     if (!isActiveQuestion()) return;
     if (gameState.counts && gameState.counts[tile] >= 4) return;
 
