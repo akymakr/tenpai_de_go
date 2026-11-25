@@ -4,7 +4,7 @@ const translations = {
     ja: {
         gameTitle: "聴牌でGO!",
         gameSubtitle: "麻雀 待ち当てトレーニング",
-        gameVersion: "v2.0.60406.0",
+        gameVersion: "v2.0.61125.0",
         scoreVersionLabel: "採点バージョン",
         scoreVersion: "1.1",
         selectMode: "モードを選択してください",
@@ -157,7 +157,7 @@ const translations = {
     en: {
         gameTitle: "Tenpai de GO!",
         gameSubtitle: "Mahjong Waiting Tile Trainer",
-        gameVersion: "v2.0.60406.0",
+        gameVersion: "v2.0.61125.0",
         scoreVersionLabel: "Scoring Version",
         scoreVersion: "1.1",
         selectMode: "Select Mode",
@@ -310,7 +310,7 @@ const translations = {
     zh: {
         gameTitle: "聽牌GO!",
         gameSubtitle: "麻雀聽牌強化訓練",
-        gameVersion: "v2.0.60406.0",
+        gameVersion: "v2.0.61125.0",
         scoreVersionLabel: "計分版本",
         scoreVersion: "1.1",
         selectMode: "請選擇遊戲模式",
@@ -4113,11 +4113,14 @@ function animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { 
         return null;
     }
 
-    // 画面上の実座標を取得し、
-    // 「どこからどこへ飛ばすか」をピクセル単位で計算できるようにする。
+    // 画面上の実座標を取得する。
     const layerRect = animationLayer.getBoundingClientRect();
     const sourceRect = sourceNode.getBoundingClientRect();
     const targetRect = targetNode.getBoundingClientRect();
+
+    // 舞台は CSS transform で縮小されているため、
+    // 画面座標をレイヤー内の CSS 座標へ戻す倍率を求める。
+    const layerScale = layerRect.width / Math.max(animationLayer.offsetWidth, 1) || 1;
 
     // 座標やサイズが正しく取得できない場合は、
     // 中途半端なアニメーションを避けて即時反映にフォールバックする。
@@ -4136,11 +4139,11 @@ function animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { 
     flyTile.classList.remove('is-dealt', 'is-arrived');
     flyTile.classList.add('breakdown-fly-tile');
 
-    // 飛行牌の初期サイズと初期位置を、移動元牌と完全に一致させる。
-    flyTile.style.width = `${sourceRect.width}px`;
-    flyTile.style.height = `${sourceRect.height}px`;
-    flyTile.style.left = `${sourceRect.left - layerRect.left}px`;
-    flyTile.style.top = `${sourceRect.top - layerRect.top}px`;
+    // 開始位置は手牌のあった場所、サイズは未縮小の CSS ピクセルで設定する。
+    flyTile.style.width = `${sourceNode.offsetWidth}px`;
+    flyTile.style.height = `${sourceNode.offsetHeight}px`;
+    flyTile.style.left = `${(sourceRect.left - layerRect.left) / layerScale}px`;
+    flyTile.style.top = `${(sourceRect.top - layerRect.top) / layerScale}px`;
     flyTile.style.transform = 'translate(0px, 0px) scale(1)';
 
     // 飛行牌をアニメーションレイヤーへ載せ、
@@ -4148,20 +4151,19 @@ function animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { 
     animationLayer.appendChild(flyTile);
     sourceNode.classList.add('is-dealt');
 
-    const dx = targetRect.left - sourceRect.left;
-    const dy = targetRect.top - sourceRect.top;
+    // 移動量も CSS ピクセルへ変換してから使う。
+    const dx = (targetRect.left - sourceRect.left) / layerScale;
+    const dy = (targetRect.top - sourceRect.top) / layerScale;
     const scale = targetRect.width / Math.max(sourceRect.width, 1);
 
-    // レイアウト確定後の次フレームで、弧を描きながら傾いて飛ぶ演出を開始する。
-    // 移動先や順序を変えず、見た目だけを滑らかにしている。
+    // 手牌の位置から正確な落点へ向かう。配置順やグループの並びは変更しない。
     requestAnimationFrame(() => {
         if (!flyTile.isConnected) return;
         flyTile.style.opacity = '1';
 
-        const lift = Math.min(96, Math.max(28, Math.abs(dy) * 0.28 + 24));
         const endTransform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) scale(${scale.toFixed(4)}) rotate(0deg)`;
 
-        // Web Animations API が使えない環境では、従来の直線移動にフォールバックする。
+        // Web Animations API が使えない環境では、素直な直線移動にフォールバックする。
         if (typeof flyTile.animate !== 'function') {
             flyTile.style.transition = `transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1)`;
             flyTile.style.transform = endTransform;
@@ -4169,9 +4171,16 @@ function animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { 
         }
 
         const animation = flyTile.animate([
-            { transform: 'translate(0px, 0px) scale(1) rotate(0deg)', offset: 0, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
-            { transform: `translate(${(dx * 0.32).toFixed(2)}px, ${(dy * 0.32 - lift).toFixed(2)}px) scale(1.1) rotate(-5deg)`, offset: 0.4, easing: 'ease-in-out' },
-            { transform: `translate(${(dx * 0.72).toFixed(2)}px, ${(dy * 0.72 - lift * 0.5).toFixed(2)}px) scale(1.04) rotate(3deg)`, offset: 0.75, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+            {
+                transform: 'translate(0px, 0px) scale(1) rotate(0deg)',
+                offset: 0,
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+            },
+            {
+                transform: `translate(${(dx * 0.7).toFixed(2)}px, ${(dy * 0.2).toFixed(2)}px) scale(1.05) rotate(0deg)`,
+                offset: 0.5,
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+            },
             { transform: endTransform, offset: 1 }
         ], { duration, easing: 'linear', fill: 'forwards' });
 
