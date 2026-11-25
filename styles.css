@@ -983,12 +983,6 @@ body.in-game .action-btn {
     color: rgba(255, 244, 214, 0.78);
 }
 
-.selection-hint {
-    min-height: 1.3rem;
-    font-size: 0.88rem;
-    color: rgba(255, 244, 214, 0.72);
-}
-
 /* 中央タイマー：数値はバーの上 */
 .hud-center #timer-display {
     font-size: 2.6rem;
@@ -1258,22 +1252,6 @@ body.in-game .time-extension-slot {
 }
 
 .mode-btn:hover::before {
-    width: 400px;
-    height: 400px;
-}
-
-.mode-btn.keyboard-nav-active,
-.nav-back-btn.keyboard-nav-active,
-.tutorial-btn.keyboard-nav-active {
-    transform: translateY(-6px) scale(1.04);
-    border-color: rgba(242, 208, 138, 0.9);
-    box-shadow:
-        0 16px 48px rgba(0, 0, 0, 0.45),
-        0 0 48px rgba(217, 178, 111, 0.42),
-        inset 0 1px 0 rgba(255, 255, 255, 0.22);
-}
-
-.mode-btn.keyboard-nav-active::before {
     width: 400px;
     height: 400px;
 }
@@ -1580,13 +1558,6 @@ body.low-power .selectable-tile:hover {
     transform: none !important;
 }
 
-body.low-power .mode-btn.keyboard-nav-active,
-body.low-power .nav-back-btn.keyboard-nav-active,
-body.low-power .tutorial-btn.keyboard-nav-active {
-    transform: none !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28) !important;
-}
-
 body.low-power .mode-btn::before,
 body.low-power .selectable-tile::before {
     display: none !important;
@@ -1599,6 +1570,16 @@ body.low-power .incorrect-selected {
     animation: none !important;
     transform: none !important; /* アニメーションだけでなく、静的な transform も無効化 */
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important; /* 負荷の低い単一の影に統一 */
+}
+
+/* 低消費電力時は光や跳ねの演出だけを省略する */
+body.low-power .breakdown-fly-tile {
+    filter: none !important;
+}
+
+body.low-power .breakdown-target-tile.is-arrived,
+body.low-power .breakdown-target-slot.is-filled {
+    animation: none !important;
 }
 
 body.low-power .timer-value,
@@ -2099,6 +2080,14 @@ body.effects-paused .confetti {
     border-color: rgba(95, 209, 166, 0.45);
     background: rgba(95, 209, 166, 0.08);
     box-shadow: inset 0 0 0 1px rgba(95, 209, 166, 0.12);
+    /* 牌が収まった瞬間だけ枠を光らせる（配置そのものは変更しない） */
+    animation: breakdown-slot-flash 0.5s ease-out;
+}
+
+@keyframes breakdown-slot-flash {
+    0% { box-shadow: 0 0 0 0 rgba(95, 209, 166, 0.5), inset 0 0 0 1px rgba(95, 209, 166, 0.12); }
+    60% { box-shadow: 0 0 16px 4px rgba(95, 209, 166, 0.3), inset 0 0 0 1px rgba(95, 209, 166, 0.35); }
+    100% { box-shadow: 0 0 0 0 rgba(95, 209, 166, 0), inset 0 0 0 1px rgba(95, 209, 166, 0.12); }
 }
 
 .breakdown-target-row {
@@ -2150,6 +2139,14 @@ body.effects-paused .confetti {
     visibility: visible;
     filter: saturate(1);
     transform: none;
+    /* 到着した牌は少し跳ねてから収まる */
+    animation: breakdown-landing 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes breakdown-landing {
+    0% { transform: scale(0.82); }
+    55% { transform: scale(1.12); }
+    100% { transform: scale(1); }
 }
 
 .breakdown-animation-layer {
@@ -2165,6 +2162,11 @@ body.effects-paused .confetti {
     opacity: 0;
     z-index: 4;
     pointer-events: none;
+    /* 移動中の牌だけ金色に光らせ、軌道を追いやすくする */
+    border-color: rgba(242, 208, 138, 0.9) !important;
+    filter: drop-shadow(0 0 10px rgba(242, 208, 138, 0.85))
+            drop-shadow(0 10px 14px rgba(0, 0, 0, 0.45));
+    will-change: transform;
 }
 
 .breakdown-winning-tile {

@@ -25,16 +25,14 @@ const translations = {
         selectWaiting: "🎯 待ち牌をすべて選んでください 🎯",
         submitAnswer: "✨ 回答する ✨",
         selectionStatusIdle: "少なくとも1枚の待ち牌を選んでください",
-        selectionStatusSelected: "{count}枚選択中。Enterで回答できます",
+        selectionStatusSelected: "{count}枚選択中",
         selectionStatusLocked: "{count}枚選択済み。結果表示中は変更できません",
-        selectionHintActive: "キーボードは 1〜9 で選択、Enter で回答できます",
-        selectionHintLocked: "この画面ではキーボード操作は無効です",
         resultCorrectSelected: "正しく選べた牌",
         resultMissedTiles: "見逃した待ち牌",
         resultIncorrectSelected: "誤って選んだ牌",
         breakdownHowTitle: "待ち牌の並び替え（1雀頭 + 4面子）",
         breakdownSortedHand: "理牌済みの和了形",
-        breakdownTarget: "牌型の並べ替え",
+        breakdownTarget: "牌形の並べ替え",
         breakdownPrevWait: "前の待ち",
         breakdownNextWait: "次の待ち",
         breakdownCounter: "{current}/{total}",
@@ -150,7 +148,7 @@ const translations = {
         tutorialRealHintFallback: "ヒント：この問題は明確な除外牌が少ない形です。中張（4/5/6）から順に仮追加して、4面子1雀頭になるかを確認しましょう。",
         tutorialRealAnswerText: "正解：待ちは {waits}。",
         tutorialRealBreakdownTitle: "待ち牌ごとの並び替え（1雀頭 + 4面子）",
-        tutorialWaitTierLabel: "教學難易度：",
+        tutorialWaitTierLabel: "難易度：",
         tutorialWaitTierEasyDesc: "1〜3面待ち",
         tutorialWaitTierMediumDesc: "4〜6面待ち",
         tutorialWaitTierHardDesc: "7〜9面待ち",
@@ -180,10 +178,8 @@ const translations = {
         selectWaiting: "🎯 Select ALL Winning Tiles (Waits) 🎯",
         submitAnswer: "✨ Submit ✨",
         selectionStatusIdle: "Select at least 1 waiting tile",
-        selectionStatusSelected: "{count} selected. Press Enter to submit",
+        selectionStatusSelected: "{count} selected",
         selectionStatusLocked: "{count} selected. Selection is locked right now",
-        selectionHintActive: "Keyboard: press 1-9 to toggle tiles, Enter to submit",
-        selectionHintLocked: "Keyboard shortcuts are disabled on this screen",
         resultCorrectSelected: "Correctly selected",
         resultMissedTiles: "Missed waits",
         resultIncorrectSelected: "Incorrect selections",
@@ -335,10 +331,8 @@ const translations = {
         selectWaiting: "🎯 請選出所有聽的牌 🎯",
         submitAnswer: "✨ 確認答案 ✨",
         selectionStatusIdle: "請至少選擇 1 張聽牌",
-        selectionStatusSelected: "已選擇 {count} 張，可按 Enter 送出",
+        selectionStatusSelected: "已選擇 {count} 張",
         selectionStatusLocked: "已選擇 {count} 張，目前不能再修改",
-        selectionHintActive: "鍵盤可用 1-9 選牌，Enter 送出答案",
-        selectionHintLocked: "此畫面已停用鍵盤快捷操作",
         resultCorrectSelected: "正確選中的牌",
         resultMissedTiles: "漏選的聽牌",
         resultIncorrectSelected: "誤選的牌",
@@ -600,7 +594,8 @@ let resultActionCache = {};
 const breakdownAnimationState = {
     currentIndex: 0,
     playToken: 0,
-    timerIds: []
+    timerIds: [],
+    flightAnimations: []
 };
 
 function getResultActionElements() {
@@ -2403,62 +2398,7 @@ const tileRenderCache = {
     possibleSlots: new Map()
 };
 
-function isKeyboardEditableTarget(target) {
-    if (!target) return false;
-    const tagName = target.tagName?.toLowerCase();
-    return tagName === 'input' || tagName === 'textarea' || tagName === 'select' || !!target.isContentEditable;
-}
-
-function clearKeyboardMenuHighlight() {
-    document.querySelectorAll('.keyboard-nav-active').forEach((button) => {
-        button.classList.remove('keyboard-nav-active');
-    });
-}
-
-function canHandleGameKeyboardInput() {
-    const gameScreen = getElementByIdCached('game-screen');
-    const tutorialScreen = getElementByIdCached('tutorial-screen');
-    const resultSection = getElementByIdCached('result-section');
-    const pauseOverlay = getElementByIdCached('pause-overlay');
-
-    return !!gameScreen &&
-        !gameScreen.classList.contains('hidden') &&
-        isActiveQuestion() &&
-        (!tutorialScreen || tutorialScreen.classList.contains('hidden')) &&
-        (!resultSection || resultSection.classList.contains('hidden')) &&
-        (!pauseOverlay || pauseOverlay.classList.contains('hidden'));
-}
-
-function handleGlobalKeyboardNavigation(event) {
-    if (event.defaultPrevented) return;
-    if (event.altKey || event.ctrlKey || event.metaKey) return;
-    if (isKeyboardEditableTarget(event.target)) return;
-
-    const key = event.key;
-    if (!canHandleGameKeyboardInput()) {
-        clearKeyboardMenuHighlight();
-        return;
-    }
-
-    if (/^[1-9]$/.test(key)) {
-        const tile = Number(key);
-        const tileButton = tileRenderCache.possibleSlots.get(tile)?.wrapper || getElementByIdCached('possible-tiles')?.querySelector(`[data-tile="${tile}"]`);
-        if (tileButton) {
-            event.preventDefault();
-            toggleTileSelection(tile, tileButton);
-        }
-        return;
-    }
-
-    if (key === 'Enter') {
-        const submitBtn = getElementByIdCached('submit-btn');
-        if (submitBtn && !submitBtn.disabled) {
-            event.preventDefault();
-            submitBtn.click();
-        }
-    }
-}
-
+// キーボードによる牌選択と回答送出は行わない。操作は画面上のタップのみ。
 // 毎回 innerHTML を作り直さず、必要数までだけノードを増やして使い回す。
 function ensureHandTileSlots(count) {
     const container = getElementByIdCached('hand-tiles');
@@ -2840,7 +2780,6 @@ function updateInteractionState() {
 
     updateTimeExtensionButton();
     updateSelectionStatus();
-    clearKeyboardMenuHighlight();
 }
 
 function updateTimerDisplay() {
@@ -3255,7 +3194,6 @@ function updateQuestionDisplay() {
 
 function updateSelectionStatus() {
     const status = getElementByIdCached('selection-status');
-    const hint = getElementByIdCached('selection-hint');
     const count = gameState.selectedTiles?.size || 0;
 
     if (status) {
@@ -3273,11 +3211,6 @@ function updateSelectionStatus() {
         }
     }
 
-    if (hint) {
-        hint.textContent = isActiveQuestion()
-            ? t('selectionHintActive')
-            : t('selectionHintLocked');
-    }
 }
 
 function renderHand() {
@@ -3454,7 +3387,8 @@ function highlightAnswers() {
 
 function displayCorrectAnswer() {
     const container = document.getElementById('correct-answer-display');
-    const selected = Array.from(gameState.selectedTiles);
+    // 選択した順番ではなく、牌番号の昇順で結果を表示する。
+    const selected = Array.from(gameState.selectedTiles).sort((a, b) => a - b);
     const correct = gameState.waitingTiles;
     const groups = [
         {
@@ -4009,6 +3943,8 @@ function clearBreakdownAnimationTimers() {
     breakdownAnimationState.playToken += 1;
     breakdownAnimationState.timerIds.forEach((timerId) => clearTimeout(timerId));
     breakdownAnimationState.timerIds = [];
+    breakdownAnimationState.flightAnimations.forEach((animation) => animation.cancel());
+    breakdownAnimationState.flightAnimations = [];
 }
 
 function getSortedBreakdownWaitingTiles() {
@@ -4184,51 +4120,73 @@ function animateBreakdownTileTransfer(animationLayer, sourceNode, targetNode, { 
     const targetRect = targetNode.getBoundingClientRect();
 
     // 座標やサイズが正しく取得できない場合は、
-// 中途半端なアニメーションを避けて即時反映にフォールバックする。
-if (!layerRect.width || !layerRect.height || !sourceRect.width || !targetRect.width) {
+    // 中途半端なアニメーションを避けて即時反映にフォールバックする。
+    if (!layerRect.width || !layerRect.height || !sourceRect.width || !targetRect.width) {
+        sourceNode.classList.add('is-dealt');
+        targetNode.classList.add('is-arrived');
+        return null;
+    }
+
+    // 元の牌 DOM を複製し、
+    // 実際に飛んで見える専用の「飛行牌」要素を作る。
+    const flyTile = sourceNode.cloneNode(true);
+
+    // 元牌や到着済み牌の状態クラスは飛行牌には不要なので外し、
+    // 飛行専用クラスだけを付与する。
+    flyTile.classList.remove('is-dealt', 'is-arrived');
+    flyTile.classList.add('breakdown-fly-tile');
+
+    // 飛行牌の初期サイズと初期位置を、移動元牌と完全に一致させる。
+    flyTile.style.width = `${sourceRect.width}px`;
+    flyTile.style.height = `${sourceRect.height}px`;
+    flyTile.style.left = `${sourceRect.left - layerRect.left}px`;
+    flyTile.style.top = `${sourceRect.top - layerRect.top}px`;
+    flyTile.style.transform = 'translate(0px, 0px) scale(1)';
+
+    // 飛行牌をアニメーションレイヤーへ載せ、
+    // 元の牌はその瞬間に「配り済み」として画面から消す。
+    animationLayer.appendChild(flyTile);
     sourceNode.classList.add('is-dealt');
-    targetNode.classList.add('is-arrived');
-    return null;
-}
 
-// 元の牌 DOM を複製し、
-// 実際に飛んで見える専用の「飛行牌」要素を作る。
-const flyTile = sourceNode.cloneNode(true);
+    const dx = targetRect.left - sourceRect.left;
+    const dy = targetRect.top - sourceRect.top;
+    const scale = targetRect.width / Math.max(sourceRect.width, 1);
 
-// 元牌や到着済み牌の状態クラスは飛行牌には不要なので外し、
-// 飛行専用クラスだけを付与する。
-flyTile.classList.remove('is-dealt', 'is-arrived');
-flyTile.classList.add('breakdown-fly-tile');
+    // レイアウト確定後の次フレームで、弧を描きながら傾いて飛ぶ演出を開始する。
+    // 移動先や順序を変えず、見た目だけを滑らかにしている。
+    requestAnimationFrame(() => {
+        if (!flyTile.isConnected) return;
+        flyTile.style.opacity = '1';
 
-// 飛行牌の初期サイズと初期位置を、移動元牌と完全に一致させる。
-flyTile.style.width = `${sourceRect.width}px`;
-flyTile.style.height = `${sourceRect.height}px`;
-flyTile.style.left = `${sourceRect.left - layerRect.left}px`;
-flyTile.style.top = `${sourceRect.top - layerRect.top}px`;
+        const lift = Math.min(96, Math.max(28, Math.abs(dy) * 0.28 + 24));
+        const endTransform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) scale(${scale.toFixed(4)}) rotate(0deg)`;
 
-// 最初は「まだ動いていない状態」にしておき、
-// 次のフレームで transform を更新して移動を発火させる。
-flyTile.style.transform = 'translate(0px, 0px) scale(1)';
-flyTile.style.transition = `transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 600ms ease`;
+        // Web Animations API が使えない環境では、従来の直線移動にフォールバックする。
+        if (typeof flyTile.animate !== 'function') {
+            flyTile.style.transition = `transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+            flyTile.style.transform = endTransform;
+            return;
+        }
 
-// 飛行牌をアニメーションレイヤーへ載せ、
-// 元の牌はその瞬間に「配り済み」として画面から消す。
-animationLayer.appendChild(flyTile);
-sourceNode.classList.add('is-dealt');
+        const animation = flyTile.animate([
+            { transform: 'translate(0px, 0px) scale(1) rotate(0deg)', offset: 0, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+            { transform: `translate(${(dx * 0.32).toFixed(2)}px, ${(dy * 0.32 - lift).toFixed(2)}px) scale(1.1) rotate(-5deg)`, offset: 0.4, easing: 'ease-in-out' },
+            { transform: `translate(${(dx * 0.72).toFixed(2)}px, ${(dy * 0.72 - lift * 0.5).toFixed(2)}px) scale(1.04) rotate(3deg)`, offset: 0.75, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+            { transform: endTransform, offset: 1 }
+        ], { duration, easing: 'linear', fill: 'forwards' });
 
-// レイアウト確定後の次フレームで透明度と移動先 transform を与え、
-// ブラウザに「今ここからあそこへ飛ぶ」アニメーションを実行させる。
-requestAnimationFrame(() => {
-    flyTile.style.opacity = '1';
+        breakdownAnimationState.flightAnimations.push(animation);
+        if (animation.finished && typeof animation.finished.then === 'function') {
+            animation.finished.then(() => {
+                const index = breakdownAnimationState.flightAnimations.indexOf(animation);
+                if (index >= 0) breakdownAnimationState.flightAnimations.splice(index, 1);
+            }).catch(() => {});
+        }
+    });
 
-    // 移動量は「移動先座標 - 移動元座標」で求め、
-    // 必要なら移動先サイズに合わせて scale も同時に調整する。
-    flyTile.style.transform = `translate(${(targetRect.left - sourceRect.left).toFixed(2)}px, ${(targetRect.top - sourceRect.top).toFixed(2)}px) scale(${(targetRect.width / Math.max(sourceRect.width, 1)).toFixed(4)})`;
-});
-
-// 呼び出し元で完了後に remove() できるよう、
-// 生成した飛行牌要素を返す。
-return flyTile;
+    // 呼び出し元で完了後に remove() できるよう、
+    // 生成した飛行牌要素を返す。
+    return flyTile;
 }
 
 function createBreakdownStageElement(displayData, { compact = false, tileType = gameState.tileType } = {}) {
@@ -4702,7 +4660,6 @@ function selectLanguage(lang) {
     }
 
     showExclusiveScreen('mode-screen', { fadeIn: true });
-    clearKeyboardMenuHighlight();
 }
 
 function ensureGoogleFontsTcLoaded() {
@@ -4728,7 +4685,6 @@ function backToLanguageSelection() {
     lockMenuNavigation(220);
 
     showExclusiveScreen('language-screen', { fadeIn: true });
-    clearKeyboardMenuHighlight();
 }
 
 function backToModeSelection() {
@@ -4740,7 +4696,6 @@ function backToModeSelection() {
     gameState.difficulty = null;
 
     showExclusiveScreen('mode-screen', { fadeIn: true });
-    clearKeyboardMenuHighlight();
 }
 
 function showPauseOverlay() {
@@ -4805,7 +4760,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }).then(() => {
             if (languageScreen) showExclusiveScreen('language-screen', { fadeIn: true });
-            clearKeyboardMenuHighlight();
         });
     });
 
@@ -4966,9 +4920,6 @@ function closeTutorial() {
     window.addEventListener('pageshow', () => {
         scheduleApplyUiScale();
         resumeWebAudioContextIfNeeded();
-        clearKeyboardMenuHighlight();
     });
-
-    document.addEventListener('keydown', handleGlobalKeyboardNavigation);
 });
  
